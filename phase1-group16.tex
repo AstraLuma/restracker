@@ -1,0 +1,128 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb,bbm,graphicx}
+
+\title{ResTracker \\ Database for WPI club room reservations}
+\author{Group 16 \\ Stephanie Fuller(sfuller@wpi.edu) \\ Sam LaFleche
+(shl@wpi.edu) \\ Jamie Bliss (jebliss@wpi.edu)}
+
+\begin{document}
+
+\maketitle
+
+\section{Description}
+As it currently stands the WPI administration does not have a good tool for
+managing what rooms have been reserved by student organizations. Room
+reservations are often lost, forgotten about, or double booked leading to
+frustration on the part of organizations and difficulty running events. Having a
+single database where room reservations could be tracked, added and deleted
+would mitigate this problem.
+
+\section{Requirements}
+%Jamie will finish this later. 
+\begin{itemize}
+\item  Students can create events for clubs and reserve rooms for them. 
+\item Users can comment on events. 
+\item The student who created an event or an administrator can edit an event. 
+\item Administrators shall be able to remove room reserverations should it
+prove necessary. 
+\item Any user shall be able to view information about any event, room, or
+reservation.
+\item A reservation shall include who booked it, what administrator approved it,
+when it was booked, and what it is being used for. 
+\item The system notifies the club and user which created it with any changes to
+an event or reservation.
+\item Students shall be able to search for a room.
+\item Students shall be able to get a list of what rooms a club has reserved and when
+they are reserved for.
+\item All changes (eg additions, deletions, and mutations) shall be logged, including the
+user who made the change, the event that was changed, and the old and new data.
+\item Administrators shall be able to view recent changes to the database, and
+students can view changes to events of their groups. 
+\item The database shall be usable by multiple users at once.
+\item The database shall have various levels of users with various levels of
+privileges. Some users have privileges to read, and some users have privileges to
+read/write.
+\item The database shall have a UI capable of showing relevant information.
+\item For each reservation the student who made the reservation must be a member
+of the group the reservation is for. 
+\end{itemize}
+
+\section{}
+\includegraphics{ERmodel.eps}
+
+\section{Additional Constraints}
+For each reservation the student who made the reservation must be a member of
+the group the reservation is for. 
+
+\section{}
+%\begin{matrix}
+%users, groups, events, reservations, rooms & -- view, change fields, create,
+%query \\
+%events & -- add/remove reservations, comment \\
+%reservations & -- approve \\
+%group & -- add/remove user \\
+%users & -- login, logout \\
+%\begin{matrix}
+
+\begin{tabular}{ccc}
+ objects & actions & types of users\\
+ users & login & all \\
+users & logout & all \\
+users & view & all \\
+users & change fields & administator, self \\
+users & create & administrator, anonomous \\
+users & query/search & all \\
+groups & add user & admininstrator, group user\\
+groups & remove user & administator, group user, self\\ 
+groups & view & all\\
+groups & change fields & administator, group user\\
+groups & create & administator \\
+groups & query/search & all \\
+reservations & approve & administator \\
+reservations & change fields & administator, event creator, group user \\
+reservations & view & all \\
+reservations & query/search & all \\
+events & remove reservation & administrator, event creator, group user \\
+events & add reservation & administator, event creator, group user\\
+events & view & all \\
+events & change fields & administator, event creator, group user \\
+events & query/serach & all \\
+\end{tabular}
+
+\section{}
+We came up with design in 5 definitive iterations. 
+\begin{enumerate}
+\item initial idea
+\item breaking out user types
+\item adding events
+\item adding comments
+\item groups are users
+\end{enumerate}
+
+Most of the ER model was done by collaberative brainstorming. However, we did
+have a long discussion as to whether reservation should be an entity or a
+relation.  
+
+%Didn't consult, but had officers of different clubs in group. 
+
+\section{}
+%after class thursday in octowedge and 3rd floor fuller wed at 3.
+%also just generally be around octowedge and talk throughout week.
+
+%this past week we met once
+
+%use git, git-web possibly 
+
+\section{}
+%All conseptual work was joint. 
+%Some examples are
+%Jamie - comments
+%Steph - group as user, event as entity
+%Sam - inigrate comments into system 
+
+%Wrote up ER model - Stephanie
+%Function ideas - Jamie
+%Requirements - Sam 
+
+\end{document}
+
