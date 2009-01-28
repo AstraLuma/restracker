@@ -1,0 +1,47 @@
+graph{
+room [shape=box];
+club [shape=box];
+event [shape=box];
+user [shape=box];
+admin [shape=box];
+student [shape=box];
+
+isaadmin [shape=triangle,label=isa];
+isastudent [shape=triangle,label=isa];
+
+isMemberOf [shape=diamond];
+runBy [shape=diamond];
+reservation [shape=diamond]; //make this an entity and relations not one-to-one?
+
+
+user--isastudent--student;
+user--isaadmin--admin;
+
+student--isMemberOf [label="0,*"];
+isMemberOf--club [label="0,*"];
+
+event--runBy [label="1,*"];
+runBy--club [label="0,*"];
+
+//primary key of reservation is room and time?
+student--reservation [label="0,*"];
+room--reservation [label="0,*"];
+reservation--event [label="0,*"]; //events can be in un-reservable places
+admin--reservation [label="0,*"];
+
+//attributes
+name--user;
+idNum--user;
+student--year;
+
+club--class;
+club--description;
+club--clubName;
+
+building--room;
+roomNum--room;
+occupancy--room;
+
+event--eventName;
+event--description;
+}

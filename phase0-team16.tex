@@ -2,7 +2,8 @@
 \usepackage{amsmath,amssymb,bbm}
 
 \title{Project Intent\\Database for WPI club room reservation}
-\author{Stephanie Fuller, Sam LaFleche, Jamie Bliss}
+\author{Stephanie Fuller (sfuller@wpi.edu)\\ Sam LaFleche (shl@wpi.edu)\\ Jamie
+Bliss (jebliss@wpi.edu)}
 
 \begin{document}
 
@@ -10,19 +11,19 @@
 
 \section{Description}
 As it currently stands the WPI administration does not have a good tool for
-managing what rooms have been reserved by student organisations. Room
+managing what rooms have been reserved by student organizations. Room
 reservations are often lost, forgotten about, or double booked leading to
-frustration on the part of organisations and difficulty running events. Having a
+frustration on the part of organizations and difficulty running events. Having a
 single database where room reservations could be tracked, added and deleted
-would mitagate this problem.
+would mitigate this problem.
 
 \section{Requirements}
 \begin{itemize}
 \item 
-Students shall be able to reserve a speific room by date and tine.
+Students shall be able to reserve a specific room by date and tine.
 \item
 Administer shall be able to remove room reservations should it prove
-nesscessary.
+necessary.
 \item
 Students shall be able to view information about booked rooms.
 \item
@@ -37,15 +38,49 @@ free, time free, or specific room.
 Students shall be able to get a list of what rooms a club has reserved and when
 they are reserved for.
 \item
+All changes (eg additions, deletions, and mutations) shall be logged, including the
+user who made the change, the event that was changed, and the old and new
+data.
+\item
 Users shall be able to view recent changes to the database.
 \item
-The database shall be able to be accessed over a netwrok.
+The database shall be usable by multiple users at once.
 \item
-The database shall have vairous levels of users with various levels of
-privlages.
+The database shall have various levels of users with various levels of
+privileges. Some users have privileges to read, and some users have privileges to
+read/write.
 \item
-The database shall have a UI capable of showing relevent information.
+The database shall have a UI capable of showing relevant information.
 \end{itemize}
+
+\section{ER description}
+This database will have at least the following entities:
+\begin{itemize}
+\item users
+\item groups
+\item rooms
+\end{itemize}
+\\
+The following relations are also necessary:
+\begin{itemize}
+\item reservation - relation between two users, a group, and a room. That is a
+room is reserved by someone for a group and a user approved this. 
+\item member of - many to many relation between users and groups. That is, users
+are members of groups.
+\end{itemize}
+\\
+There will also be some sort of table(s) for logging, but we have not been able to
+map this to ER modeling. 
+
+%entities
+%users
+%groups
+%rooms
+%relations
+%reservations - two users, group, room
+%"in group" - many to many
+%tables of some sort
+%logging
 
 %\section{Expected Implementation}
 %\begin{itemize}
