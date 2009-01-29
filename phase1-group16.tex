@@ -17,38 +17,76 @@ frustration on the part of organizations and difficulty running events. Having a
 single database where room reservations could be tracked, added and deleted
 would mitigate this problem.
 
+%\section{Requirements}
+%%Jamie will finish this later. 
+%\begin{itemize}
+%\item  Students can create events for clubs and reserve rooms for them. 
+%\item Users can comment on events. 
+%\item The student who created an event or an administrator can edit an event. 
+%\item Administrators shall be able to remove room reserverations should it
+%prove necessary. 
+%\item Any user shall be able to view information about any event, room, or
+%reservation.
+%\item A reservation shall include who booked it, what administrator approved it,
+%when it was booked, and what it is being used for. 
+%\item The system notifies the club and user which created it with any changes to
+%an event or reservation.
+%\item Students shall be able to search for a room.
+%\item Students shall be able to get a list of what rooms a club has reserved and when
+%they are reserved for.
+%\item All changes (eg additions, deletions, and mutations) shall be logged, including the
+%user who made the change, the event that was changed, and the old and new data.
+%\item Administrators shall be able to view recent changes to the database, and
+%students can view changes to events of their groups. 
+%\item The database shall be usable by multiple users at once.
+%\item The database shall have various levels of users with various levels of
+%privileges. Some users have privileges to read, and some users have privileges to
+%read/write.
+%\item The database shall have a UI capable of showing relevant information.
+%\item For each reservation the student who made the reservation must be a member
+%of the group the reservation is for. 
+%\end{itemize}
+
 \section{Requirements}
-%Jamie will finish this later. 
 \begin{itemize}
-\item  Students can create events for clubs and reserve rooms for them. 
-\item Users can comment on events. 
-\item The student who created an event or an administrator can edit an event. 
-\item Administrators shall be able to remove room reserverations should it
-prove necessary. 
-\item Any user shall be able to view information about any event, room, or
-reservation.
-\item A reservation shall include who booked it, what administrator approved it,
-when it was booked, and what it is being used for. 
-\item The system notifies the club and user which created it with any changes to
-an event or reservation.
-\item Students shall be able to search for a room.
-\item Students shall be able to get a list of what rooms a club has reserved and when
-they are reserved for.
-\item All changes (eg additions, deletions, and mutations) shall be logged, including the
-user who made the change, the event that was changed, and the old and new data.
-\item Administrators shall be able to view recent changes to the database, and
-students can view changes to events of their groups. 
+\item Users are broken up into Administrators, Students, and Groups
+\item Students and administrators can create events.
+\item Events have sponsoring groups, name, description, and room reservation(s).
+\item A reservation shall include who booked it, what administrator
+approved it (if any), when it was booked, when it is being reserved,
+and the event it is for.
+\item An administrator must approve a reservation before it is official.
+\item Users can comment on events. When they comment on events they can rate the
+event.
+\item Users can reply to comments. When they reply, they can rate the comment. 
+\item The student who created the event, a sponsoring group, or an
+administrator can edit an event.
+\item Administrators shall be able to remove room reserverations
+should it prove necessary.
+\item Any user shall be able to view information about any event,
+room, or reservation.
+\item The system notifies the group and user which created it with any
+changes to an event or reservation.
+\item Users shall be able to search for a room.
+\item Users shall be able to get a list of what rooms a group has
+reserved and when they are reserved for.
+\item All changes (eg additions, deletions, and mutations) shall be
+logged, including the user who made the change, the event that was
+changed, and the old and new data.
+\item Administrators shall be able to view recent changes to the database
+\item Students can view changes to events of their groups.
+\item Groups can view changes to events they're sponsoring.
 \item The database shall be usable by multiple users at once.
-\item The database shall have various levels of users with various levels of
-privileges. Some users have privileges to read, and some users have privileges to
-read/write.
+\item The database shall have various levels of users with various
+levels of privileges. Some users have privileges to read, and some
+users have privileges to read/write.
 \item The database shall have a UI capable of showing relevant information.
-\item For each reservation the student who made the reservation must be a member
-of the group the reservation is for. 
+\item For each reservation the student who made the reservation must
+be a member of the group the reservation is for.
 \end{itemize}
 
 \section{}
-\includegraphics{ERmodel.eps}
+\scalebox{.4}{\includegraphics[angle=90]{ERmodel.eps}}
 
 \section{Additional Constraints}
 For each reservation the student who made the reservation must be a member of
@@ -130,7 +168,7 @@ We will be using git throughout this project.
 
 \section{}
 Generally, all of our work was done jointly. All conceptual work was done
-jointly. Specifically, Stephanie wrote up the ER model, and did less in the
+jointly. Stephanie wrote up the ER model, and did less in the
 functions and descriptions of the requirements. 
 
 Some examples of specific contributions by different people was Jamie coming up
