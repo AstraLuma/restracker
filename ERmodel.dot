@@ -5,7 +5,7 @@ event [shape=box];
 user [shape=box];
 admin [shape=box];
 student [shape=box];
-session [shape=box];
+//session [shape=box];
 comment [shape=box];
 
 isaadmin [shape=triangle,label=isa];
@@ -15,15 +15,16 @@ isagroup [shape=triangle,label=isa];
 isMemberOf [shape=diamond];
 runBy [shape=diamond];
 reservation [shape=diamond]; //make this an entity and relations not one-to-one?
-loggedIn [shape=diamond];
+//loggedIn [shape=diamond];
 eventComment [shape=diamond];
 madeby [shape=diamond];
 reply [shape=diamond];
 
 stuff[peripheries=2];
 
-session--loggedIn [label="0,1"];
-loggedIn--user [label="0,*"];
+//session--loggedIn [label="0,1"];
+//loggedIn--user [label="0,*"];
+
 event--eventComment [label="0,*"];
 eventComment--comment [label="1,1"];
 comment--madeby [label="1,1"];
@@ -33,7 +34,8 @@ reply--comment [label="0,1"];
 
 user--isastudent--student;
 user--isaadmin--admin;
-users--isagroup--group;
+user--isagroup--group;
+
 student--isMemberOf [label="0,*"];
 isMemberOf--group [label="0,*"];
 
@@ -42,7 +44,7 @@ runBy--group [label="0,*"];
 
 //primary key of reservation is room and time?
 student--reservation [label="0,*"];
-room--reservation [label="0,*"];
+reservation--room [label="0,*"];
 reservation--event [label="0,*"]; //events can be in un-reservable places
 admin--reservation [label="0,*"];
 
@@ -64,12 +66,16 @@ stuff--room;
 
 event--eventName;
 event--eventDescription;
-event--id; //key
+event--eventId; //key
 
 reservation--time;
 reservation--timeBooked;
 
+rating--eventComment;
+
+commentRating--comment;
 when--comment;
 txt--comment;
-comment--id; //key
+comment--commentId; //key
+
 }

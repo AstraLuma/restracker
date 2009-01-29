@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{amsmath,amssymb,bbm,graphicx}
+\usepackage{graphicx,booktabs}
 
 \title{ResTracker \\ Database for WPI club room reservations}
 \author{Group 16 \\ Stephanie Fuller(sfuller@wpi.edu) \\ Sam LaFleche
@@ -64,8 +64,10 @@ the group the reservation is for.
 %users & -- login, logout \\
 %\begin{matrix}
 
-\begin{tabular}{ccc}
+\begin{tabular}{lll}
+\toprule
  objects & actions & types of users\\
+\midrule
  users & login & all \\
 users & logout & all \\
 users & view & all \\
@@ -87,6 +89,7 @@ events & add reservation & administator, event creator, group user\\
 events & view & all \\
 events & change fields & administator, event creator, group user \\
 events & query/serach & all \\
+\bottomrule
 \end{tabular}
 
 \section{}
@@ -103,17 +106,38 @@ Most of the ER model was done by collaberative brainstorming. However, we did
 have a long discussion as to whether reservation should be an entity or a
 relation.  
 
-%Didn't consult, but had officers of different clubs in group. 
+We didn't consult any domain experts for our application domain. We did however
+use the experience of two of the three of having been officers in a club who had
+experience booking events with the current method. 
 
 \section{}
-%after class thursday in octowedge and 3rd floor fuller wed at 3.
-%also just generally be around octowedge and talk throughout week.
+We are groing to have two offical meetings as well as unoffical meetings
+throughout the week. We are going to meet after class Thursday in the octowedge
+to discuss what we will do for the next week include what individuals will do.
+We will also meet at 3 PM on Wedensdays in the lounge on the 3rd floor of
+Fuller, so we could go to see the TAs if we find it necessary. While there would
+not be other official meetings, we will generally see each other around in the
+octowedge and discuss the project at those times. This is doable because we know
+each other outside of this class. 
 
-%this past week we met once
+This past week we only met once, Wedensday at 3 PM, however this was because of
+the schedule of Stephanie, while she had to deal with the death of her
+grandfather. 
 
-%use git, git-web possibly 
+We will share our partial results by using a distributed version control system.
+We will be using git throughout this project. 
+%use git 
 
 \section{}
+Generally, all of our work was done jointly. All conceptual work was done
+jointly. Specifically, Stephanie wrote up the ER model, and did less in the
+functions and descriptions of the requirements. 
+
+Some examples of specific contributions by different people was Jamie coming up
+with the idea of comments, Sam figuring out how to integrate comments
+in the system, and Stephanie thinking of changing group to a type of user, and
+event to an entity. 
+
 %All conseptual work was joint. 
 %Some examples are
 %Jamie - comments
