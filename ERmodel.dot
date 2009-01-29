@@ -24,6 +24,7 @@ reply [shape=diamond];
 isIn [shape=diamond];
 uses [shape=diamond];
 runBy [shape=diamond];
+approved [shape=diamond];
 
 //stuff[peripheries=2];
 major [peripheries=2];
@@ -50,11 +51,12 @@ uses--equipment [label="1,*"];
 student--reservation [label="0,*"];
 reservation--room [label="0,*"];
 reservation--event [label="0,*"]; //events can be in un-reservable places
-admin--reservation [label="0,*"];
+admin--approved [label="0,*"];
+approved--reservation [label="0,1"];
 
 //attributes
 subgraph cluster_users{
-
+style=invis;
 user--isastudent--student;
 user--isaadmin--admin;
 user--isagroup--group;
@@ -65,18 +67,29 @@ isMemberOf--group [label="0,*"];
 
 
 subgraph cluster_usergraph {
+style=invis;
+
 name--user;
 email--user; //key
 password--user;
 }
 subgraph cluster_studentgraph{
+style=invis;
+
 student--year;
 student--major;
 }
 
-admin;
+subgraph cluster_admingraph{
+style=invis;
+
+admin--privledges;
+admin--title;
+}
 
 subgraph cluster_groupgraph{
+style=invis;
+
 group--class;
 group--description;
 //group--groupName; //key
@@ -85,6 +98,8 @@ group--description;
 }
 
 subgraph cluster_roomgraph{
+style=invis;
+
 room--building; //key
 room--roomNum; //key
 room--occupancy;
@@ -92,12 +107,17 @@ room--occupancy;
 }
 
 subgraph cluster_eventgraph{
+style=invis;
+
 event--eventName;
 event--eventDescription;
 event--eventId; //key
+event--expectedSize;
 }
 
 subgraph cluster_reservationgraph{
+style=invis;
+
 reservation--time;
 reservation--timeBooked;
 }
@@ -105,9 +125,10 @@ reservation--timeBooked;
 eventComment--rating;
 
 subgraph cluster_commentgraph{
+style=invis;
 
-comment--reply [label="0,*"];
-reply--comment [label="0,1"];
+comment--reply [label="0,* parent"];
+reply--comment [label="0,1 child"];
 
 reply--commentRating;
 when--comment;
@@ -116,6 +137,8 @@ comment--commentId; //key
 }
 
 subgraph cluster_equipmentgraph{
+style=invis;
+
 type--equipment;
 quantity--equipment;
 }
