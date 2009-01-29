@@ -7,6 +7,7 @@ admin [shape=box];
 student [shape=box];
 //session [shape=box];
 comment [shape=box];
+equipment [shape=box];
 
 isaadmin [shape=triangle,label=isa];
 isastudent [shape=triangle,label=isa];
@@ -19,8 +20,11 @@ reservation [shape=diamond]; //make this an entity and relations not one-to-one?
 eventComment [shape=diamond];
 madeby [shape=diamond];
 reply [shape=diamond];
+isIn [shape=diamond];
+uses [shape=diamond];
 
-stuff[peripheries=2];
+
+//stuff[peripheries=2];
 
 //session--loggedIn [label="0,1"];
 //loggedIn--user [label="0,*"];
@@ -39,8 +43,13 @@ user--isagroup--group;
 student--isMemberOf [label="0,*"];
 isMemberOf--group [label="0,*"];
 
+equipment--isIn [label="0,*"];
+isIn--room [label="0,*"];
+
 event--runBy [label="1,*"];
 runBy--group [label="0,*"];
+event--uses [label="0,*"];
+uses--equipment [label="0,*"];
 
 //primary key of reservation is room and time?
 student--reservation [label="0,*"];
@@ -62,7 +71,7 @@ group--groupEmail;
 building--room; //key
 roomNum--room; //key
 occupancy--room;
-stuff--room;
+//stuff--room;
 
 event--eventName;
 event--eventDescription;
