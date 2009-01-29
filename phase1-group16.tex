@@ -50,14 +50,23 @@ would mitigate this problem.
 \section{Requirements}
 \begin{itemize}
 \item Users are broken up into Administrators, Students, and Groups
+\item All users have names, email addresses, and passwords.
+\item Students also have a graduation year and major(s).
+\item Administrators have titles and privledges to remove events or not. 
+\item Groups have descriptions and what class (class 1, class 2, class 3, etc.).
+\item Events have a name, description, ID, and expected size.
 \item Students and administrators can create events.
 \item Events have sponsoring groups, name, description, and room reservation(s).
+\item There are rooms. Rooms have buildings, room numbers, and occupancy.
+\item There is equipment. Equipment is a type of equipment.
+\item Equipment can be in rooms and can be used for events.
+\item When equipment is in a room there is a quantity.
 \item A reservation shall include who booked it, what administrator
 approved it (if any), when it was booked, when it is being reserved,
 and the event it is for.
 \item An administrator must approve a reservation before it is official.
 \item Users can comment on events. When they comment on events they can rate the
-event.
+event. Comments also include when they were made. 
 \item Users can reply to comments. When they reply, they can rate the comment. 
 \item The student who created the event, a sponsoring group, or an
 administrator can edit an event.
@@ -83,14 +92,38 @@ users have privileges to read/write.
 \item The database shall have a UI capable of showing relevant information.
 \item For each reservation the student who made the reservation must
 be a member of the group the reservation is for.
+\item Events can have any number of comments on them, including none.
+\item Comments must be on exactly one event.
+\item Users may make as many comments as they want, including none.
+\item Each comment is made only by one user.
+\item Events are run by one or more clubs. There cannot be an event run by no
+club, but more than one club can run the event. This is as is currently done for
+events at WPI.  
+\item Groups can run any number of events including none. New clubs can have not
+run any events yet. 
+\item Events may or may not use equipment.
+\item Equipment may or may not be used. 
+\item  Students can make reservations, but do not have to do so.
+\item Rooms may be reserved, but do not have to be.
+\item Rooms cannot be booked for more than one event at the same time. 
+\item Events can be in public, non-reservable places.
+\item Events can be in more than one room. Large events can have multiple rooms
+reserved for it.
+\item Admins can approve as many reservations as they want.
+\item Reservations can either be approved or not yet approved.
+\item Students can be members of as many clubs as they want to be, including 0.
+\item Groups can have as many members as they want, including potentially 0 if
+it is a newly created club or members have not yet joined for the year.
 \end{itemize}
 
 \section{}
-\scalebox{.4}{\includegraphics[angle=90]{ERmodel.eps}}
+\scalebox{.42}{\includegraphics[angle=90]{ERmodel.eps}}
 
 \section{Additional Constraints}
 For each reservation the student who made the reservation must be a member of
 the group the reservation is for. 
+
+Also, rooms cannot be booked for two or more events at the same time.
 
 \section{}
 %\begin{matrix}

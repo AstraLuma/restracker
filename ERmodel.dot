@@ -45,7 +45,7 @@ isIn--room [label="0,*"];
 event--runBy [label="1,*"];
 runBy--group [label="0,*"];
 event--uses [label="0,*"];
-uses--equipment [label="1,*"];
+uses--equipment [label="0,*"]; //why was this a 1,*?
 
 //primary key of reservation is room and time?
 student--reservation [label="0,*"];
@@ -140,6 +140,6 @@ subgraph cluster_equipmentgraph{
 style=invis;
 
 type--equipment;
-quantity--equipment;
 }
+quantity--isIn;
 }
