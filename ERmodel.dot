@@ -1,10 +1,12 @@
 graph{
-room [shape=box];
+rankdir=LR;
+
 group [shape=box];
 event [shape=box];
 user [shape=box];
 admin [shape=box];
 student [shape=box];
+room [shape=box];
 //session [shape=box];
 comment [shape=box];
 equipment [shape=box];
@@ -14,7 +16,6 @@ isastudent [shape=triangle,label=isa];
 isagroup [shape=triangle,label=isa];
 
 isMemberOf [shape=diamond];
-runBy [shape=diamond];
 reservation [shape=diamond]; //make this an entity and relations not one-to-one?
 //loggedIn [shape=diamond];
 eventComment [shape=diamond];
@@ -22,26 +23,20 @@ madeby [shape=diamond];
 reply [shape=diamond];
 isIn [shape=diamond];
 uses [shape=diamond];
-
+runBy [shape=diamond];
 
 //stuff[peripheries=2];
+major [peripheries=2];
 
 //session--loggedIn [label="0,1"];
 //loggedIn--user [label="0,*"];
 
-event--eventComment [label="0,*"];
-eventComment--comment [label="1,1"];
+eventComment--event [label="0,*"];
+comment--eventComment [label="1,1"];
 comment--madeby [label="1,1"];
 madeby--user [label="0,*"];
-comment--reply [label="0,*"];
-reply--comment [label="0,1"];
 
-user--isastudent--student;
-user--isaadmin--admin;
-user--isagroup--group;
 
-student--isMemberOf [label="0,*"];
-isMemberOf--group [label="0,*"];
 
 equipment--isIn [label="0,*"];
 isIn--room [label="0,*"];
@@ -49,7 +44,7 @@ isIn--room [label="0,*"];
 event--runBy [label="1,*"];
 runBy--group [label="0,*"];
 event--uses [label="0,*"];
-uses--equipment [label="0,*"];
+uses--equipment [label="1,*"];
 
 //primary key of reservation is room and time?
 student--reservation [label="0,*"];
@@ -58,33 +53,70 @@ reservation--event [label="0,*"]; //events can be in un-reservable places
 admin--reservation [label="0,*"];
 
 //attributes
+subgraph cluster_users{
+
+user--isastudent--student;
+user--isaadmin--admin;
+user--isagroup--group;
+
+
+student--isMemberOf [label="0,*"];
+isMemberOf--group [label="0,*"];
+
+
+subgraph cluster_usergraph {
 name--user;
 email--user; //key
 password--user;
+}
+subgraph cluster_studentgraph{
 student--year;
+student--major;
+}
 
+admin;
+
+subgraph cluster_groupgraph{
 group--class;
 group--description;
-group--groupName; //key
-group--groupEmail; 
+//group--groupName; //key
+//group--groupEmail; 
+}
+}
 
-building--room; //key
-roomNum--room; //key
-occupancy--room;
+subgraph cluster_roomgraph{
+room--building; //key
+room--roomNum; //key
+room--occupancy;
 //stuff--room;
+}
 
+subgraph cluster_eventgraph{
 event--eventName;
 event--eventDescription;
 event--eventId; //key
+}
 
+subgraph cluster_reservationgraph{
 reservation--time;
 reservation--timeBooked;
+}
 
-rating--eventComment;
+eventComment--rating;
 
-commentRating--comment;
+subgraph cluster_commentgraph{
+
+comment--reply [label="0,*"];
+reply--comment [label="0,1"];
+
+reply--commentRating;
 when--comment;
 txt--comment;
 comment--commentId; //key
+}
 
+subgraph cluster_equipmentgraph{
+type--equipment;
+quantity--equipment;
+}
 }
