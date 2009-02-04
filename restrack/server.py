@@ -10,11 +10,11 @@ class Request(object):
 	"""
 	The req object passed to pages.
 	"""
-	__slots__ = '__weakref__', 'environ', '_start_response', 'db', '_log_handler'
+	__slots__ = ('__weakref__', 'environ', '_start_response', 'db', 
+		'_log_handler')
 	def __init__(self, environ, start_response):
 		self.environ = environ
 		self._start_response = start_response
-		self.db = None # TODO: database connecting
 	
 	def status(self, code, status=None):
 		"""req.status(integer, [string]) -> None
