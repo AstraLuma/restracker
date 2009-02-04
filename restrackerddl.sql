@@ -35,8 +35,8 @@ CREATE TABLE memberOf(
 student VARCHAR(32),
 club VARCHAR(32),
 PRIMARY KEY(student,club),
-FOREIGN KEY student REFERENCES student(email),
-FOREIGN KEY club REFERENCES club(email)
+FOREIGN KEY (student) REFERENCES student(email),
+FOREIGN KEY (club) REFERENCES club(email)
 );
 
 CREATE TABLE event(
@@ -44,15 +44,15 @@ description TEXT,
 name VARCHAR(32),
 expectedSize INT,
 ID INT,
-PRIMARY KEY (ID),
+PRIMARY KEY (ID)
 );
 
 CREATE TABLE runBy(
 club VARCHAR(32),
-event INT,
-PRIMARY KEY(club,event),
+eventran INT,
+PRIMARY KEY(club,eventran),
 FOREIGN KEY (club) REFERENCES club(email),
-FOREIGN KEY (event) REFERENCES event(ID)
+FOREIGN KEY (eventran) REFERENCES event(ID)
 );
 
 CREATE TABLE room(
@@ -64,54 +64,54 @@ PRIMARY KEY(roomNum,building)
 
 CREATE TABLE equipment(
 name VARCHAR(32),
-PRIMAY KEY(name)
+PRIMARY KEY(name)
 );
 
 CREATE TABLE isIn(
-equipment VARCHAR(32),
+whatequip VARCHAR(32),
 roomNum INT,
 building VARCHAR(3),
 quantity INT,
-PRIMARY KEY (equipment,roomNum,building),
-FOREIGN KEY(equipment) REFERENCES equipment(name),
+PRIMARY KEY (whatequip,roomNum,building),
+FOREIGN KEY(whatequip) REFERENCES equipment(name),
 FOREIGN KEY (roomNum,building) REFERENCES room(roomNum,building)
 );
 
 CREATE TABLE uses(
-event INT,
-equipment VARCHAR(32),
+usedat INT,
+whatequip VARCHAR(32),
 quantity INT,
-PRIMARY KEY(event,equipment),
-FOREIGN KEY (event) REFERENCES event(ID),
-FOREIGN KEY(equipment) REFERENCES equipment(name)
+PRIMARY KEY(usedat,whatequip),
+FOREIGN KEY (usedat) REFERENCES event(ID),
+FOREIGN KEY(whatequip) REFERENCES equipment(name)
 );
 
 CREATE TABLE comments(
 ID INT,
-when DATETIME, 
+madeat TIMESTAMP, 
 txt TEXT,
 madeBy VARCHAR(32) NOT NULL,
-event INT NOT NULL,
+about INT NOT NULL,
 parent INT,
 FOREIGN KEY(madeBy) REFERENCES users(email),
-FOREIGN KEY(event) REFERENCES event(ID),
+FOREIGN KEY(about) REFERENCES event(ID),
 PRIMARY KEY (ID),
 FOREIGN KEY (parent) REFERENCES comments(ID)
 );
 
 CREATE TABLE reservation(
 ID INT,
-timeBooked DATETIME NOT NULL,
-startTime DATETIME NOT NULL,
-endTime DATETIME NOT NULL,
+timeBooked TIMESTAMP NOT NULL,
+startTime TIMESTAMP NOT NULL,
+endTime TIMESTAMP NOT NULL,
 roomNum INT NOT NULL,
-building INT NOT NULL,
+building VARCHAR(3) NOT NULL,
 student VARCHAR(32) NOT NULL,
 admin VARCHAR(32),
-event INT,
+forevent INT,
 FOREIGN KEY(roomNum,building) REFERENCES room(roomNum,building),
 FOREIGN KEY(student) REFERENCES student(email),
 FOREIGN KEY(admin) REFERENCES admin(email),
-FOREIGN KEY(event) REFERENCES event(ID),
+FOREIGN KEY(forevent) REFERENCES event(ID),
 PRIMARY KEY(ID)
 );

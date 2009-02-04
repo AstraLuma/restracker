@@ -1,4 +1,9 @@
-from somewhere import page, template
+# -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
+# vim:tabstop=4:noexpandtab:
+"""
+Some example pages.
+"""
+from web import page, template, HTTPError
 
 @page('/test')
 def test(req): # req == Request
@@ -13,6 +18,7 @@ def user(req, userid): # The group from the regex is passed as a positional para
 	req.header('Content-Type', 'text/html')
 	
 	# Do some processing
+	# Use req.db as the Connection object
 	
 	# sent all at once
 	return template('user', user=data) # user is a variable that the template references
