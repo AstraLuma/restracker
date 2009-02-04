@@ -1,51 +1,51 @@
 User:
-Primary Key – email
-Other Attributes – password (not nullable), name
+Primary Key - email
+Other Attributes - password (not nullable), name
 
 Club:
-Primary/Foreign Key – email (from User)
-Other Attributes – description, class
+Primary/Foreign Key - email (from User)
+Other Attributes - description, class
 
 Student:
-Primary/Foreign Key – email (from User)
-Other Attributes – year, major1, major2
+Primary/Foreign Key - email (from User)
+Other Attributes - year, major1, major2
 
 Admin:
-Primary/Foreign Key – email (from User)
-Other Attributes – title, privileges
+Primary/Foreign Key - email (from User)
+Other Attributes - title, privileges
 
 MemberOf:
-Primary/Foreign Keys – email (from User), email (from Club)
+Primary/Foreign Keys - email (from User), email (from Club)
 
 Event:
-Primary Key – eventID
-Other Attributes – description, name (not nullable), expectedSize
+Primary Key - eventID
+Other Attributes - description, name (not nullable), expectedSize
 
 RunBy:
-Primary/Foreign Keys – email (from Club), eventID (from Event)
+Primary/Foreign Keys - email (from Club), eventID (from Event)
 
 Comment:
-Primary Key – commentID
+Primary Key - commentID
 Foreign Key - email (from Club)
-Foreign Keys – email (from User), eventID (from Event), commmentID (from Comment, nullable)
-Other Attributes – text, when, rating
+Foreign Keys - email (from User), eventID (from Event), commmentID (from Comment, nullable)
+Other Attributes - text, when, rating
 
 Equipment:
-Primary Key – name
+Primary Key - name
 
 Uses:
-Primary/Foreign Keys – name (from Equipment), eventID (from Event)
-Other Attributes – quantity
+Primary/Foreign Keys - name (from Equipment), eventID (from Event)
+Other Attributes - quantity
 
 Room:
-Primary Keys – building, room#
+Primary Keys - building, room#
 
 IsIn:
-Primary/Foreign Keys – building (from Room), room# (from Room), name (from Equipment)
+Primary/Foreign Keys - building (from Room), room# (from Room), name (from Equipment)
 
 Reservation:
-Primary Key – reservationID
-Foreign Keys – email (from Admin, nullable), email (from Student), eventID (from Event), building (from Room), room# (from Room)
-Other Attributes – startTime (not nullable), endTime(not nullable), bookTime (not nullable)
+Primary Key - reservationID
+Foreign Keys - email (from Admin, nullable), email (from Student), eventID (from Event), building (from Room), room# (from Room)
+Other Attributes - startTime (not nullable), endTime(not nullable), bookTime (not nullable)
 
 All foreign keys are not nullable unless noted otherwise. All local attributes are nullable unless noted otherwise or they are a key.
