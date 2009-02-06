@@ -1,26 +1,51 @@
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "users_pkey" for table "users"
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "users_pkey" for table "users" 
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "admin_pkey" for table "admin"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "admin_pkey" for table "admin"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "student_pkey" for table "student"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "student_pkey" for table "student"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "club_pkey" for table "club"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "club_pkey" for table "club"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "memberof_pkey" for table "memberof"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "memberof_pkey" for table "memberof"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "event_pkey" for table "event"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "event_pkey" for table "event"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "runby_pkey" for table "runby"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "runby_pkey" for table "runby"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "room_pkey" for table "room"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "room_pkey" for table "room"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "equipment_pkey" for table "equipment"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "equipment_pkey" for table "equipment"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "isin_pkey" for table "isin"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "isin_pkey" for table "isin"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "uses_pkey" for table "uses"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "uses_pkey" for table "uses"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "comments_pkey" for table "comments"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "comments_pkey" for table "comments"
 CREATE TABLE
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "reservation_pkey" for table "reservation"
+
+NOTICE:  CREATE TABLE / PRIMARY KEY will create 
+implicit index "reservation_pkey" for table "reservation"
 CREATE TABLE

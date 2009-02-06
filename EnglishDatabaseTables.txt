@@ -26,8 +26,8 @@ Primary/Foreign Keys - email (from Club), eventID (from Event)
 
 Comment:
 Primary Key - commentID
-Foreign Key - email (from Club)
-Foreign Keys - email (from User), eventID (from Event), commmentID (from Comment, nullable)
+Foreign Key - email (from Club) Foreign Keys - email (from User), eventID (from
+	Event), commmentID (from Comment, nullable)
 Other Attributes - text, when, rating
 
 Equipment:
@@ -38,14 +38,18 @@ Primary/Foreign Keys - name (from Equipment), eventID (from Event)
 Other Attributes - quantity
 
 Room:
-Primary Keys - building, room#
+Primary Keys - building, roomNum
 
 IsIn:
-Primary/Foreign Keys - building (from Room), room# (from Room), name (from Equipment)
+Primary/Foreign Keys - building (from Room), roomNum (from Room), name (from
+	Equipment)
 
 Reservation:
 Primary Key - reservationID
-Foreign Keys - email (from Admin, nullable), email (from Student), eventID (from Event), building (from Room), room# (from Room)
-Other Attributes - startTime (not nullable), endTime(not nullable), bookTime (not nullable)
+Foreign Keys - email (from Admin, nullable), email (from Student), eventID (from
+	Event), building (from Room), roomNum (from Room)
+Other Attributes - startTime (not nullable), endTime(not nullable), bookTime
+	(not nullable)
 
-All foreign keys are not nullable unless noted otherwise. All local attributes are nullable unless noted otherwise or they are a key.
+All foreign keys are not nullable unless noted otherwise. All local attributes
+are nullable unless noted otherwise or they are a key.

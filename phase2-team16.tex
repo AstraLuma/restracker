@@ -6,6 +6,7 @@
 LaFleche (shl@wpi.edu)}
 
 \begin{document}
+%\oddsidemargin -0.5in
 
 \maketitle
 
@@ -97,7 +98,7 @@ submission.
 %\includegraphics[angle=90]{ERmodel.eps}
 
 \section{}
-\include{EnglishDatabaseTables.txt}
+\verbatiminput{EnglishDatabaseTables.txt}
 
 \section{}
 Having analyzed every non-key attribute in every table, we realized that no
@@ -113,7 +114,9 @@ dependent on what will be going on that week.
 
 \section{}
 \verbatiminput{restrackerddl.sql}
+\verbatiminput{createtables.log}
 %Load data in and show output of script.
+
 
 \section{}
 This past week we met Thursday after class to discuss what we were doing, on
