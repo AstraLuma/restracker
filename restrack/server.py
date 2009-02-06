@@ -10,16 +10,81 @@ __all__ = 'Request', 'restracker_app'
 SESSION_CHARS = '1234567890qwertyuiopasdfghjklzxcvbnm'
 SESSION_SIZE = 16
 
+HTTP_STATUS_CODES = {
+	# 1xx Informational
+	100 : '100 Continue',
+	101 : '101 Switching Protocols',
+	102 : '102 Processing', # WebDAV
+	122 : '122 Request-URI too long', # IE7 (?)
+	# 2xx Success
+	200 : '200 OK',
+	201 : '201 Created',
+	202 : '202 Accepted',
+	203 : '203 Non-Authoritative Information', # HTTP/1.1
+	204 : '204 No Content',
+	205 : '205 Reset Content',
+	206 : '206 Partial Content',
+	207 : '207 Multi-Status', # WebDAV
+	# 3xx Redirection
+	300 : '300 Multiple Choices',
+	301 : '301 Moved Permanently',
+	302 : '302 Found',
+	303 : '303 See Other', # HTTP/1.1
+	304 : '304 Not Modified',
+	305 : '305 Use Proxy', # HTTP/1.1
+#	306 : '306 Switch Proxy', # Out since HTTP/1.1
+	307 : '307 Temporary Redirect', # HTTP/1.1
+	# 4xx Client Error
+	400 : '400 Bad Request',
+	401 : '401 Unauthorized',
+	402 : '402 Payment Required',
+	403 : '403 Forbidden',
+	404 : '404 Not Found',
+	405 : '405 Method Not Allowed',
+	406 : '406 Not Acceptable', # HTCPCP
+	407 : '407 Proxy Authentication Required',
+	408 : '408 Request Timeout',
+	409 : '409 Conflict',
+	410 : '410 Gone',
+	411 : '411 Length Required',
+	412 : '412 Precondition Failed',
+	413 : '413 Request Entity Too Large',
+	414 : '414 Request-URI Too Long',
+	415 : '415 Unsupported Media Type',
+	416 : '416 Requested Range Not Satisfiable',
+	417 : '417 Expectation Failed',
+	418 : '418 I\'m a Teapot', # HTCPCP
+	422 : '422 Unprocessable Entity', # WebDAV
+	423 : '423 Locked', # WebDAV
+	424 : '424 Failed Dependency', # WebDAV
+	425 : '425 Unordered Collection', # WebDAV Advanced Collections
+	426 : '426 Upgrade Required', # RFC 2817 (Upgrading to TLS Within HTTP/1.1)
+	449 : '449 Retry With', # Microsoft
+	450 : '450 Blocked', # Microsoft
+	# 5xx Server Error
+	500 : '500 Internal Server Error',
+	501 : '501 Service Unavailable',
+	502 : '502 Bad Gateway',
+	503 : '503 Service Unavailable',
+	504 : '504 Gateway Timeout',
+	505 : '505 HTTP Version Not Supported',
+	506 : '506 Variant Also Negotiates', # RFC 2295 (Transparent Content Negotiation in HTTP)
+	507 : '507 Insufficient Storage', # WebDAV
+	509 : '509 Bandwidth Limit Exceeded', # Apache
+	510 : '510 Not Extended', # RFC 2774 (An HTTP Extension Framework)
+	}
+
 class Request(object):
 	"""
 	The req object passed to pages.
 	"""
 	#TODO: Sessions
 	__slots__ = ('__weakref__', 'environ', '_start_response', 'db', 
-		'_log_handler', 'cookies', 'session', 'user')
+		'_log_handler', 'cookies', 'session', 'user', '_status', '_headers')
 	def __init__(self, environ, start_response):
 		self.environ = environ
 		self._start_response = start_response
+		self._status = None
 		
 		# Database
 		self.db = pgdb.connect(
@@ -124,8 +189,9 @@ class Request(object):
 		"""req.send_response() -> None
 		Sends headers & status to the client.
 		"""
-		self.header('Set-Cookie', 
-		pass #TODO
+		headers = [] #FIXME: Pull from self._headers somehow
+		headers += [('Set-Cookie', v.OutputString()) for v in self.cookies.itervalues()]
+		st = HTTP_STATUS_CODES[self._status or 200]
 	
 	def __enter__(self):
 		"""
