@@ -237,11 +237,14 @@ def restracker_app(environ, start_response):
 	finally:
 		req.__exit__(*sys.exc_info())
 	
-	t = rv.next()
+	body = list(rv)
+	
+	#FIXME: Handle 'Expect: 100-continue'
+	#	(if we would send a 2xx, send a 100 instead, send 4xx as 417, and send everything else as-is)
+	
 	req.send_response()
-	if environ['REQUEST_METHOD'] != 'HEAD':
-		yield t
-	for t in rv: 
-		if environ['REQUEST_METHOD'] != 'HEAD':
-			yield t
+	if environ['REQUEST_METHOD'] == 'HEAD':
+		return []
+	else:
+		return body
 
