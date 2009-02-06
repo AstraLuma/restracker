@@ -43,13 +43,13 @@ CREATE TABLE event(
 description TEXT,
 name VARCHAR(32),
 expectedSize INT,
-ID INT,
+ID SERIAL, -- Special PostgreSQL type
 PRIMARY KEY (ID)
 );
 
 CREATE TABLE runBy(
 club VARCHAR(32),
-eventran INT,
+eventran INTEGER, -- The actual type of SERIAL
 PRIMARY KEY(club,eventran),
 FOREIGN KEY (club) REFERENCES club(email),
 FOREIGN KEY (eventran) REFERENCES event(ID)
@@ -78,7 +78,7 @@ FOREIGN KEY (roomNum,building) REFERENCES room(roomNum,building)
 );
 
 CREATE TABLE uses(
-usedat INT,
+usedat INTEGER,
 whatequip VARCHAR(32),
 quantity INT,
 PRIMARY KEY(usedat,whatequip),
@@ -87,12 +87,12 @@ FOREIGN KEY(whatequip) REFERENCES equipment(name)
 );
 
 CREATE TABLE comments(
-ID INT,
+ID SERIAL,
 madeat TIMESTAMP, 
 txt TEXT,
 madeBy VARCHAR(32) NOT NULL,
-about INT NOT NULL,
-parent INT,
+about INTEGER NOT NULL,
+parent INTEGER,
 FOREIGN KEY(madeBy) REFERENCES users(email),
 FOREIGN KEY(about) REFERENCES event(ID),
 PRIMARY KEY (ID),
@@ -100,7 +100,7 @@ FOREIGN KEY (parent) REFERENCES comments(ID)
 );
 
 CREATE TABLE reservation(
-ID INT,
+ID SERIAL,
 timeBooked TIMESTAMP NOT NULL,
 startTime TIMESTAMP NOT NULL,
 endTime TIMESTAMP NOT NULL,
@@ -108,10 +108,17 @@ roomNum INT NOT NULL,
 building VARCHAR(3) NOT NULL,
 student VARCHAR(32) NOT NULL,
 admin VARCHAR(32),
-forevent INT,
+forevent INTEGER NOT NULL,
 FOREIGN KEY(roomNum,building) REFERENCES room(roomNum,building),
 FOREIGN KEY(student) REFERENCES student(email),
 FOREIGN KEY(admin) REFERENCES admin(email),
 FOREIGN KEY(forevent) REFERENCES event(ID),
 PRIMARY KEY(ID)
+);
+
+-- This doesn't appear in our ER model.
+CREATE TABLE sessions (
+	id CHAR(16) PRIMARY KEY,
+	data BYTEA DEFAULT E''::bytea, -- PostgreSQL's BLOB, A Python Pickle of the session dict
+	expires TIMESTAMP -- When to delete this record, same value as the cookie
 );

@@ -3,30 +3,78 @@
 """
 The top-level WSGI work.
 """
-import sys, logging, urllib, pgdb
+import sys, logging, urllib, pgdb, Cookie, random
+import config
 __all__ = 'Request', 'restracker_app'
+
+SESSION_CHARS = '1234567890qwertyuiopasdfghjklzxcvbnm'
+SESSION_SIZE = 16
 
 class Request(object):
 	"""
 	The req object passed to pages.
 	"""
+	#TODO: Sessions
 	__slots__ = ('__weakref__', 'environ', '_start_response', 'db', 
-		'_log_handler')
+		'_log_handler', 'cookies', 'session', 'user')
 	def __init__(self, environ, start_response):
 		self.environ = environ
 		self._start_response = start_response
+		
+		# Database
+		self.db = pgdb.connect(
+			host=config.SQL_HOST, database=config.SQL_DATABASE, 
+			user=config.SQL_USER, password=config.SQL_PASSWORD
+			)
+		
+		# Cookies
+		self.cookies = Cookie.SimpleCookie(self.environ.get('HTTP_COOKIE', None))
+		
+		# Session
+		if config.SESSION_COOKIE not in self.cookies:
+			while not self._initsession(): pass
+		else:
+			#TODO: Load session
+			pass
+		
+		#TODO: User
+	
+	def _initsession(self):
+		"""req._initsession() -> bool
+		Tries to create a session, load the cookie, and insert it into the 
+		database.
+		
+		Returns if it is successful.
+		"""
+		sess = self._mksession()
+		exp = time.time() + config.SESSION_LENGTH
+		cur = self.db.cursor()
+		cur.execute(
+			"""INSERT INTO sessions (id, expires) VALUES (%(id)s, %(exp)s)""", 
+			id=sess, exp=pgdb.TimestampFromTicks(exp))
+		if cur.rowcount == 0:
+			return False
+		self.cookies[config.SESSION_COOKIE] = sess
+		self.cookies[config.SESSION_COOKIE]['max-age'] = config.SESSION_LENGTH
+		return True
+	
+	def _mksession(self):
+		"""req._mksession() -> string
+		Returns a random session identifier. Not guaranteed to be unique.
+		"""
+		return ''.join(random.select(SESSION_CHARS) for _ in xrange(SESSION_SIZE))
 	
 	def status(self, code, status=None):
 		"""req.status(integer, [string]) -> None
 		Sets the current HTTP status.
 		"""
-		pass
+		pass #TODO
 	
 	def header(self, name, value, overwrite=True):
 		"""req.header(string, string, [boolean]) -> None
 		Sets an HTTP header. Set overwrite to False in order to append headers.
 		"""
-		pass
+		pass #TODO
 	
 	def fullurl(self, path=None):
 		"""req.fullurl([string]) -> string
@@ -72,37 +120,42 @@ class Request(object):
 		"""
 		return self.environ.get('SCRIPT_NAME','') + self.environ.get('PATH_INFO','')
 	
+	def send_response(self):
+		"""req.send_response() -> None
+		Sends headers & status to the client.
+		"""
+		self.header('Set-Cookie', 
+		pass #TODO
+	
 	def __enter__(self):
 		"""
 		PEP 343
-		Does things like set logging, open DB connection, etc.
+		Causes this request to become the active one.
 		"""
 		# Logging
 		self._log_handler = logging.StreamHandler(self.environ['wsgi.error'])
 		logging.root.addHandler(self._log_handler)
-		
-		# Database
-		# FIXME: Load these values from a config
-		self.db = pgdb.connect(host='localhost', database=None, user=None, password=None)
 	
 	def __exit__(self, type, value, traceback):
 		"""
 		PEP 343
-		Reverses __enter__()
+		Reverses __enter__().
 		"""
 		# Database
-		if type is None:
-			self.db.commit()
-		else:
-			self.db.rollback()
-		self.db.close()
-		del self.db
+#		if type is None:
+#			self.db.commit()
+#		else:
+#			self.db.rollback()
 		
 		# Logging
 		logging.root.removeHandler(self._log_handler)
 		del self._log_handler
 		
 		# XXX: Send different reponse if error?
+	
+	def __del__(self):
+		self.db.close()
+
 
 def restracker_app(environ, start_response):
 	"""
