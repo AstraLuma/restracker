@@ -28,7 +28,7 @@ def page(regex):
 		return func
 	return _
 
-def findpages(path)
+def findpages(path):
 	for r, f in _pages:
 		if isinstance(r, basestring):
 			if r == path:
@@ -59,7 +59,7 @@ def callpage(req):
 			page, (_, pargs, kwargs) = repaths.items()[0]
 		else:
 			logging.getLogger(__name__+'.callpage')\
-				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths]
+				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths])
 			# FIXME: Come up with some algorithm to select a page
 	
 	if page is None:
