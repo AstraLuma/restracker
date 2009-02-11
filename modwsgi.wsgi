@@ -6,4 +6,4 @@ The funky script for mod_wsgi.
 
 def application(environ, start_response):
 	import restrack.server
-	return restrack.server.restracker_app(environ, start_response):
+	return restrack.server.restracker_app(environ, start_response)
