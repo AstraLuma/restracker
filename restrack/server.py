@@ -220,7 +220,8 @@ class Request(object):
 		# XXX: Send different reponse if error?
 	
 	def __del__(self):
-		self.db.close()
+		if hasattr(self, 'db'):
+			self.db.close()
 
 
 def restracker_app(environ, start_response):
