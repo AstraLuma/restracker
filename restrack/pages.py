@@ -32,3 +32,13 @@ def eggs(req):
 	req.status(302) # Alternative method for setting the response status code
 	req.header('Location', req.fullurl('/test'))
 	# No content, don't have to return anything
+
+@page('/teapot')
+def eggs(req):
+	req.status(418)
+	req.header('Content-Type', 'text/plain')
+	yield """
+I'm a little teapot, short and stout
+Here is my handle, here is my spout
+When I get all steamed up hear me shout.
+Tip me over and pour me out."""

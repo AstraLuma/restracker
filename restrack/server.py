@@ -3,8 +3,8 @@
 """
 The top-level WSGI work.
 """
-import sys, logging, urllib, pgdb, Cookie, random
-import config
+import sys, logging, urllib, pgdb, Cookie, random, time
+import config, web
 __all__ = 'Request', 'restracker_app'
 
 SESSION_CHARS = '1234567890qwertyuiopasdfghjklzxcvbnm'
@@ -116,7 +116,8 @@ class Request(object):
 		cur = self.db.cursor()
 		cur.execute(
 			"""INSERT INTO sessions (id, expires) VALUES (%(id)s, %(exp)s)""", 
-			id=sess, exp=pgdb.TimestampFromTicks(exp))
+			dict(id=sess, exp=pgdb.TimestampFromTicks(exp))
+			)
 		if cur.rowcount == 0:
 			return False
 		self.cookies[config.SESSION_COOKIE] = sess
@@ -127,7 +128,7 @@ class Request(object):
 		"""req._mksession() -> string
 		Returns a random session identifier. Not guaranteed to be unique.
 		"""
-		return ''.join(random.select(SESSION_CHARS) for _ in xrange(SESSION_SIZE))
+		return ''.join(random.choice(SESSION_CHARS) for _ in xrange(SESSION_SIZE))
 	
 	def status(self, code, status=None):
 		"""req.status(integer, [string]) -> None
@@ -185,13 +186,17 @@ class Request(object):
 		"""
 		return self.environ.get('SCRIPT_NAME','') + self.environ.get('PATH_INFO','')
 	
-	def send_response(self):
+	def send_response(self, exc_info=None):
 		"""req.send_response() -> None
 		Sends headers & status to the client.
 		"""
 		headers = [] #FIXME: Pull from self._headers somehow
 		headers += [('Set-Cookie', v.OutputString()) for v in self.cookies.itervalues()]
 		st = HTTP_STATUS_CODES[self._status or 200]
+		if exc_info is not None:
+			st = HTTP_STATUS_CODES[500]
+		#....
+		self._start_response(st, headers, exc_info)
 	
 	def __enter__(self):
 		"""
@@ -199,7 +204,7 @@ class Request(object):
 		Causes this request to become the active one.
 		"""
 		# Logging
-		self._log_handler = logging.StreamHandler(self.environ['wsgi.error'])
+		self._log_handler = logging.StreamHandler(self.environ['wsgi.errors'])
 		logging.root.addHandler(self._log_handler)
 	
 	def __exit__(self, type, value, traceback):
@@ -228,6 +233,10 @@ def restracker_app(environ, start_response):
 	"""
 	The WSGI callback.
 	"""
+	
+	for m in config.PAGE_MODULES:
+		__import__(m)
+	
 	req = Request(environ, start_response)
 	
 	# Emulate PEP 343

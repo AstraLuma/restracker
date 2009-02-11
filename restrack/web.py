@@ -1,6 +1,7 @@
 # -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
 # vim:tabstop=4:noexpandtab:
-import kid, re, logging
+import kid, re, logging, os
+import config
 __all__ = 'HTTPError', 'page', 'callpage', 'template'
 
 class HTTPError(Exception):
@@ -32,7 +33,7 @@ def findpages(path):
 	for r, f in _pages:
 		if isinstance(r, basestring):
 			if r == path:
-				yield False, f, (), {}
+				yield False, f, None, (), {}
 		else:
 			m = r.search(path)
 			if m:
@@ -53,9 +54,9 @@ def callpage(req):
 		else:
 			repaths[func] = regex, p, kw
 	else:
-		if len(relpaths) < 1:
+		if len(repaths) < 1:
 			pass # None found
-		if len(relpaths) == 1:
+		elif len(repaths) == 1:
 			page, (_, pargs, kwargs) = repaths.items()[0]
 		else:
 			logging.getLogger(__name__+'.callpage')\
@@ -92,7 +93,16 @@ def template(req, name, **kwargs):
 	if 'source' in kwargs:
 		extrakw['source'] = kwargs
 		del kwargs['source']
-	tmpl = kid.Template(name=name, request=req, **kwargs)
+	
+	f = name+'.kid'
+	for d in config.TEMPLATE_PATHS:
+		fn = os.path.join(d, f)
+		if os.path.exists(fn):
+			break
+	else:
+		raise ValueError, "Template %r does not exist." % name
+	
+	tmpl = kid.Template(file=fn, request=req, **kwargs)
 	for k,v in extrakw.iteritems():
 		setattr(tmpl, k, v)
 	return tmpl.serialize(encoding='utf-8', output=kid.XHTMLSerializer(doctype='xhtml-strict'))
