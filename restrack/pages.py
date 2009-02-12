@@ -3,6 +3,7 @@
 """
 Some example pages.
 """
+import os
 from web import page, template, HTTPError
 
 @page('/test')
@@ -12,6 +13,35 @@ def test(req): # req == Request
 	# Possibly sent in chunks
 	yield 'This is a test page. '
 	yield 'Hi! '
+
+@page('/info')
+def info(req):
+	req.header('Content-Type', 'text/plain')
+	
+	for attr in [a for a in dir(req) if a[0] != '_']:
+		try:
+			value = getattr(req, attr)
+		except AttributeError:
+			continue
+		if callable(value): continue
+		if attr == 'environ':
+			yield '%s = {\n' % attr
+			ex = []
+			for k,v in sorted(value.items(), key=lambda v: v[0]):
+				if k in os.environ:
+					ex.append(k)
+				else:
+					yield '\t%r: %r\n' % (k,v)
+			yield '\tNot included: %s\n' % ', '.join(map(repr, ex))
+			yield '}\n'
+		elif isinstance(value, dict):
+			yield '%s = {\n' % attr
+			for k,v in sorted(value.items(), key=lambda v: v[0]):
+				yield '\t%r: %r\n' % (k,v)
+			yield '}\n'
+		else:
+			yield '%s = %r\n' % (attr, value)
+	
 
 @page('/user/(.*)') #regex
 def user(req, userid): # The group from the regex is passed as a positional parameter
@@ -42,3 +72,9 @@ I'm a little teapot, short and stout
 Here is my handle, here is my spout
 When I get all steamed up hear me shout.
 Tip me over and pour me out."""
+
+@page('/error')
+def mkerror(req):
+	raise Exception, "A random exception"
+
+

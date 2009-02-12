@@ -1,6 +1,6 @@
 # -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
 # vim:tabstop=4:noexpandtab:
-import kid, re, logging, os
+import kid, re, logging, os, sys
 import config
 __all__ = 'HTTPError', 'page', 'callpage', 'template'
 

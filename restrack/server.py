@@ -3,7 +3,7 @@
 """
 The top-level WSGI work.
 """
-import sys, logging, urllib, pgdb, Cookie, random, time
+import sys, logging, urllib, pgdb, Cookie, random, time, pickle
 import config, web
 __all__ = 'Request', 'restracker_app'
 
@@ -78,13 +78,11 @@ class Request(object):
 	"""
 	The req object passed to pages.
 	"""
-	#TODO: Sessions
-	__slots__ = ('__weakref__', 'environ', '_start_response', 'db', 
-		'_log_handler', 'cookies', 'session', 'user', '_status', '_headers')
 	def __init__(self, environ, start_response):
 		self.environ = environ
 		self._start_response = start_response
 		self._status = None
+		self._headers = []
 		
 		# Database
 		self.db = pgdb.connect(
@@ -96,13 +94,25 @@ class Request(object):
 		self.cookies = Cookie.SimpleCookie(self.environ.get('HTTP_COOKIE', None))
 		
 		# Session
-		if config.SESSION_COOKIE not in self.cookies:
+		self._session_id = None
+		if config.SESSION_COOKIE in self.cookies:
+			self._session_id = self.cookies[config.SESSION_COOKIE].value
+			cur = self.db.cursor()
+			cur.execute(
+				"""SELECT data FROM sessions WHERE id=%(id)s""", 
+				dict(id=self._session_id)
+				)
+			data = cur.fetchone()
+			if data is None:
+				self._session_id = None
+			else:
+				self.session = pickle.loads(pgdb.unescape_bytea(data[0]))
+		if self._session_id is None:
 			while not self._initsession(): pass
-		else:
-			#TODO: Load session
-			pass
+			self.db.commit()
+			self.session = {}
 		
-		#TODO: User
+		self.user = self.session.get('user', None) # None = anonymous user
 	
 	def _initsession(self):
 		"""req._initsession() -> bool
@@ -120,6 +130,7 @@ class Request(object):
 			)
 		if cur.rowcount == 0:
 			return False
+		self._session_id = sess
 		self.cookies[config.SESSION_COOKIE] = sess
 		self.cookies[config.SESSION_COOKIE]['max-age'] = config.SESSION_LENGTH
 		return True
@@ -134,13 +145,17 @@ class Request(object):
 		"""req.status(integer, [string]) -> None
 		Sets the current HTTP status.
 		"""
-		pass #TODO
+		self._status = code
 	
 	def header(self, name, value, overwrite=True):
 		"""req.header(string, string, [boolean]) -> None
 		Sets an HTTP header. Set overwrite to False in order to append headers.
 		"""
-		pass #TODO
+		if overwrite:
+			for v in self._headers[:]:
+				if v[0].lower() == name.lower():
+					self._headers.remove(v)
+		self._headers.append((name, value))
 	
 	def fullurl(self, path=None):
 		"""req.fullurl([string]) -> string
@@ -190,13 +205,27 @@ class Request(object):
 		"""req.send_response() -> None
 		Sends headers & status to the client.
 		"""
-		headers = [] #FIXME: Pull from self._headers somehow
+		headers = self._headers[:] #FIXME: Pull from self._headers somehow
 		headers += [('Set-Cookie', v.OutputString()) for v in self.cookies.itervalues()]
 		st = HTTP_STATUS_CODES[self._status or 200]
 		if exc_info is not None:
 			st = HTTP_STATUS_CODES[500]
 		#....
 		self._start_response(st, headers, exc_info)
+	
+	def save_session(self):
+		print "save_session"
+		cur = self.db.cursor()
+		cur.execute(
+			"""UPDATE sessions SET data=E%(data)s::bytea WHERE id=%(id)s""", 
+			dict(
+				id=self._session_id, 
+				data=pgdb.escape_bytea(pickle.dumps(self.session, pickle.HIGHEST_PROTOCOL)),
+				)
+			)
+		self.db.commit()
+		print cur.rowcount
+
 	
 	def __enter__(self):
 		"""
@@ -244,10 +273,18 @@ def restracker_app(environ, start_response):
 	try:
 		# TODO: Write this
 		rv = web.callpage(req)
+	except:
+		req.db.rollback()
+		req.status(500)
+		rv = web.template(req, 'error-500', exception=sys.exc_info())
 	finally:
 		req.__exit__(*sys.exc_info())
 	
-	body = list(rv)
+	if rv is None:
+		body = []
+	else:
+		body = list(rv)
+	req.save_session()
 	
 	#FIXME: Handle 'Expect: 100-continue'
 	#	(if we would send a 2xx, send a 100 instead, send 4xx as 417, and send everything else as-is)

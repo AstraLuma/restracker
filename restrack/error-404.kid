@@ -8,7 +8,7 @@
 		<h1>Not Found</h1>
 		<p>The requested URL <tt py:content="request.getpath()" /> was not found on this server.</p>
 		<hr />
-		<address>... Server at ... Port ...</address>
+		<address><span py:replace="request.environ['SERVER_SOFTWARE']"/> Server at <span py:replace="request.environ['SERVER_NAME']"/> Port <span py:replace="request.environ['SERVER_PORT']"/></address>
 	</body>
 </html>
 
