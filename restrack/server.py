@@ -74,6 +74,20 @@ HTTP_STATUS_CODES = {
 	510 : '510 Not Extended', # RFC 2774 (An HTTP Extension Framework)
 	}
 
+class blob(object):
+	"""
+	A quick hack so that bytea isn't double-escaped
+	"""
+	def __init__(self, data):
+		self.data = data
+	
+	def __pg_repr__(self):
+		return "E'%s'::bytea" % pgdb.escape_bytea(self.data)
+	
+	@staticmethod
+	def load(data):
+		return pgdb.unescape_bytea(data)
+
 class Request(object):
 	"""
 	The req object passed to pages.
@@ -106,7 +120,7 @@ class Request(object):
 			if data is None:
 				self._session_id = None
 			else:
-				self.session = pickle.loads(pgdb.unescape_bytea(data[0]))
+				self.session = pickle.loads(blob.load(data[0]))
 		if self._session_id is None:
 			while not self._initsession(): pass
 			self.db.commit()
@@ -214,17 +228,15 @@ class Request(object):
 		self._start_response(st, headers, exc_info)
 	
 	def save_session(self):
-		print "save_session"
 		cur = self.db.cursor()
 		cur.execute(
-			"""UPDATE sessions SET data=E%(data)s::bytea WHERE id=%(id)s""", 
+			"""UPDATE sessions SET data=%(data)s WHERE id=%(id)s""", 
 			dict(
 				id=self._session_id, 
-				data=pgdb.escape_bytea(pickle.dumps(self.session, pickle.HIGHEST_PROTOCOL)),
+				data=blob(pickle.dumps(self.session, pickle.HIGHEST_PROTOCOL)),
 				)
 			)
 		self.db.commit()
-		print cur.rowcount
 
 	
 	def __enter__(self):
