@@ -8,7 +8,7 @@ import config, web
 __all__ = 'Request', 'restracker_app'
 
 FORMAT = "(%(name)s)[%(asctime)s] %(filename)s:%(lineno)d: %(levelname)s: %(message)s"
-logging.basicConfig(filename='restracker.log', format=FORMAT)
+logging.basicConfig(filename='/tmp/restracker.log', format=FORMAT)
 
 SESSION_CHARS = '1234567890qwertyuiopasdfghjklzxcvbnm'
 SESSION_SIZE = 16
