@@ -7,7 +7,7 @@ The funky script for mod_wsgi.
 def application(environ, start_response):
 	import sys
 	for n,m in sys.modules.iteritems():
-		if n.startswith('restrack.'):
+		if n.startswith('restrack.') and m is not None:
 			reload(m)
 	import restrack.server
 	return restrack.server.restracker_app(environ, start_response)
