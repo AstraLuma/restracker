@@ -47,7 +47,9 @@ def callpage(req):
 	# 1. Find callable & assemble args
 	page = pargs = kwargs = None
 	repaths = {}
-	for isre, func, regex, p, kw in findpages(req.getpath()):
+	# about PATH_INFO:
+	# wsgiref and mod_wsgi set it to be the part after the path to this app
+	for isre, func, regex, p, kw in findpages(req.environ['PATH_INFO']):
 		if not isre:
 			page, pargs, kwargs = func, p, kw
 			break
