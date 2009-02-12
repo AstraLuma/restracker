@@ -8,7 +8,6 @@ def application(environ, start_response):
 	import sys
 	for n,m in sys.modules.iteritems():
 		if n.startswith('restrack.'):
-			print n
 			reload(m)
 	import restrack.server
 	return restrack.server.restracker_app(environ, start_response)
