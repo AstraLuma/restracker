@@ -7,6 +7,9 @@ import sys, logging, urllib, pgdb, Cookie, random, time, pickle
 import config, web
 __all__ = 'Request', 'restracker_app'
 
+FORMAT = "(%(name)s)[%(asctime)s] %(filename)s:%(lineno)d: %(levelname)s: %(message)s"
+logging.basicConfig(filename='restracker.log', format=FORMAT)
+
 SESSION_CHARS = '1234567890qwertyuiopasdfghjklzxcvbnm'
 SESSION_SIZE = 16
 
@@ -246,6 +249,7 @@ class Request(object):
 		"""
 		# Logging
 		self._log_handler = logging.StreamHandler(self.environ['wsgi.errors'])
+		self._log_handler.setFormatter(logging.Formatter(FORMAT))
 		logging.root.addHandler(self._log_handler)
 	
 	def __exit__(self, type, value, traceback):

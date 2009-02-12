@@ -102,7 +102,10 @@ def template(req, name, **kwargs):
 	else:
 		raise ValueError, "Template %r does not exist." % name
 	
+	logging.getLogger(__name__+'.template').info("%s -> %r", name, fn)
+	
 	tmpl = kid.Template(file=fn, request=req, **kwargs)
+	logging.getLogger(__name__+'.template').info("%r", tmpl)
 	for k,v in extrakw.iteritems():
 		setattr(tmpl, k, v)
 	return tmpl.serialize(encoding='utf-8', output=kid.XHTMLSerializer(doctype='xhtml-strict'))
