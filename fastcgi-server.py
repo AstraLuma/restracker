@@ -11,6 +11,13 @@ lh.setFormatter(logging.Formatter(restrack.server.FORMAT))
 logging.root.addHandler(lh)
 logging.root.setLevel(logging.DEBUG)
 
-ws = WSGIServer(restrack.server.restracker_app, bindAddress='/tmp/restracker.sock')
-if ws.run():
-	os.execv(__file__, sys.argv)
+f = open('/tmp/restracker.pid', 'w')
+f.write(os.gitpid())
+f.close()
+
+try:
+	ws = WSGIServer(restrack.server.restracker_app, bindAddress='/tmp/restracker.sock')
+	if ws.run():
+		os.execv(__file__, sys.argv)
+finally:
+	os.unlink('/tmp/restracker.pid')
