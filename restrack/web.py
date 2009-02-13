@@ -49,7 +49,7 @@ def callpage(req):
 	repaths = {}
 	# about PATH_INFO:
 	# wsgiref and mod_wsgi set it to be the part after the path to this app
-	for isre, func, regex, p, kw in findpages(req.environ['PATH_INFO']):
+	for isre, func, regex, p, kw in findpages(req.apppath()):
 		if not isre:
 			page, pargs, kwargs = func, p, kw
 			break
