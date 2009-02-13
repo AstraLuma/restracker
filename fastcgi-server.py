@@ -4,7 +4,9 @@ FastCGI server using flup. Reloads on SIGHUP.
 """
 import restrack.server
 from flup.server.fcgi import WSGIServer
-import os, sys, logging
+import os, sys, logging, site
+
+site.addsitedir(os.path.dirname(__file__))
 
 lh = logging.StreamHandler(sys.stderr)
 lh.setFormatter(logging.Formatter(restrack.server.FORMAT))
