@@ -1,6 +1,7 @@
 # -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
 # vim:tabstop=4:noexpandtab:
-import kid, re, logging
+import kid, re, logging, os, sys
+import config
 __all__ = 'HTTPError', 'page', 'callpage', 'template'
 
 class HTTPError(Exception):
@@ -28,11 +29,11 @@ def page(regex):
 		return func
 	return _
 
-def findpages(path)
+def findpages(path):
 	for r, f in _pages:
 		if isinstance(r, basestring):
 			if r == path:
-				yield False, f, (), {}
+				yield False, f, None, (), {}
 		else:
 			m = r.search(path)
 			if m:
@@ -46,20 +47,22 @@ def callpage(req):
 	# 1. Find callable & assemble args
 	page = pargs = kwargs = None
 	repaths = {}
-	for isre, func, regex, p, kw in findpages(req.getpath()):
+	# about PATH_INFO:
+	# wsgiref and mod_wsgi set it to be the part after the path to this app
+	for isre, func, regex, p, kw in findpages(req.environ['PATH_INFO']):
 		if not isre:
 			page, pargs, kwargs = func, p, kw
 			break
 		else:
 			repaths[func] = regex, p, kw
 	else:
-		if len(relpaths) < 1:
+		if len(repaths) < 1:
 			pass # None found
-		if len(relpaths) == 1:
+		elif len(repaths) == 1:
 			page, (_, pargs, kwargs) = repaths.items()[0]
 		else:
 			logging.getLogger(__name__+'.callpage')\
-				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths]
+				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths])
 			# FIXME: Come up with some algorithm to select a page
 	
 	if page is None:
@@ -92,7 +95,19 @@ def template(req, name, **kwargs):
 	if 'source' in kwargs:
 		extrakw['source'] = kwargs
 		del kwargs['source']
-	tmpl = kid.Template(name=name, request=req, **kwargs)
+	
+	f = name+'.kid'
+	for d in config.TEMPLATE_PATHS:
+		fn = os.path.join(d, f)
+		if os.path.exists(fn):
+			break
+	else:
+		raise ValueError, "Template %r does not exist." % name
+	
+	logging.getLogger(__name__+'.template').info("%s -> %r", name, fn)
+	
+	tmpl = kid.Template(file=fn, request=req, **kwargs)
+	logging.getLogger(__name__+'.template').info("%r", tmpl)
 	for k,v in extrakw.iteritems():
 		setattr(tmpl, k, v)
 	return tmpl.serialize(encoding='utf-8', output=kid.XHTMLSerializer(doctype='xhtml-strict'))
