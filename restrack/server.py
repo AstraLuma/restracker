@@ -216,7 +216,16 @@ class Request(object):
 		"""req.getpath() -> string
 		Returns the path component of the URL.
 		"""
-		return self.environ.get('SCRIPT_NAME','') + self.environ.get('PATH_INFO','')
+		return self.environ.get('SCRIPT_NAME','')+self.environ.get('PATH_INFO','')
+	
+	def apppath(self):
+		"""req.apppath() -> string
+		Returns the path component of the URL, sans application base.
+		"""
+		if 'lighttpd' in self.environ['SERVER_SOFTWARE']:
+			return self.environ.get('SCRIPT_NAME','')
+		else:
+			return self.environ.get('PATH_INFO','')
 	
 	def send_response(self, exc_info=None):
 		"""req.send_response() -> None
@@ -240,7 +249,6 @@ class Request(object):
 				)
 			)
 		self.db.commit()
-
 	
 	def __enter__(self):
 		"""
@@ -279,10 +287,17 @@ def restracker_app(environ, start_response):
 	The WSGI callback.
 	"""
 	
+	logging.getLogger(__name__+'.restracker_app').debug("environ: %r", environ)
+	
 	for m in config.PAGE_MODULES:
 		__import__(m)
 	
 	req = Request(environ, start_response)
+	
+	logging.getLogger(__name__+'.restracker_app').info(
+		"Handling: %r (PATH_INFO=%r)", 
+		req.fullurl(), req.environ['PATH_INFO']
+		)
 	
 	# Emulate PEP 343
 	req.__enter__()
