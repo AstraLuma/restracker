@@ -4,7 +4,8 @@
 The top-level WSGI work.
 """
 import sys, logging, urllib, pgdb, Cookie, random, time, pickle
-import config, web
+import web
+from config import config
 __all__ = 'Request', 'restracker_app'
 
 FORMAT = "(%(name)s)[%(asctime)s] %(filename)s:%(lineno)d: %(levelname)s: %(message)s"
