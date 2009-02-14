@@ -6,6 +6,16 @@ Some example pages.
 import os
 from web import page, template, HTTPError
 
+@page('/')
+def index(req):
+	req.header('Content-Type', 'text/html')
+	import web
+	yield '<ul>'
+	for r, f in web._pages:
+		if isinstance(r, basestring):
+			yield '<li><a href="%(url)s">%(url)s</a></li>' % {'url':r}
+	yield '</ul>'
+
 @page('/test')
 def test(req): # req == Request
 	req.header('Content-Type', 'text/plain')
@@ -32,7 +42,8 @@ def info(req):
 					ex.append(k)
 				else:
 					yield '\t%r: %r\n' % (k,v)
-			yield '\tNot included: %s\n' % ', '.join(map(repr, ex))
+			if len(ex):
+				yield '\tNot included: %s\n' % ', '.join(map(repr, ex))
 			yield '}\n'
 		elif isinstance(value, dict):
 			yield '%s = {\n' % attr
