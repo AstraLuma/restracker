@@ -14,7 +14,7 @@ logging.root.addHandler(lh)
 logging.root.setLevel(logging.DEBUG)
 
 f = open('/tmp/restracker.pid', 'w')
-f.write(os.gitpid())
+f.write(os.getpid())
 f.close()
 
 try:
