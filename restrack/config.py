@@ -56,6 +56,15 @@ class _Config(object):
 		else:
 			return super(_Config, self).__getattr__(name)
 	
+	def get(self, name, default=None):
+		"""config.get(string, [object]) -> object
+		Gets a configuration value, or default if it is undefined.
+		"""
+		try:
+			return getattr(self, name)
+		except AttributeError:
+			return default
+	
 	def getlist(self, name):
 		"""config.getlist(string) -> sequence
 		Goes through each source and concats the values together, most recent 
