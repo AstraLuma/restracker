@@ -97,6 +97,7 @@ class Request(object):
 			)
 		if config.get('SQL_LOGQUERIES', False):
 			import sqllog
+			sqllog.setuplog()
 			self.db = sqllog.ConnWrapper(self.db)
 		
 		# Cookies

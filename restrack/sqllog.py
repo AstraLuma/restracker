@@ -3,7 +3,7 @@
 """
 Defines classes for logging SQL queries.
 """
-import logger
+import logging
 __all__ = 'ConnWrapper',
 
 class ConnWrapper(object):
@@ -17,7 +17,7 @@ class ConnWrapper(object):
 	def cursor(self):
 		return CurWrapper(self.__obj.cursor())
 
-def CurWrapper(object):
+class CurWrapper(object):
 	__obj = None
 	def __init__(self, obj):
 		self.__obj = obj
@@ -30,24 +30,25 @@ def CurWrapper(object):
 	
 	def callproc(self, procname, *pargs, **kwargs):
 		if operation not in self.__proc:
-			logger.getLogger('sql.callproc').info("%s", procname)
+			logging.getLogger('sql.callproc').info("%s", procname)
 			self.__proc.add(operation)
 		return self.__obj.callproc(procname, *pargs, **kwargs)
 	
 	def execute(self, operation, *pargs, **kwargs):
 		if operation not in self.__exec:
-			logger.getLogger('sql.execute').info("%s", operation)
+			logging.getLogger('sql.execute').info("%s", operation)
 			self.__exec.add(operation)
 		return self.__obj.execute(operation, *pargs, **kwargs)
 	
 	def executemany(self, operation, *pargs, **kwargs):
 		if operation not in self.__many:
-			logger.getLogger('sql.executemany').info("%s", operation)
+			logging.getLogger('sql.executemany').info("%s", operation)
 			self.__many.add(operation)
 		return self.__obj.executemany(operation, *pargs, **kwargs)
 
 setup = False
 def setuplog():
+	global setup
 	if setup: return
 	l = logging.getLogger('sql')
 	l.propogate = False
