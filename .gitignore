@@ -1,0 +1,6 @@
+# Some python-related things
+*.pyc
+*.pyo
+# For user-specific configuration of the test server
+user-config.py
+

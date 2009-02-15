@@ -4,7 +4,7 @@
 The top-level WSGI work.
 """
 import sys, logging, urllib, pgdb, Cookie, random, time, pickle
-import web
+import web, utils
 from config import config
 __all__ = 'Request', 'restracker_app'
 
@@ -78,24 +78,13 @@ HTTP_STATUS_CODES = {
 	510 : '510 Not Extended', # RFC 2774 (An HTTP Extension Framework)
 	}
 
-class blob(object):
-	"""
-	A quick hack so that bytea isn't double-escaped
-	"""
-	def __init__(self, data):
-		self.data = data
-	
-	def __pg_repr__(self):
-		return "E'%s'::bytea" % pgdb.escape_bytea(self.data)
-	
-	@staticmethod
-	def load(data):
-		return pgdb.unescape_bytea(data)
-
 class Request(object):
 	"""
 	The req object passed to pages.
 	"""
+	#TODO: Use more urlparse stuff
+	#TODO: Examine wsgiref more and see if it's useful
+	#TODO: Add the ability to log SQL queries (via wrapper objects)
 	def __init__(self, environ, start_response):
 		self.environ = environ
 		self._start_response = start_response
@@ -124,7 +113,7 @@ class Request(object):
 			if data is None:
 				self._session_id = None
 			else:
-				self.session = pickle.loads(blob.load(data[0]))
+				self.session = pickle.loads(utils.blob.load(data[0]))
 		if self._session_id is None:
 			while not self._initsession(): pass
 			self.db.commit()
@@ -246,7 +235,7 @@ class Request(object):
 			"""UPDATE sessions SET data=%(data)s WHERE id=%(id)s""", 
 			dict(
 				id=self._session_id, 
-				data=blob(pickle.dumps(self.session, pickle.HIGHEST_PROTOCOL)),
+				data=utils.blob(pickle.dumps(self.session, pickle.HIGHEST_PROTOCOL)),
 				)
 			)
 		self.db.commit()
