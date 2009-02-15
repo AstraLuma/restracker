@@ -20,6 +20,8 @@ httpd = make_server('', PORT, restrack.server.restracker_app)
 print "Serving HTTP on port %i..." % PORT
 
 # Respond to requests until process is killed
-httpd.serve_forever()
-
+try:
+	httpd.serve_forever()
+except KeyboardInterrupt:
+	pass
 
