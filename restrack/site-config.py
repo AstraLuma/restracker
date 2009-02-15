@@ -1,7 +1,7 @@
 """
-This is the configuration file.
+This is the configuration file. Use config.py to actually get settings.
 
-NOTE: Do not use "from config import *". This prevents reloading of values.
+NOTE: All paths are relative to this file.
 """
 
 # The root of this application, in the form '/spam/eggs'
@@ -19,14 +19,13 @@ SQL_DATABASE = 'restracker'
 SQL_USER = None
 SQL_PASSWORD = None
 
-import os
 # Paths to find templates in
 TEMPLATE_PATHS = (
-	os.path.dirname(os.path.dirname(__file__)), # Application dir
-	os.path.dirname(__file__), # Framework dir
+	'..', # Application dir
+	'.', # Framework dir
 	)
 
-# Load these at startup.
+# Import these at startup.
 PAGE_MODULES = (
 	'restrack.pages',
 	)

@@ -97,7 +97,7 @@ def template(req, name, **kwargs):
 		del kwargs['source']
 	
 	f = name+'.kid'
-	for d in config.TEMPLATE_PATHS:
+	for d in config.getpathlist('TEMPLATE_PATHS'):
 		fn = os.path.join(d, f)
 		if os.path.exists(fn):
 			break
