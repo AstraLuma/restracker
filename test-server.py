@@ -4,7 +4,7 @@ A simple test server using wsgiref. That module is default in Python 2.5.
 """
 import restrack.server, restrack.config
 import wsgiref.simple_server
-import logging, sys, os
+import logging, sys, os, cgitb
 
 PORT = 8888
 
@@ -25,7 +25,7 @@ class DebugServerHandler(wsgiref.simple_server.ServerHandler):
 		be overridden in a subclass to dynamically generate diagnostics,
 		choose an appropriate message for the user's preferred language, etc.
 		"""
-		start_response('500 Internal Server Error',[('Content-Type','text/html')],sys.exc_info())
+		start_response('500 Internal Server Error', [('Content-Type','text/html')], sys.exc_info())
 		return [cgitb.html(sys.exc_info())]
 
 class DebugWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):

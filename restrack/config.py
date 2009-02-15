@@ -113,7 +113,8 @@ class _Config(object):
 						warnings.warn("Relative path-valued setting found in %r but unable to make an absolute path out of it." % s)
 						continue
 				if os.path.isabs(v):
-					return v
+					rv.append(v)
+		return rv
 
 config = _Config()
 config.addfile('site-config.py', relto=__file__)
