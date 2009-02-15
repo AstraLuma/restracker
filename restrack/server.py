@@ -84,7 +84,6 @@ class Request(object):
 	"""
 	#TODO: Use more urlparse stuff
 	#TODO: Examine wsgiref more and see if it's useful
-	#TODO: Add the ability to log SQL queries (via wrapper objects)
 	def __init__(self, environ, start_response):
 		self.environ = environ
 		self._start_response = start_response
@@ -96,6 +95,9 @@ class Request(object):
 			host=config.SQL_HOST, database=config.SQL_DATABASE, 
 			user=config.SQL_USER, password=config.SQL_PASSWORD
 			)
+		if config.get('SQL_LOGQUERIES', False):
+			import sqllog
+			self.db = sqllog.ConnWrapper(self.db)
 		
 		# Cookies
 		self.cookies = Cookie.SimpleCookie(self.environ.get('HTTP_COOKIE', None))
@@ -118,6 +120,7 @@ class Request(object):
 			while not self._initsession(): pass
 			self.db.commit()
 			self.session = {}
+		self.cookies[config.SESSION_COOKIE]['max-age'] = config.SESSION_LENGTH
 		
 		self.user = self.session.get('user', None) # None = anonymous user
 	
@@ -139,7 +142,6 @@ class Request(object):
 			return False
 		self._session_id = sess
 		self.cookies[config.SESSION_COOKIE] = sess
-		self.cookies[config.SESSION_COOKIE]['max-age'] = config.SESSION_LENGTH
 		return True
 	
 	def _mksession(self):
@@ -221,7 +223,7 @@ class Request(object):
 		"""req.send_response() -> None
 		Sends headers & status to the client.
 		"""
-		headers = self._headers[:] #FIXME: Pull from self._headers somehow
+		headers = self._headers[:]
 		headers += [('Set-Cookie', v.OutputString()) for v in self.cookies.itervalues()]
 		st = HTTP_STATUS_CODES[self._status or 200]
 		if exc_info is not None:
