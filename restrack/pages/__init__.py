@@ -9,7 +9,7 @@ from restrack.web import page, template, HTTPError
 @page('/')
 def index(req):
 	req.header('Content-Type', 'text/html')
-	import web
+	import restrack.web as web
 	yield '<ul>'
 	for r, f in web._pages:
 		if isinstance(r, basestring):
