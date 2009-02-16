@@ -18,7 +18,7 @@ super boolean,
 PRIMARY KEY(email),
 FOREIGN KEY(email) REFERENCES users(email)
 );
-COMMENT ON TABLE admin IS 'All non-anonymous users of the system.';
+COMMENT ON TABLE admin IS 'Users who approve, arbitrate, and manage.';
 COMMENT ON COLUMN admin.email IS 'The reference back to the user table.';
 COMMENT ON COLUMN admin.title IS 'The job title of the admin';
 COMMENT ON COLUMN admin.super IS 'Can this admin manage the application?';
