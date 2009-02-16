@@ -3,7 +3,8 @@
 """
 The top-level WSGI work.
 """
-import sys, logging, urllib, pgdb, Cookie, random, time, pickle
+import sys, logging, urllib, pgdb, Cookie, random, time, pickle, cgi
+# Local imports
 import web, utils
 from config import config
 __all__ = 'Request', 'restracker_app'
@@ -167,9 +168,10 @@ class Request(object):
 					self._headers.remove(v)
 		self._headers.append((name, value))
 	
-	def fullurl(self, path=None):
-		"""req.fullurl([string]) -> string
-		Dereferences relative URLs, prefixes domain names, etc.
+	def fullurl(self, path=None, **query):
+		"""req.fullurl([string], [name=value, ...]) -> string
+		Dereferences relative URLs, prefixes domain names, etc. Adds the query 
+		string in the keyword arguments.
 		"""
 		if path is not None and (path.startswith('http:') or path.startswith('https:')):
 			return path
@@ -203,6 +205,9 @@ class Request(object):
 				if '?' not in path: # If doesn't contain a query string, ...
 					path = urllib.quote(path) # then quote the path as needed
 				url += path
+		if len(query):
+			url += '?'
+			url += urllib.urlencode(query.items())
 		return url
 	
 	def getpath(self):
@@ -219,6 +224,46 @@ class Request(object):
 			return self.environ.get('SCRIPT_NAME','')
 		else:
 			return self.environ.get('PATH_INFO','')
+	
+	def post(self):
+		"""r.post() -> None|dict
+		Returns the POST data as a dictionary, or None if there was no POST.
+		"""
+		rv = self.postall()
+		if rv is None:
+			return None
+		else:
+			return dict(rv)
+	
+	_postvars = None
+	def postall(self):
+		"""r.postall() -> [(name, value), ...]
+		Returns the POST data as an ordered sequence of name/value pairs, or 
+		None if there was no POST.
+		"""
+		if 'HTTP_CONTENT_LENGTH' not in self.environ: return
+		if self._postvars is None:
+			ctype, pdict = cgi.parse_header(self.environ['HTTP_CONTENT_TYPE'])
+			clength = int(self.environ['HTTP_CONTENT_LENGTH'])
+			qs = self.environ['wsgi.input'].read(clength)
+			self._postvars = parse_qs(qs, True)
+		return self._postvars
+	
+	def query(self):
+		"""r.query() -> dict
+		Returns the query string as a dictionary.
+		"""
+		rv = self.queryall()
+		if rv is None:
+			return None
+		else:
+			return dict(rv)
+	
+	def queryall(self):
+		"""r.queryall() -> [(name, value), ...]
+		Returns the query string as an ordered sequence of name/value pairs.
+		"""
+		return cgi.parse_qsl(self.environ.get('QUERY_STRING', ''), True)
 	
 	def send_response(self, exc_info=None):
 		"""req.send_response() -> None
