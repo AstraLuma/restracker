@@ -12,32 +12,38 @@ class HTTPError(Exception):
 		self.code = code
 		self.status = status
 
-
+# [(regex|string, callable, dict), ...]
 _pages = []
 
-def page(regex):
-	"""@page(string)
+def page(regex, **options):
+	"""@page(string, [option=value, ...])
 	Registers a callable as a page handler. The passed string is used as a 
 	Regular Expression if a '(' is found in the string.
 	
 	Note that searching (not matching) is used to select pages.
+	
+	The following flags may also be given as keyword arguments:
+	* methods: Sequence of valid methods. Defaults to ['GET'].
+	* mustauth: Boolean. Does the user need to be logged in? Defaults to False.
 	"""
 	if '(' in regex:
 		regex = re.compile(regex)
+	options.setdefault('methods', ['GET'])
+	options.setdefault('mustauth', False)
 	def _(func):
-		_pages.append((regex, func))
+		_pages.append((regex, func, options))
 		return func
 	return _
 
 def findpages(path):
-	for r, f in _pages:
+	for r, f, ops in _pages:
 		if isinstance(r, basestring):
 			if r == path:
-				yield False, f, None, (), {}
+				yield False, f, None, (), {}, ops
 		else:
 			m = r.search(path)
 			if m:
-				yield True, f, r, m.groups(), m.groupdict()
+				yield True, f, r, m.groups(), m.groupdict(), ops
 
 def callpage(req):
 	"""callpage(Request) -> iterable
@@ -47,19 +53,20 @@ def callpage(req):
 	# 1. Find callable & assemble args
 	page = pargs = kwargs = None
 	repaths = {}
+	pageops = {}
 	# about PATH_INFO:
 	# wsgiref and mod_wsgi set it to be the part after the path to this app
-	for isre, func, regex, p, kw in findpages(req.apppath()):
+	for isre, func, regex, p, kw, ops in findpages(req.apppath()):
 		if not isre:
-			page, pargs, kwargs = func, p, kw
+			page, pargs, kwargs, pageops = func, p, kw, ops
 			break
 		else:
-			repaths[func] = regex, p, kw
+			repaths[func] = regex, p, kw, ops
 	else:
 		if len(repaths) < 1:
 			pass # None found
 		elif len(repaths) == 1:
-			page, (_, pargs, kwargs) = repaths.items()[0]
+			page, (_, pargs, kwargs, pageops) = repaths.items()[0]
 		else:
 			logging.getLogger(__name__+'.callpage')\
 				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths])
@@ -68,13 +75,20 @@ def callpage(req):
 	if page is None:
 		rv = template(req, 'error-404')
 	else:
-		# 2. Call
-		try:
-			rv = page(req, *pargs, **kwargs)
-		except HTTPError, e:
-			# 2a. Handle HTTPErrors
-			req.status(e.code, e.status)
-			rv = template(req, 'error-%i' % e.code, error=e)
+		if req.environ['REQUEST_METHOD'] not in pageops['methods']:
+			req.status(405)
+			rv = template('error-405')
+		elif pageops['needauth'] and req.user is None:
+			# TODO: Put up a login page
+			pass
+		else:
+			# 2. Call
+			try:
+				rv = page(req, *pargs, **kwargs)
+			except HTTPError, e:
+				# 2a. Handle HTTPErrors
+				req.status(e.code, e.status)
+				rv = template(req, 'error-%i' % e.code, error=e)
 	
 	# 3. Return
 	return rv
