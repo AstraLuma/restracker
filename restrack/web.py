@@ -78,7 +78,7 @@ def callpage(req):
 		if req.environ['REQUEST_METHOD'] not in pageops['methods']:
 			req.status(405)
 			rv = template('error-405')
-		elif pageops['needauth'] and req.user is None:
+		elif pageops['mustauth'] and req.user is None:
 			# TODO: Put up a login page
 			pass
 		else:
