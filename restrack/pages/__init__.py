@@ -24,7 +24,7 @@ def test(req): # req == Request
 	yield 'This is a test page. '
 	yield 'Hi! '
 
-@page('/info')
+@page('/info', methods=['GET', 'POST'])
 def info(req):
 	req.header('Content-Type', 'text/plain')
 	
