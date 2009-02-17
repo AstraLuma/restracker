@@ -75,7 +75,9 @@ def callpage(req):
 	if page is None:
 		rv = template(req, 'error-404')
 	else:
-		if req.environ['REQUEST_METHOD'] not in pageops['methods']:
+		meth = req.environ['REQUEST_METHOD']
+		if meth == 'HEAD': meth = 'GET' # HEAD is GET, but don't send the body
+		if meth not in pageops['methods']:
 			req.status(405)
 			rv = template('error-405')
 		elif pageops['mustauth'] and req.user is None:
