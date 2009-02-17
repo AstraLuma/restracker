@@ -6,6 +6,7 @@ password VARCHAR(16) NOT NULL,
 name VARCHAR(32),
 PRIMARY KEY(email)
 );
+ALTER TABLE users OWNER TO restracker;
 COMMENT ON TABLE users IS 'All non-anonymous users of the system.';
 COMMENT ON COLUMN users.email IS 'The email address and login identifier of the user.';
 COMMENT ON COLUMN users.password IS 'A hash of the password.';
@@ -18,6 +19,7 @@ super boolean,
 PRIMARY KEY(email),
 FOREIGN KEY(email) REFERENCES users(email)
 );
+ALTER TABLE admin OWNER TO restracker;
 COMMENT ON TABLE admin IS 'Users who approve, arbitrate, and manage.';
 COMMENT ON COLUMN admin.email IS 'The reference back to the user table.';
 COMMENT ON COLUMN admin.title IS 'The job title of the admin';
@@ -31,6 +33,7 @@ major2 VARCHAR(32),
 PRIMARY KEY(email),
 FOREIGN KEY (email) REFERENCES users(email)
 );
+ALTER TABLE student OWNER TO restracker;
 COMMENT ON TABLE student IS 'Members of groups.';
 COMMENT ON COLUMN student.email IS 'The reference back to the user table.';
 COMMENT ON COLUMN student.year IS 'Their official class year.';
@@ -44,6 +47,7 @@ class INT, --INT(1)
 PRIMARY KEY (email),
 FOREIGN KEY (email) REFERENCES users(email)
 );
+ALTER TABLE club OWNER TO restracker;
 COMMENT ON TABLE club IS 'A student association, group, club, etc.';
 COMMENT ON COLUMN club.email IS 'Reference bakc to the user table.';
 COMMENT ON COLUMN club.description IS 'A short description of the group.';
@@ -56,9 +60,10 @@ PRIMARY KEY(student,club),
 FOREIGN KEY (student) REFERENCES student(email),
 FOREIGN KEY (club) REFERENCES club(email)
 );
-COMMENT ON TABLE memberof IS 'What groups each student is a member of.';
-COMMENT ON COLUMN memberof.student IS 'The student in question.';
-COMMENT ON COLUMN memberof.club IS 'The group the student is part of.';
+ALTER TABLE memberOf OWNER TO restracker;
+COMMENT ON TABLE memberOf IS 'What groups each student is a member of.';
+COMMENT ON COLUMN memberOf.student IS 'The student in question.';
+COMMENT ON COLUMN memberOf.club IS 'The group the student is part of.';
 
 CREATE TABLE event(
 description TEXT,
@@ -67,6 +72,7 @@ expectedSize INT,
 ID SERIAL, -- Special PostgreSQL type
 PRIMARY KEY (ID)
 );
+ALTER TABLE event OWNER TO restracker;
 COMMENT ON TABLE event IS 'Some event a group is throwing. The date/time it is thrown is dependent on its reservations.';
 COMMENT ON COLUMN event.description IS 'A long textual description of an event. Can be multiple paragraphs, etc.';
 COMMENT ON COLUMN event.name IS 'The short display name of the event.';
@@ -80,9 +86,10 @@ PRIMARY KEY(club,eventran),
 FOREIGN KEY (club) REFERENCES club(email),
 FOREIGN KEY (eventran) REFERENCES event(ID)
 );
-COMMENT ON TABLE runby IS 'What groups run events.';
-COMMENT ON COLUMN runby.club IS 'The group running the event.';
-COMMENT ON COLUMN runby.eventran IS 'The event being run.';
+ALTER TABLE runBy OWNER TO restracker;
+COMMENT ON TABLE runBy IS 'What groups run events.';
+COMMENT ON COLUMN runBy.club IS 'The group running the event.';
+COMMENT ON COLUMN runBy.eventran IS 'The event being run.';
 
 CREATE TABLE room(
 occupancy INT,
@@ -90,6 +97,7 @@ roomNum INT,
 building VARCHAR(3),
 PRIMARY KEY(roomNum,building)
 );
+ALTER TABLE room OWNER TO restracker;
 COMMENT ON TABLE room IS 'A place that can be reserved. May have equipment intrinsic to it.';
 COMMENT ON COLUMN room.occupancy IS 'About how many people the room can hold.';
 COMMENT ON COLUMN room.roomnum IS 'The room number.';
@@ -99,6 +107,7 @@ CREATE TABLE equipment(
 name VARCHAR(32),
 PRIMARY KEY(name)
 );
+ALTER TABLE equipment OWNER TO restracker;
 COMMENT ON TABLE equipment IS 'Something used by an event and intrinsic to a room. eg, projectors.';
 COMMENT ON COLUMN equipment.name IS 'The name of the equipment';
 
@@ -111,11 +120,12 @@ PRIMARY KEY (whatequip,roomNum,building),
 FOREIGN KEY(whatequip) REFERENCES equipment(name),
 FOREIGN KEY (roomNum,building) REFERENCES room(roomNum,building)
 );
-COMMENT ON TABLE isin IS 'Equipment that a room has intrinsic to it.';
-COMMENT ON COLUMN isin.whatequip IS 'The equipment in reference.';
-COMMENT ON COLUMN isin.roomnum IS 'The room number the equipment is in.';
-COMMENT ON COLUMN isin.building IS 'The building the room is in.';
-COMMENT ON COLUMN isin.quantity IS 'How many instances of the equipment is present.';
+ALTER TABLE isIn OWNER TO restracker;
+COMMENT ON TABLE isIn IS 'Equipment that a room has intrinsic to it.';
+COMMENT ON COLUMN isIn.whatequip IS 'The equipment in reference.';
+COMMENT ON COLUMN isIn.roomnum IS 'The room number the equipment is in.';
+COMMENT ON COLUMN isIn.building IS 'The building the room is in.';
+COMMENT ON COLUMN isIn.quantity IS 'How many instances of the equipment is present.';
 
 CREATE TABLE uses(
 usedat INTEGER,
@@ -125,6 +135,7 @@ PRIMARY KEY(usedat,whatequip),
 FOREIGN KEY (usedat) REFERENCES event(ID),
 FOREIGN KEY(whatequip) REFERENCES equipment(name)
 );
+ALTER TABLE uses OWNER TO restracker;
 COMMENT ON TABLE uses IS 'Equipment used by a particular event.';
 COMMENT ON COLUMN uses.usedat IS 'The event that''s using equipment.';
 COMMENT ON COLUMN uses.whatequip IS 'The equipment being used.';
@@ -142,6 +153,7 @@ FOREIGN KEY(about) REFERENCES event(ID),
 PRIMARY KEY (ID),
 FOREIGN KEY (parent) REFERENCES comments(ID)
 );
+ALTER TABLE comments OWNER TO restracker;
 COMMENT ON TABLE comments IS 'Comments made by users about events';
 COMMENT ON COLUMN comments.ID IS 'An arbitrary numeric identifier.';
 COMMENT ON COLUMN comments.madeat IS 'When it was made.';
@@ -166,6 +178,7 @@ FOREIGN KEY(admin) REFERENCES admin(email),
 FOREIGN KEY(forevent) REFERENCES event(ID),
 PRIMARY KEY(ID)
 );
+ALTER TABLE reservation OWNER TO restracker;
 COMMENT ON TABLE reservation IS 'A particular room & time for an event.
 
 Note: reservation.student must be a member of one of the reservation.forevent.runby clubs.';
