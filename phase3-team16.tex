@@ -1,16 +1,89 @@
 \documentclass{article}
-\usepackage{amsmath,amssymb,bbm}
+\usepackage{graphicx,verbatim}
 
-\title{}
-\author{Stephanie Fuller}
+\title{ResTracker Phase 3}
+\author{Team 16\\Stephanie Fuller (sfuller@wpi.edu)\\Jamie Bliss (jebliss@wpi.edu)\\Sam
+LaFleche (shl@wpi.edu)}
 
 \begin{document}
 
 \maketitle
 
 \section{}
-%old requirements
-%by user
+Requirements:
+
+\begin{itemize}
+\item Users are broken up into Administrators, Super Administrators, Anonymous Users, Students, and Groups
+\item All users have names, email addresses, and passwords.
+\item Students also have a graduation year and major(s).
+\item Administrators have titles and Super Administrator privileges or not. 
+\item Groups have descriptions and what class (class 1, class 2, class 3, etc.).
+\item Events have a name, description, ID, and expected size.
+\item Events have sponsoring groups, name, description, and room reservation(s).
+\item There are rooms. Rooms have buildings, room numbers, and occupancy.
+\item There is equipment. Equipment is a type of equipment.
+\item Equipment can be in rooms and can be used for events.
+\item When equipment is in a room there is a quantity.
+\item A reservation shall include who booked it, what administrator
+approved it (if any), when it was booked, when it is being reserved,
+and the event it is for.
+\item The system notifies the group and user which created it with any
+changes to an event or reservation.
+\item All changes (eg additions, deletions, and mutations) shall be
+logged, including the user who made the change, the event that was
+changed, and the old and new data.
+\item The database shall be usable by multiple users at once.
+\item The database shall have a UI capable of showing relevant information.
+\item For each reservation the student who made the reservation must
+be a member of the group the reservation is for.
+\item Events can have any number of comments on them, including none.
+\item Comments must be on exactly one event.
+\item Each comment is made only by one user.
+\item Events are run by one or more clubs. There cannot be an event run by no
+club, but more than one club can run the event. This is as is currently done for
+events at WPI.  
+\item Groups can run any number of events including none. New clubs can have not
+run any events yet. 
+\item Events may or may not use equipment.
+\item Equipment may or may not be used.
+\item Students can make reservations, but do not have to do so.
+\item Rooms may be reserved, but do not have to be.
+\item Rooms cannot be booked for more than one event at the same time. 
+\item Events can be in public, non-reservable places.
+\item Events can be in more than one room. Large events can have multiple rooms
+reserved for it.
+\item Reservations can either be approved or not yet approved.
+\item Students can be members of as many clubs as they want to be, including 0.
+\item Groups can have as many members as they want, including potentially 0 if
+it is a newly created club or members have not yet joined for the year.
+\item Anonymous users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Anonymous users can create user accounts.
+\item Student users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Student users can request group membership.
+\item Student users can comment on events and comments.
+\item Student users can create events for groups they are members for.
+\item Student users can edit the events they create.
+\item Student users can make reservations for the events they create.
+\item Student users can edit the reservations for the events they create.
+\item Group users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Group users can edit events they sponsor.
+\item Group users can edit the reservations for the events they sponsor.
+\item Group users can comment on events and comments.
+\item Group users can add students to a group.
+\item Administrator users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Administrator users can approve reservations.
+\item Administrator users can comment on events and comments.
+\item Administrator users can update room information.
+\item Super Administrator users can perform any action Administrators can.
+\item Super Administrator users can view, add, update and delete: rooms, events, equipment, users, reservations and comments.
+\item Users shall be able to search for a room.
+\item Users shall be able to get a list of what rooms a group has
+reserved and when they are reserved for.
+\item Administrators shall be able to view recent changes to the database.
+\item An administrator must approve a reservation before it is official.
+\end{itemize}
+
+\section{}
 
 %\section{queries}
 
@@ -25,7 +98,7 @@
 %\end{itemize}
 
 %available times
-%overlapping reservations
+%overlapping reservations - including events
 %search for rooms based on date/time
 %search for rooms based on equipment
 %search for rooms based on occupancy range (or just minimum occupancy)
@@ -33,10 +106,12 @@
 %statistic pages:
 	%most used rooms
 	%favourite events
-	%most common majors for specific events
+	%most common majors for running events
 
 %updates:
 %clean out sessions
+
+\section{}
 
 \end{document}
 
