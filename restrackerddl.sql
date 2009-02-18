@@ -2,14 +2,14 @@ COMMENT ON DATABASE restracker IS 'The tables for ResTracker.';
 
 CREATE TABLE users(
 email VARCHAR(32),
-password CHAR(16) NOT NULL,
-name VARCHAR(32),
+password CHAR(32) NOT NULL,
+name VARCHAR(64),
 PRIMARY KEY(email)
 );
 ALTER TABLE users OWNER TO restracker;
 COMMENT ON TABLE users IS 'All non-anonymous users of the system.';
 COMMENT ON COLUMN users.email IS 'The email address and login identifier of the user.';
-COMMENT ON COLUMN users.password IS 'A hash of the password.';
+COMMENT ON COLUMN users.password IS 'An MD5 hash of the password.';
 COMMENT ON COLUMN users.name IS 'The display name of the user.';
 
 CREATE TABLE admin(
