@@ -95,7 +95,7 @@ CREATE TABLE room(
 occupancy INT,
 roomNum VARCHAR(5),
 building VARCHAR(3),
-displayname VARCHAR(16),
+displayname VARCHAR(32),
 PRIMARY KEY(roomNum,building)
 );
 ALTER TABLE room OWNER TO restracker;
