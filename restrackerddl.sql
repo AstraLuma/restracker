@@ -103,6 +103,7 @@ COMMENT ON TABLE room IS 'A place that can be reserved. May have equipment intri
 COMMENT ON COLUMN room.occupancy IS 'About how many people the room can hold.';
 COMMENT ON COLUMN room.roomnum IS 'The room number.';
 COMMENT ON COLUMN room.building IS 'The abbrev. of the building the room is in. (eg, FL, CC, KH)';
+COMMENT ON COLUMN room.displayname IS 'The well-known name of the room. eg The Morgan Room instead of CC 208.';
 
 CREATE TABLE equipment(
 equipname VARCHAR(32),
@@ -110,11 +111,11 @@ PRIMARY KEY(equipname)
 );
 ALTER TABLE equipment OWNER TO restracker;
 COMMENT ON TABLE equipment IS 'Something used by an event and intrinsic to a room. eg, projectors.';
-COMMENT ON COLUMN equipment.name IS 'The name of the equipment';
+COMMENT ON COLUMN equipment.equipname IS 'The name of the equipment';
 
 CREATE TABLE isIn(
 equipname VARCHAR(32),
-roomNum INT,
+roomNum VARCHAR(5),
 building VARCHAR(3),
 quantity INT,
 PRIMARY KEY (equipname,roomNum,building),
@@ -168,7 +169,7 @@ RID SERIAL,
 timeBooked TIMESTAMP NOT NULL,
 startTime TIMESTAMP NOT NULL,
 endTime TIMESTAMP NOT NULL,
-roomNum INT NOT NULL,
+roomNum VARCHAR(5) NOT NULL,
 building VARCHAR(3) NOT NULL,
 sEmail VARCHAR(32) NOT NULL,
 aEmail VARCHAR(32),
@@ -187,7 +188,7 @@ COMMENT ON COLUMN reservation.rid IS 'An arbitrary numeric identifier.';
 COMMENT ON COLUMN reservation.timebooked IS 'When the reservation was requested.';
 COMMENT ON COLUMN reservation.starttime IS 'The start of when the room is needed.';
 COMMENT ON COLUMN reservation.endtime IS 'The end of when the room is needed.';
-COMMENT ON COLUMN reservation.roomnum IS 'The room which is requested.';
+COMMENT ON COLUMN reservation.roomNum IS 'The room which is requested.';
 COMMENT ON COLUMN reservation.building IS 'The building the requested room is in.';
 COMMENT ON COLUMN reservation.semail IS 'The user who made the reservation.';
 COMMENT ON COLUMN reservation.aemail IS 'The administrator who approved the reservation, making it official. NULL if it is unapproved.';
