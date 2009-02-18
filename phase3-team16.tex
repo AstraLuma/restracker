@@ -9,8 +9,7 @@ LaFleche (shl@wpi.edu)}
 
 \maketitle
 
-\section{}
-Requirements:
+\section{Requirements}
 
 \begin{itemize}
 \item Users are broken up into Administrators, Super Administrators, Anonymous Users, Students, and Groups
@@ -85,28 +84,35 @@ reserved and when they are reserved for.
 
 \section{}
 
-%\section{queries}
+\section{Queries}
 
-%listing page and detail page on including relations:
-%\begin{itemize}
-%\item room -includes equipment
-%\item equipment - includes rooms in
-%\item clubs -include events sponsored 
-%\item events -include comments, equipment used
-%\item users -include events they're in charge of
-%\item reservation 
-%\end{itemize}
+The following items can be queried on for either an identifying list of items,
+or for a detailed list of the information and relations in the database about each item:
+\begin{itemize}
+\item room - includes equipment
+\item equipment - includes rooms in
+\item clubs - include events sponsored 
+\item events - include comments, equipment used
+\item users - include events they're in charge of
+\item reservation 
+\end{itemize}
 
-%available times
-%overlapping reservations - including events
-%search for rooms based on date/time
-%search for rooms based on equipment
-%search for rooms based on occupancy range (or just minimum occupancy)
+Rooms can be queried based on available times such that only rooms with no approved reservations at those times are returned.
+If there are unapproved reservations for that room at that time that is also returned.
 
-%statistic pages:
-	%most used rooms
-	%favourite events
-	%most common majors for running events
+Rooms can be queried based on the presence of specific equipment in them.
+
+Rooms can be queried based on occupancy range (or just minimum occupancy).
+
+Reservations can be queried such that all overlapping reservations are returned along with their events.
+
+A user can request statistic pages from the database. These include statistics on:
+\begin{itemize}
+\item most commonly used rooms
+\item favorite events based on rating of comments about the event
+\item which student majors run the most events
+\end{itemize}
+
 
 %updates:
 %clean out sessions
