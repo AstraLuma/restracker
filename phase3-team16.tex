@@ -9,7 +9,6 @@ LaFleche (shl@wpi.edu)}
 
 \maketitle
 
-
 \section{}
 Requirements:
 
@@ -84,57 +83,35 @@ reserved and when they are reserved for.
 \item An administrator must approve a reservation before it is official.
 \end{itemize}
 
+\section{}
 
+%\section{queries}
+
+%listing page and detail page on including relations:
+%\begin{itemize}
+%\item room -includes equipment
+%\item equipment - includes rooms in
+%\item clubs -include events sponsored 
+%\item events -include comments, equipment used
+%\item users -include events they're in charge of
+%\item reservation 
+%\end{itemize}
+
+%available times
+%overlapping reservations - including events
+%search for rooms based on date/time
+%search for rooms based on equipment
+%search for rooms based on occupancy range (or just minimum occupancy)
+
+%statistic pages:
+	%most used rooms
+	%favourite events
+	%most common majors for running events
+
+%updates:
+%clean out sessions
 
 \section{}
-Our ER model was created in an iterative process and ran by the TA before
-the submission of phase 1. The TA had no further comments on our phase 1
-submission. 
-\scalebox{.42}{\includegraphics[angle=90]{ERmodel.eps}}
-%\includegraphics[angle=90]{ERmodel.eps}
-
-\section{}
-\verbatiminput{EnglishDatabaseTables.txt}
-
-\section{}
-Having analyzed every non-key attribute in every table, we realized that no
-other attribute is implied by it. This means normalization isn't possible. 
-
-Some things we questioned as to whether or not there were functional
-dependences. These were the title and privaledges of an admin, and the title and
-description of an event. Because titles are something defined by the
-administration, and may not directly relate to how the user uses the system, we
-felt there wasn't a functional dependency. In the case of event name and
-description, weekly events may have the same name and different descriptions
-dependent on what will be going on that week.
-
-\section{}
-\marginpar{In the submitted online version there are some mistakes in the DDL
-statements. I had accidentally checked out from the repository before the fixed
-version was committed and did not notice the file I included was not the one
-without mistakes.}
-\verbatiminput{restrackerddl.sql}
-\verbatiminput{createtables.log}
-%Load data in and show output of script.
-
-
-\section{}
-This past week we met Thursday after class to discuss what we were doing, on
-Sunday, and on Wedensday. We are contining to meet on Wedensday to work, when
-the phase is first assigned to discuss our plan, and once other, though that
-meeting is dependent on our schedules. We also distribute our work over git,
-though we meet in person.
-
-\section{}
-\marginpar{In our online submission Jamie was said to have handled loading the
-data. The data had not been loaded last night and this was not his fault.
-Stephanie had taken over this with the extended deadline, but did not get it
-done because of health reasons. }
-Like our previous phase, our work was mainly joint. All work was done while we
-were in meetings. However, certain parts were mostly done by specific people.
-Sam wrote up the english description of the tables of the database. Stephanie
-wrote up the ddl statements. Jamie handled configuring the database, testing and
-fixing the ddl statements.  
 
 \end{document}
 
