@@ -23,6 +23,7 @@ SQL_PASSWORD = None
 TEMPLATE_PATHS = (
 	'..', # Application dir
 	'.', # Framework dir
+	'pages',
 	)
 
 # Import these at startup.

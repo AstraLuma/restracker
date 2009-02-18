@@ -100,8 +100,14 @@ def result2objs(cursor, *tmap, **dmap):
 	"""result2objs(dbCursor, (slice, cls, attr, ...), ...) -> tuple, ...
 	result2objs(dbCusros, name=(slice, cls, attr, ...), ...) -> dict, ...
 	Maps an entire result set to a generator of either tuples or dicts, 
-	depending on how it's called.
+	depending on how it's called. If the attribute listing is omitted, it's 
+	pulled from the query's names.
 	"""
+	def fixsca(cursor, sca):
+		if len(sca) == 2:
+			return sca + zip(*cursor.description[sca[0]])[0]
+		else:
+			return sca
 	if not xor(len(tmap), len(dmap)):
 		raise TypeError, "Call with either positional or keyword arguments, not both."
 	for row in itercursor(cursor):

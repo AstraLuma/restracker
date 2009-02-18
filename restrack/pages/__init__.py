@@ -5,6 +5,7 @@ Some example pages.
 """
 import os
 from restrack.web import page, template, HTTPError
+import users
 
 @page('/')
 def index(req):
@@ -52,17 +53,7 @@ def info(req):
 			yield '}\n'
 		else:
 			yield '%s = %r\n' % (attr, value)
-	
-
-@page('/user/(.*)') #regex
-def user(req, userid): # The group from the regex is passed as a positional parameter
-	req.header('Content-Type', 'text/html')
-	
-	# Do some processing
-	# Use req.db as the Connection object
-	
-	# sent all at once
-	return template('user', user=data) # user is a variable that the template references
+	yield 'postall() = %r\n' % (req.postall())
 
 @page('/spam')
 def spam(req):
