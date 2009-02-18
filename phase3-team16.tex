@@ -1,0 +1,140 @@
+\documentclass{article}
+\usepackage{graphicx,verbatim}
+
+\title{ResTracker Phase 3}
+\author{Team 16\\Stephanie Fuller (sfuller@wpi.edu)\\Jamie Bliss (jebliss@wpi.edu)\\Sam
+LaFleche (shl@wpi.edu)}
+
+\begin{document}
+
+\maketitle
+
+
+\section{}
+Requirements:
+
+\begin{itemize}
+\item Users are broken up into Administrators, Super Administrators, Anonymous Users, Students, and Groups
+\item All users have names, email addresses, and passwords.
+\item Students also have a graduation year and major(s).
+\item Administrators have titles and Super Administrator privileges or not. 
+\item Groups have descriptions and what class (class 1, class 2, class 3, etc.).
+\item Events have a name, description, ID, and expected size.
+\item Events have sponsoring groups, name, description, and room reservation(s).
+\item There are rooms. Rooms have buildings, room numbers, and occupancy.
+\item There is equipment. Equipment is a type of equipment.
+\item Equipment can be in rooms and can be used for events.
+\item When equipment is in a room there is a quantity.
+\item A reservation shall include who booked it, what administrator
+approved it (if any), when it was booked, when it is being reserved,
+and the event it is for.
+\item The system notifies the group and user which created it with any
+changes to an event or reservation.
+\item All changes (eg additions, deletions, and mutations) shall be
+logged, including the user who made the change, the event that was
+changed, and the old and new data.
+\item The database shall be usable by multiple users at once.
+\item The database shall have a UI capable of showing relevant information.
+\item For each reservation the student who made the reservation must
+be a member of the group the reservation is for.
+\item Events can have any number of comments on them, including none.
+\item Comments must be on exactly one event.
+\item Each comment is made only by one user.
+\item Events are run by one or more clubs. There cannot be an event run by no
+club, but more than one club can run the event. This is as is currently done for
+events at WPI.  
+\item Groups can run any number of events including none. New clubs can have not
+run any events yet. 
+\item Events may or may not use equipment.
+\item Equipment may or may not be used.
+\item Students can make reservations, but do not have to do so.
+\item Rooms may be reserved, but do not have to be.
+\item Rooms cannot be booked for more than one event at the same time. 
+\item Events can be in public, non-reservable places.
+\item Events can be in more than one room. Large events can have multiple rooms
+reserved for it.
+\item Reservations can either be approved or not yet approved.
+\item Students can be members of as many clubs as they want to be, including 0.
+\item Groups can have as many members as they want, including potentially 0 if
+it is a newly created club or members have not yet joined for the year.
+\item Anonymous users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Anonymous users can create user accounts.
+\item Student users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Student users can request group membership.
+\item Student users can comment on events and comments.
+\item Student users can create events for groups they are members for.
+\item Student users can edit the events they create.
+\item Student users can make reservations for the events they create.
+\item Student users can edit the reservations for the events they create.
+\item Group users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Group users can edit events they sponsor.
+\item Group users can edit the reservations for the events they sponsor.
+\item Group users can comment on events and comments.
+\item Group users can add students to a group.
+\item Administrator users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Administrator users can approve reservations.
+\item Administrator users can comment on events and comments.
+\item Administrator users can update room information.
+\item Super Administrator users can perform any action Administrators can.
+\item Super Administrator users can view, add, update and delete: rooms, events, equipment, users, reservations and comments.
+\item Users shall be able to search for a room.
+\item Users shall be able to get a list of what rooms a group has
+reserved and when they are reserved for.
+\item Administrators shall be able to view recent changes to the database.
+\item An administrator must approve a reservation before it is official.
+\end{itemize}
+
+
+
+\section{}
+Our ER model was created in an iterative process and ran by the TA before
+the submission of phase 1. The TA had no further comments on our phase 1
+submission. 
+\scalebox{.42}{\includegraphics[angle=90]{ERmodel.eps}}
+%\includegraphics[angle=90]{ERmodel.eps}
+
+\section{}
+\verbatiminput{EnglishDatabaseTables.txt}
+
+\section{}
+Having analyzed every non-key attribute in every table, we realized that no
+other attribute is implied by it. This means normalization isn't possible. 
+
+Some things we questioned as to whether or not there were functional
+dependences. These were the title and privaledges of an admin, and the title and
+description of an event. Because titles are something defined by the
+administration, and may not directly relate to how the user uses the system, we
+felt there wasn't a functional dependency. In the case of event name and
+description, weekly events may have the same name and different descriptions
+dependent on what will be going on that week.
+
+\section{}
+\marginpar{In the submitted online version there are some mistakes in the DDL
+statements. I had accidentally checked out from the repository before the fixed
+version was committed and did not notice the file I included was not the one
+without mistakes.}
+\verbatiminput{restrackerddl.sql}
+\verbatiminput{createtables.log}
+%Load data in and show output of script.
+
+
+\section{}
+This past week we met Thursday after class to discuss what we were doing, on
+Sunday, and on Wedensday. We are contining to meet on Wedensday to work, when
+the phase is first assigned to discuss our plan, and once other, though that
+meeting is dependent on our schedules. We also distribute our work over git,
+though we meet in person.
+
+\section{}
+\marginpar{In our online submission Jamie was said to have handled loading the
+data. The data had not been loaded last night and this was not his fault.
+Stephanie had taken over this with the extended deadline, but did not get it
+done because of health reasons. }
+Like our previous phase, our work was mainly joint. All work was done while we
+were in meetings. However, certain parts were mostly done by specific people.
+Sam wrote up the english description of the tables of the database. Stephanie
+wrote up the ddl statements. Jamie handled configuring the database, testing and
+fixing the ddl statements.  
+
+\end{document}
+
