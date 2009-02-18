@@ -2,7 +2,7 @@ COMMENT ON DATABASE restracker IS 'The tables for ResTracker.';
 
 CREATE TABLE users(
 email VARCHAR(32),
-password VARCHAR(16) NOT NULL,
+password CHAR(16) NOT NULL,
 name VARCHAR(32),
 PRIMARY KEY(email)
 );
@@ -93,8 +93,9 @@ COMMENT ON COLUMN runBy.EID IS 'The event being run.';
 
 CREATE TABLE room(
 occupancy INT,
-roomNum INT,
+roomNum VARCHAR(5),
 building VARCHAR(3),
+displayname VARCHAR(16),
 PRIMARY KEY(roomNum,building)
 );
 ALTER TABLE room OWNER TO restracker;
