@@ -17,7 +17,7 @@ aEmail VARCHAR(32),
 title VARCHAR(32),
 super boolean,
 PRIMARY KEY(aEmail),
-FOREIGN KEY(aEmail) REFERENCES users(email)
+FOREIGN KEY(aEmail) REFERENCES users(email) ON UPDATE CASCADE
 );
 ALTER TABLE admin OWNER TO restracker;
 COMMENT ON TABLE admin IS 'Users who approve, arbitrate, and manage.';
@@ -31,7 +31,7 @@ year INT, --INT(4)
 major1 VARCHAR(32),
 major2 VARCHAR(32),
 PRIMARY KEY(sEmail),
-FOREIGN KEY (sEmail) REFERENCES users(email)
+FOREIGN KEY (sEmail) REFERENCES users(email) ON UPDATE CASCADE
 );
 ALTER TABLE student OWNER TO restracker;
 COMMENT ON TABLE student IS 'Members of groups.';
@@ -45,7 +45,7 @@ cEmail VARCHAR(32),
 description TEXT,
 class INT, --INT(1)
 PRIMARY KEY (cEmail),
-FOREIGN KEY (cEmail) REFERENCES users(email)
+FOREIGN KEY (cEmail) REFERENCES users(email) ON UPDATE CASCADE
 );
 ALTER TABLE club OWNER TO restracker;
 COMMENT ON TABLE club IS 'A student association, group, club, etc.';
@@ -57,8 +57,8 @@ CREATE TABLE memberOf(
 sEmail VARCHAR(32),
 cEmail VARCHAR(32),
 PRIMARY KEY(sEmail,cEmail),
-FOREIGN KEY (sEmail) REFERENCES student(sEmail),
-FOREIGN KEY (cEmail) REFERENCES club(cEmail)
+FOREIGN KEY (sEmail) REFERENCES student(sEmail) ON UPDATE CASCADE,
+FOREIGN KEY (cEmail) REFERENCES club(cEmail) ON UPDATE CASCADE
 );
 ALTER TABLE memberOf OWNER TO restracker;
 COMMENT ON TABLE memberOf IS 'What groups each student is a member of.';
@@ -83,7 +83,7 @@ CREATE TABLE runBy(
 cEmail VARCHAR(32),
 EID INTEGER, -- The actual type of SERIAL
 PRIMARY KEY(cEmail,EID),
-FOREIGN KEY (cEmail) REFERENCES club(cEmail),
+FOREIGN KEY (cEmail) REFERENCES club(cEmail) ON UPDATE CASCADE,
 FOREIGN KEY (EID) REFERENCES event(EID)
 );
 ALTER TABLE runBy OWNER TO restracker;
@@ -150,7 +150,7 @@ txt TEXT,
 email VARCHAR(32) NOT NULL,
 EID INTEGER NOT NULL,
 parent INTEGER,
-FOREIGN KEY(email) REFERENCES users(email),
+FOREIGN KEY(email) REFERENCES users(email) ON UPDATE CASCADE,
 FOREIGN KEY(EID) REFERENCES event(EID),
 PRIMARY KEY (CID),
 FOREIGN KEY (parent) REFERENCES comments(CID)
@@ -175,8 +175,8 @@ sEmail VARCHAR(32) NOT NULL,
 aEmail VARCHAR(32),
 EID INTEGER NOT NULL,
 FOREIGN KEY(roomNum,building) REFERENCES room(roomNum,building),
-FOREIGN KEY(sEmail) REFERENCES student(sEmail),
-FOREIGN KEY(aEmail) REFERENCES admin(aEmail),
+FOREIGN KEY(sEmail) REFERENCES student(sEmail) ON UPDATE CASCADE,
+FOREIGN KEY(aEmail) REFERENCES admin(aEmail) ON UPDATE CASCADE,
 FOREIGN KEY(EID) REFERENCES event(EID),
 PRIMARY KEY(RID)
 );
