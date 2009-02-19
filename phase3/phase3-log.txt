@@ -1,0 +1,121 @@
+Script started on Thu 19 Feb 2009 06:21:40 PM EST
+ roomnum | building | occupancy | displayname | equipname | quantity 
+---------+----------+-----------+-------------+-----------+----------
+ 1946    | CC       |        30 | Octawedge   | chairs    |       10
+(1 row)
+
+ roomnum | building | equipname | quantity | occupancy | displayname 
+---------+----------+-----------+----------+-----------+-------------
+ 1946    | CC       | chairs    |       10 |        30 | Octawedge
+(1 row)
+
+ eid | equipname | quantity |            description             |     name      | expectedsize 
+-----+-----------+----------+------------------------------------+---------------+--------------
+   1 | chairs    |       20 | People getting together and gaming | Friday Gaming |           20
+(1 row)
+
+    cemail    |   description   | class 
+--------------+-----------------+-------
+ smas@wpi.edu | All things old. |     1
+(1 row)
+
+ eid |    cemail    |                     description                      |         name          | expectedsize 
+-----+--------------+------------------------------------------------------+-----------------------+--------------
+   2 | smas@wpi.edu | People swinging foam.                                | Monday Fight Practice |           20
+  11 | smas@wpi.edu | Information about events, plus a workshop sometimes. | Meeting               |           15
+(2 rows)
+
+            description             |     name      | expectedsize | eid 
+------------------------------------+---------------+--------------+-----
+ People getting together and gaming | Friday Gaming |           20 |   1
+(1 row)
+
+    cemail    |   description   | class | eid 
+--------------+-----------------+-------+-----
+ smas@wpi.edu | All things old. |     1 |   2
+(1 row)
+
+ cid |       madeat        |          txt           |      email      | eid | parent 
+-----+---------------------+------------------------+-----------------+-----+--------
+   1 | 2004-10-19 10:23:54 | This is a test comment | sfuller@wpi.edu |   1 |       
+(1 row)
+
+ eid | equipname | quantity 
+-----+-----------+----------
+   1 | chairs    |       20
+(1 row)
+
+ rid | timebooked | starttime | endtime | roomnum | building | semail | aemail | eid | conflicts 
+-----+------------+-----------+---------+---------+----------+--------+--------+-----+-----------
+(0 rows)
+
+    email    |             password             | name |   semail    | year | major1 | major2 | aemail | title | super 
+-------------+----------------------------------+------+-------------+------+--------+--------+--------+-------+-------
+ shl@wpi.edu | acbd18db4cc2f85cedef654fccc4a4d8 | Sam  | shl@wpi.edu | 2010 | CS     | NULL   |        |       | 
+(1 row)
+
+    cemail    |     semail      |   description   | class 
+--------------+-----------------+-----------------+-------
+ smas@wpi.edu | jebliss@wpi.edu | All things old. |     1
+(1 row)
+
+            description             |     name      | expectedsize | eid 
+------------------------------------+---------------+--------------+-----
+ People getting together and gaming | Friday Gaming |           20 |   1
+(1 row)
+
+ eid | rid |     timebooked      |      starttime      |       endtime       | roomnum | building |   semail    |     aemail      |            description             |     name      | expectedsize 
+-----+-----+---------------------+---------------------+---------------------+---------+----------+-------------+-----------------+------------------------------------+---------------+--------------
+   1 |   1 | 2009-01-01 10:23:54 | 2009-02-20 18:00:00 | 2009-02-21 02:00:00 | 1946    | CC       | shl@wpi.edu | sfuller@wpi.edu | People getting together and gaming | Friday Gaming |           20
+(1 row)
+
+ rid | timebooked | starttime | endtime | roomnum | building | semail | aemail | eid 
+-----+------------+-----------+---------+---------+----------+--------+--------+-----
+(0 rows)
+
+ eid | rid | timebooked | starttime | endtime | roomnum | building | semail | aemail | description | name | expectedsize 
+-----+-----+------------+-----------+---------+---------+----------+--------+--------+-------------+------+--------------
+(0 rows)
+
+ rid | timebooked | starttime | endtime | roomnum | building | semail | aemail | eid | rid | timebooked | starttime | endtime | roomnum | building | semail | aemail | eid 
+-----+------------+-----------+---------+---------+----------+--------+--------+-----+-----+------------+-----------+---------+---------+----------+--------+--------+-----
+(0 rows)
+
+ occupancy | roomnum | building | displayname 
+-----------+---------+----------+-------------
+(0 rows)
+
+BEGIN
+CREATE TABLE
+INSERT 0 1
+ERROR:  syntax error at or near "EXCEPT"
+LINE 4:   ((SELECT * FROM search) EXCEPT 
+                                  ^
+ROLLBACK
+ occupancy | roomnum | building |   displayname   
+-----------+---------+----------+-----------------
+        30 | 1946    | CC       | Octawedge
+        15 | 208     | CC       | The Morgan Room
+        15 | 128     | CC       | Taylor Room
+        15 | 129     | CC       | Chairman's Room
+(4 rows)
+
+ count | building | roomnum 
+-------+----------+---------
+     1 | CC       | 1946
+     2 | Q        | QUAD
+     2 | CC       | 208
+(3 rows)
+
+ count |     semail      
+-------+-----------------
+     4 | jebliss@wpi.edu
+     1 | shl@wpi.edu
+(2 rows)
+
+ count 
+-------
+(0 rows)
+
+
+Script done on Thu 19 Feb 2009 06:21:40 PM EST

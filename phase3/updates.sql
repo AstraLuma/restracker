@@ -78,6 +78,9 @@ DELETE FROM sessions WHERE expires <= NOW();
 
 -- Add equipment to an event
 INSERT INTO uses (eid, equipname, quantity) VALUES (%(eid)i, %(equip)s, %(num)i);
-UPDATE uses SET quantity=%(num)i WHERE eid=%(eid)i AND equipname=%(equip)s;
-DELETE FROM uses WHERE eid=%(eid)i AND equipname=%(equip)s;
 
+-- Change amount of equipment an event uses
+UPDATE uses SET quantity=%(num)i WHERE eid=%(eid)i AND equipname=%(equip)s;
+
+-- Remove equipment from event
+DELETE FROM uses WHERE eid=%(eid)i AND equipname=%(equip)s;
