@@ -82,9 +82,38 @@ reserved and when they are reserved for.
 \item An administrator must approve a reservation before it is official.
 \end{itemize}
 
-\section{}
+
+%\section{queries}
+
+%listing page and detail page on including relations:
+%\begin{itemize}
+%\item room -includes equipment
+%\item equipment - includes rooms in
+%\item clubs -include events sponsored 
+%\item events -include comments, equipment used
+%\item users -include events they're in charge of
+%\item reservation 
+%\end{itemize}
+
+%available times
+%overlapping reservations - including events
+%search for rooms based on date/time
+%search for rooms based on equipment
+%search for rooms based on occupancy range (or just minimum occupancy)
+
+%statistic pages:
+	%most used rooms
+	%favourite events
+	%most common majors for running events
+
+%updates:
+%clean out sessions
+%change approval of reservation
+%add a comment
+%
 
 \section{Queries}
+\subsection{Retrival}
 
 The following items can be queried on for either an identifying list of items,
 or for a detailed list of the information and relations in the database about each item:
@@ -113,9 +142,7 @@ A user can request statistic pages from the database. These include statistics o
 \item which student majors run the most events
 \end{itemize}
 
-\section{}
-
-\section{Updates}
+\subsection{Updates}
 \begin{itemize}
 \item New users can be added to the database.
 \item New reservations can be created.
@@ -129,7 +156,11 @@ however only common operations will be supported with prewritten queries.
 Others will be handled by given Super Administrators (presumably skilled users) database access.
 \end{itemize}
 
-\section{}
+\section{SQL queries}
+\subsection{Retrevial}
+\verbatiminput{phase3-queries.txt}
+
+\subsection{Updates}
 
 \section{Application Layer Decisions}
 Python is the language being used to implement the front end of the system. Jamie is familiar with this language
