@@ -241,12 +241,12 @@ class Request(object):
 		Returns the POST data as an ordered sequence of name/value pairs, or 
 		None if there was no POST.
 		"""
-		if 'HTTP_CONTENT_LENGTH' not in self.environ: return
+		if 'CONTENT_LENGTH' not in self.environ or not self.environ['CONTENT_LENGTH']: return
 		if self._postvars is None:
-			ctype, pdict = cgi.parse_header(self.environ['HTTP_CONTENT_TYPE'])
-			clength = int(self.environ['HTTP_CONTENT_LENGTH'])
+			ctype, pdict = cgi.parse_header(self.environ['CONTENT_TYPE'])
+			clength = int(self.environ['CONTENT_LENGTH'])
 			qs = self.environ['wsgi.input'].read(clength)
-			self._postvars = parse_qs(qs, True)
+			self._postvars = cgi.parse_qs(qs, True)
 		return self._postvars
 	
 	def query(self):
