@@ -79,15 +79,17 @@ Search for room based on date and time:
 			OVERLAPS (r.startTime, r.endTime)); 
 
 Search for room based on Equipment
+BEGIN;
 CREATE TEMPORARY TABLE search_546534 (equipname VARCHAR(32)) ON COMMIT DROP;
 	INSERT INTO search_546534 VALUES (%(val)s), (%(val)s);
 	SELECT * 
 	FROM room 
 	WHERE NOT EXIST 
-		((SELECT * FROM search_546534) DIFFERENCE 
+		((SELECT * FROM search_546534) EXCEPT
 			(SELECT equipname 
 			FROM isIN 
 			WHERE roomNum=%(roomNum)s and building=%(building)s));
+COMMIT;
 
 Search for room based on occupancy: 
 	SELECT room.* 
