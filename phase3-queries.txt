@@ -21,11 +21,22 @@ Information about events:
 
 	SELECT * FROM uses WHERE EID=%(event)i;
 
-	SELECT count() AS conflicts, r1.* 
+	SELECT count(*) AS conflicts, r1.* 
 	FROM reservation AS r1, reservation AS r2 
 	WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime)
-		AND r1.EID=%(event)i AND r2.EID!=%(event)i 
+		AND r1.EID=%(event)i AND r2.EID!=%(event)i AND
+		r1.roomNum=r2.roomNum AND r1.building=r2.building 
 		GROUP BY r1.RID; 
+
+	SELECT * 
+	FROM reservation
+	NATURAL JOIN 
+		(SELECT count(r2.RID) AS conflicts, r1.RID
+		FROM reservation AS r1, reservation AS r2
+		WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) 
+		AND r1.EID=%(event)i AND r2.EID!=%(event)i
+		AND r1.roomNum=r2.roomNum AND r1.building=r2.building 
+		GROUP BY r1.RID) AS conflicting;
  
 Information about clubs:
 	SELECT * 
@@ -33,7 +44,7 @@ Information about clubs:
 		email=aEmail 
 	WHERE (email=%(user)s; 
 
-	SELECT * FROM memberOf NATURAL JOIN group WHERE email=%(user)s; 
+	SELECT * FROM memberOf NATURAL JOIN club WHERE sEmail=%(user)s; 
 
 	SELECT event.* FROM reservation NATURAL JOIN event WHERE sEmail=%(user)s;
 
@@ -43,7 +54,8 @@ Information about reservations:
 	SELECT *
 	FROM reservation 
 	WHERE (%(start)s, %(end)s) OVERLAPS (startTime, endTime)
-		AND RID!=%(id)i;
+		AND RID!=%(id)i
+	AND roomNum=%(roomNum)s AND building=%(building)s;
 
 
 Select all unapproved reservations:
@@ -53,7 +65,9 @@ Select all unapproved reservations:
 Select all overlapping reservations:
 	SELECT * 
 	FROM reservation AS r1, reservation AS r2
-	WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) AND r1.ID < r2.ID 
+	WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) 
+		AND r1.RID < r2.RID 
+		AND r1.roomNum=r2.roomNum AND r1.building=r2.building
 		ORDER BY r1.startTime; 
 
 Search for room based on date and time:
@@ -61,11 +75,11 @@ Search for room based on date and time:
 	WHERE NOT EXISTS 
 		(SELECT * 
 		FROM reservation AS r 
-		WHERE r.roomnum = roomnum AND r.building = building AND (%(start)s, %(end)s)
+		WHERE r.roomnum = %(roomnum)s AND r.building = %(building)s AND (%(start)s, %(end)s)
 			OVERLAPS (r.startTime, r.endTime)); 
 
 Search for room based on Equipment
-	CREATE TEMPORARY TABLE search_546534 (equipname VARCHAR(32)) ON COMMIT DROP;
+CREATE TEMPORARY TABLE search_546534 (equipname VARCHAR(32)) ON COMMIT DROP;
 	INSERT INTO search_546534 VALUES (%(val)s), (%(val)s);
 	SELECT * 
 	FROM room 
@@ -73,17 +87,33 @@ Search for room based on Equipment
 		((SELECT * FROM search_546534) DIFFERENCE 
 			(SELECT equipname 
 			FROM isIN 
-			WHERE roomNum=%(roomNum)s and building=%(building)s));\\
+			WHERE roomNum=%(roomNum)s and building=%(building)s));
 
 Search for room based on occupancy: 
 	SELECT room.* 
 	FROM room 
 	WHERE %(min)i <= occupancy AND occupancy <= %(max)i; 
 
-%statistic pages:
-	%most used rooms
-	%favourite events
-	%most common majors for running events
+Random statistics:
+Most used rooms:
+	SELECT count(*),building,roomNum 
+	FROM room NATURAL JOIN reservation 
+	GROUP BY building,roomNum;
+
+Students who run most events:
+	SELECT count(*),sEmail FROM reservation NATURAL JOIN student 
+	GROUP BY sEmail;
+
+Majors which runs most events:
+	SELECT count1+count2 AS count 
+	FROM 
+		(SELECT count(*) AS count1, major1 AS major 
+		FROM reservation NATURAL JOIN students GROUP BY major1) AS
+someone
+	NATURAL JOIN
+		(SELECT count(*) AS count2, major2 AS major 
+		FROM reservation NATURAL JOIN students GROUP BY major2) AS
+something;
 
 
 
