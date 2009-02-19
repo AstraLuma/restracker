@@ -17,13 +17,6 @@
 
 	SELECT * FROM uses WHERE EID=1;
 
-	SELECT count(*) AS conflicts, r1.* 
-	FROM reservation AS r1, reservation AS r2 
-	WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime)
-		AND r1.EID=2 AND r2.EID!=2 
-		AND r1.roomNum=r2.roomNum AND r1.building=r2.building	
-		GROUP BY r1.RID; 
-
 	SELECT * 
 	FROM reservation
 	NATURAL JOIN 
