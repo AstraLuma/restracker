@@ -98,4 +98,4 @@ someone
 something;
 
 
-
+SELECT DISTINCT equipName FROM uses UNION SELECT DISTINCT equipName FROM isIn;
