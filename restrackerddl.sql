@@ -105,21 +105,12 @@ COMMENT ON COLUMN room.roomnum IS 'The room number.';
 COMMENT ON COLUMN room.building IS 'The abbrev. of the building the room is in. (eg, FL, CC, KH)';
 COMMENT ON COLUMN room.displayname IS 'The well-known name of the room. eg The Morgan Room instead of CC 208.';
 
-CREATE TABLE equipment(
-equipname VARCHAR(32),
-PRIMARY KEY(equipname)
-);
-ALTER TABLE equipment OWNER TO restracker;
-COMMENT ON TABLE equipment IS 'Something used by an event and intrinsic to a room. eg, projectors.';
-COMMENT ON COLUMN equipment.equipname IS 'The name of the equipment';
-
 CREATE TABLE isIn(
 equipname VARCHAR(32),
 roomNum VARCHAR(5),
 building VARCHAR(3),
 quantity INT,
 PRIMARY KEY (equipname,roomNum,building),
-FOREIGN KEY(equipname) REFERENCES equipment(equipname),
 FOREIGN KEY (roomNum,building) REFERENCES room(roomNum,building)
 );
 ALTER TABLE isIn OWNER TO restracker;
@@ -135,7 +126,6 @@ equipname VARCHAR(32),
 quantity INT,
 PRIMARY KEY(EID,equipname),
 FOREIGN KEY (EID) REFERENCES event(EID),
-FOREIGN KEY(equipname) REFERENCES equipment(equipname)
 );
 ALTER TABLE uses OWNER TO restracker;
 COMMENT ON TABLE uses IS 'Equipment used by a particular event.';
