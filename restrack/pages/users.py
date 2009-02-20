@@ -16,7 +16,7 @@ def index(req):
 	# sent all at once
 	return template(req, 'user-list', user=data) # user is a variable that the template references
 
-@page('/user/(.+)') #regex
+@page('/user/([^/]+)') #regex
 def details(req, userid): # The group from the regex is passed as a positional parameter
 	req.header('Content-Type', 'text/html')
 	
@@ -44,7 +44,7 @@ def editthem(req, user):
 
 @page('/user/create', methods=['GET','POST'])
 def create(req):
-	return user_edit(req, req.user)
+	pass
 
 @page('/login', methods=['GET', 'POST'])
 def login(req):
