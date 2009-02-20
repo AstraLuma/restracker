@@ -7,7 +7,7 @@ import hashlib
 from restrack.web import page, template, HTTPError
 
 @page('/user')
-def user_list(req):
+def index(req):
 	req.header('Content-Type', 'text/html')
 	
 	# Do some processing
@@ -16,8 +16,8 @@ def user_list(req):
 	# sent all at once
 	return template(req, 'user-list', user=data) # user is a variable that the template references
 
-@page('/user/(.*)') #regex
-def user_details(req, userid): # The group from the regex is passed as a positional parameter
+@page('/user/(.+)') #regex
+def details(req, userid): # The group from the regex is passed as a positional parameter
 	req.header('Content-Type', 'text/html')
 	
 	# Do some processing
@@ -25,6 +25,26 @@ def user_details(req, userid): # The group from the regex is passed as a positio
 	
 	# sent all at once
 	return template(req, 'user', user=data) # user is a variable that the template references
+
+def user_edit(req, user):
+	# Handles:
+	# * user/student/admin/club info
+	# * changing the type of user
+	# * making admins super
+	# * Adding club adminship
+	pass
+
+@page('/user/edit', mustauth=True, methods=['GET','POST'])
+def editme(req):
+	return user_edit(req, req.user)
+
+@page('/user/(.+)/edit', mustauth=True, methods=['GET','POST'])
+def editthem(req, user):
+	return user_edit(req, user)
+
+@page('/user/create', methods=['GET','POST'])
+def create(req):
+	return user_edit(req, req.user)
 
 @page('/login', methods=['GET', 'POST'])
 def login(req):
