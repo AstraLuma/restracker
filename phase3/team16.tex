@@ -143,17 +143,26 @@ A user can request statistic pages from the database. These include statistics o
 \end{itemize}
 
 \subsection{Updates}
+The following operations are supported:
 \begin{itemize}
-\item New users can be added to the database.
-\item New reservations can be created.
-\item Reservations can be edited.
-\item Reservations can be approved.
-\item New events can be created.
-\item Events can be edited.
-\item Rooms, and its contained equipment can be edited.
-\item Super Administrators can create, edit, or delete whatever they like,
-however only common operations will be supported with prewritten queries.
-Others will be handled by given Super Administrators (presumably skilled users) database access.
+\item Create a user
+\item Change user information
+\item Turn a user into a student, administrator, or a club
+\item Make an administrator super
+\item Add student to a club
+\item Comment on an event
+\item Create an event
+\item Add, change, and remove equipment in a room
+\item Add, change, and remove equipment used by an event
+\item Add and remove a reservation
+\item Approve a reservation
+\item Remove approval of a reservation
+\item Add and remove clubs to events
+\item Create a room
+\item Change room information
+\item Create and update sessions
+\item Clean old sessions
+\item Super Administrators (presumably skilled users) may run additional queries via direct database access
 \end{itemize}
 
 \section{SQL queries}

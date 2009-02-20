@@ -1,3 +1,9 @@
+-- Create a room
+INSERT INTO room (building, roomNum, displayName, occupancy) VALUES (%(building)s, %(room)s, %(name)s, %(size)i);
+
+-- Change room info
+UPDATE room SET displayName=%(name)s occupancy=%(size)i WHERE building=%(building)s AND roomNum=%(room)s;
+
 -- Create a user
 INSERT INTO users (email, password) VALUES (%(email)s, %(hash)s);
 
@@ -61,11 +67,14 @@ INSERT INTO runBy (eid, cemail) VALUES (%(eid)i, %(cemail)s);
 -- Remove a club from an event
 DELETE FROM runBy WHERE eid=%(eid)i AND cemail=%(cemail)s;
 
--- Create a room
-INSERT INTO room (building, roomNum, displayName, occupancy) VALUES (%(building)s, %(room)s, %(name)s, %(size)i);
+-- Add equipment to an event
+INSERT INTO uses (eid, equipname, quantity) VALUES (%(eid)i, %(equip)s, %(num)i);
 
--- Change room info
-UPDATE room SET displayName=%(name)s occupancy=%(size)i WHERE building=%(building)s AND roomNum=%(room)s;
+-- Change amount of equipment an event uses
+UPDATE uses SET quantity=%(num)i WHERE eid=%(eid)i AND equipname=%(equip)s;
+
+-- Remove equipment from event
+DELETE FROM uses WHERE eid=%(eid)i AND equipname=%(equip)s;
 
 -- Create a session
 INSERT INTO sessions (id, expires) VALUES (%(id)s, %(exp)s);
@@ -75,12 +84,3 @@ UPDATE sessions SET data=%(data)s WHERE id=%(id)s;
 
 -- Clean sessions
 DELETE FROM sessions WHERE expires <= NOW();
-
--- Add equipment to an event
-INSERT INTO uses (eid, equipname, quantity) VALUES (%(eid)i, %(equip)s, %(num)i);
-
--- Change amount of equipment an event uses
-UPDATE uses SET quantity=%(num)i WHERE eid=%(eid)i AND equipname=%(equip)s;
-
--- Remove equipment from event
-DELETE FROM uses WHERE eid=%(eid)i AND equipname=%(equip)s;
