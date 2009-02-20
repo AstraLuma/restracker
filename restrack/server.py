@@ -221,7 +221,7 @@ class Request(object):
 		Returns the path component of the URL, sans application base.
 		"""
 		if 'lighttpd' in self.environ['SERVER_SOFTWARE']:
-			return self.environ.get('SCRIPT_NAME','')
+			return self.getpath()
 		else:
 			return self.environ.get('PATH_INFO','')
 	
