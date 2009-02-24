@@ -4,7 +4,7 @@
 Helpful functions, classes, etc. That don't really have a home.
 """
 import pgdb, itertools
-__all__ = 'blob', 'struct', 'itercursor', 'result2objs', 'result2objs_table'
+__all__ = 'blob', 'struct', 'wrapprop', 'itercursor', 'result2objs', 'result2objs_table'
 
 class blob(object):
 	"""
@@ -84,6 +84,17 @@ class struct(object):
 		for n, a in renamed.iteritems():
 			rv[n] = getattr(self, a)
 		return rv
+
+def wrapprop(name):
+	"""wrapprop(string) -> property
+	Creates a full property descriptor to access a particular property. Ment to 
+	wrap properties like 'class'.
+	"""
+	return property(
+		lambda self: getattr(self, 'class'), 
+		lambda self, val: setattr(self, 'class', val), 
+		lambda self: delattr(self,'class')
+		)
 
 xor = lambda l, r: bool(l) ^ bool(r)
 

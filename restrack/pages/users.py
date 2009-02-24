@@ -5,6 +5,18 @@ Stuff dealing with users.
 """
 import hashlib
 from restrack.web import page, template, HTTPError
+from restrack.utils import struct, wrapprop, result2objs_table
+
+class User(struct):
+	__fields__ = ('email', 'name',
+		# admin
+		'title', 'super',
+		# student
+		'year', 'major1', 'major2',
+		# club
+		'description', 'class'
+		)
+		class_ = wrapprop('class')
 
 @page('/user')
 def index(req):
@@ -22,6 +34,9 @@ def details(req, userid): # The group from the regex is passed as a positional p
 	
 	# Do some processing
 	# Use req.db as the Connection object
+	
+	cur = req.db.cursor()
+	
 	
 	# sent all at once
 	return template(req, 'user', user=data) # user is a variable that the template references
