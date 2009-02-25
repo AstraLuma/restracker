@@ -16,27 +16,43 @@ class User(struct):
 		# club
 		'description', 'class'
 		)
-		class_ = wrapprop('class')
+	class_ = wrapprop('class')
+	
+	@property
+	def majors(self):
+		if hasattr(self, 'major1') and self.major1:
+			if hasattr(self, 'major2') and self.major2:
+				return self.major1, self.major2
+			else:
+				return self.major1,
+		else:
+			return ()
 
 @page('/user')
 def index(req):
 	req.header('Content-Type', 'text/html')
 	
-	# Do some processing
-	# Use req.db as the Connection object
+	cur = req.db.cursor()
+	cur.execute("""SELECT * FROM users ORDER BY name;""")
+	data = (o[None] for o in result2objs_table(cur, User))
 	
-	# sent all at once
-	return template(req, 'user-list', user=data) # user is a variable that the template references
+	return template(req, 'user-list', users=data)
 
 @page('/user/([^/]+)') #regex
 def details(req, userid): # The group from the regex is passed as a positional parameter
 	req.header('Content-Type', 'text/html')
 	
-	# Do some processing
-	# Use req.db as the Connection object
-	
 	cur = req.db.cursor()
-	
+	cur.execute("""
+SELECT * FROM users 
+	LEFT OUTER JOIN admin ON email = aEmail 
+	LEFT OUTER JOIN student ON email = sEmail
+	LEFT OUTER JOIN club ON email = cEmail
+WHERE email = %(email)s;
+""", {'email': userid})
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	data = list(result2objs_table(cur, User))[0][None]
 	
 	# sent all at once
 	return template(req, 'user', user=data) # user is a variable that the template references

@@ -37,7 +37,8 @@ class struct(object):
 		Takes the same arguments as dict.
 		"""
 		self = super(struct, cls).__new__(cls)
-		self.__dict__.update(dict(*p, **kw))
+		self.__dict__.update(dict(*pargs, **kwargs))
+		return self
 	
 	def __repr__(self):
 		"""s.__repr__() <==> repr(s)
