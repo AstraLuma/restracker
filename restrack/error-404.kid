@@ -2,7 +2,6 @@
 <!-- See http://www.kid-templating.org/language.html -->
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:py="http://purl.org/kid/ns#">
 <?python
-# We can get away with this because nothing's sent until after this is executed
 request.header('Content-Type', 'text/html')
 ?>
 	<head>
