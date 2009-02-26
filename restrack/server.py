@@ -318,7 +318,50 @@ class Request(object):
 	def __del__(self):
 		if hasattr(self, 'db'):
 			self.db.close()
-
+	
+	_issuper = None
+	_isadmin = None
+	_isstudent = None
+	_isclub = None
+	
+	def _findusertypes(self):
+		if self.user is None:
+			self._issuper = self._isadmin = self._isstudent = self._isclub = False
+		else:
+			cur = self.db.cursor()
+			cur.execute("""
+SELECT email, aemail, super, semail, cemail FROM users 
+	LEFT OUTER JOIN admin ON email = aEmail 
+	LEFT OUTER JOIN student ON email = sEmail
+	LEFT OUTER JOIN club ON email = cEmail
+WHERE email = %(email)s;
+""", {'email': self.user})
+			assert cur.rowcount
+			row = cur.fetchone()
+			del cur
+			self._issuper = row[2]
+			self._isadmin = bool(row[1])
+			self._isstudent = bool(row[3])
+			self._isclub = bool(row[4])
+	
+	def isuser(self):
+		return self.user is not None
+	
+	def isstudent(self):
+		if self._isstudent is None: self._findusertypes()
+		return self._isstudent
+	
+	def isclub(self):
+		if self._isclub is None: self._findusertypes()
+		return self._isclub
+	
+	def isadmin(self):
+		if self._isadmin is None: self._findusertypes()
+		return self._isadmin
+	
+	def issuper(self):
+		if self._issuper is None: self._findusertypes()
+		return self._issuper
 
 def restracker_app(environ, start_response):
 	"""

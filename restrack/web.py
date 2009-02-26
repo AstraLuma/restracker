@@ -2,7 +2,7 @@
 # vim:tabstop=4:noexpandtab:
 import kid, re, logging, os, sys
 from config import config
-__all__ = 'HTTPError', 'page', 'callpage', 'template'
+__all__ = 'HTTPError', 'ActionNotAllowed', 'page', 'callpage', 'template'
 
 class HTTPError(Exception):
 	"""
@@ -11,6 +11,11 @@ class HTTPError(Exception):
 	def __init__(self, code, status=None):
 		self.code = code
 		self.status = status
+
+class ActionNotAllowed(Exception):
+	"""
+	Used for when the user is not authenticated correctly.
+	"""
 
 # [(regex|string, callable, dict), ...]
 _pages = []
