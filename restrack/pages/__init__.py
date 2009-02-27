@@ -12,7 +12,7 @@ def index(req):
 	req.header('Content-Type', 'text/html')
 	import restrack.web as web
 	yield '<ul>'
-	for r, f, _ in sorted(web._pages, key=lambda r: r[1]):
+	for r, f, _ in sorted(web._pages, key=lambda r: r[0]):
 		if isinstance(r, basestring):
 			yield '<li><a href="%(url)s">%(url)s</a></li>' % {'url':r}
 	yield '</ul>'
