@@ -230,6 +230,7 @@ class Request(object):
 		Returns the POST data as a dictionary, or None if there was no POST.
 		"""
 		rv = self.postall()
+		print "rv=%r" % rv
 		if rv is None:
 			return None
 		else:
@@ -241,13 +242,19 @@ class Request(object):
 		Returns the POST data as an ordered sequence of name/value pairs, or 
 		None if there was no POST.
 		"""
-		if 'CONTENT_LENGTH' not in self.environ or not self.environ['CONTENT_LENGTH']: return
+		if 'CONTENT_LENGTH' not in self.environ: 
+			return
+		if not self.environ['CONTENT_LENGTH']:
+			return
+		if self.environ['REQUEST_METHOD'] == 'GET':
+			return
 		if self._postvars is None:
 			ctype, pdict = cgi.parse_header(self.environ['CONTENT_TYPE'])
 			clength = int(self.environ['CONTENT_LENGTH'])
 			qs = self.environ['wsgi.input'].read(clength)
 			self._postvars = cgi.parse_qs(qs, True)
-		return self._postvars
+		
+		return [(k,v) for k, vs in self._postvars.iteritems() for v in vs]
 	
 	def query(self):
 		"""r.query() -> dict

@@ -27,6 +27,14 @@ request.header('Content-Type', 'text/html')
 			<div class="infobit" py:if="user.description"><span>Description:</span> ${user.description}</div>
 			<div class="infobit" py:if="user.class_"><span>SGA Class:</span> ${user.class_}</div>
 		</fieldset>
+		
+		<div py:if="request.user == user.email or request.issuper()">
+			<a href="/user/${user.email}/edit">Edit</a>
+		</div>
+		
+		<div py:if="request.isclub() and user.semail">
+			<a href="/club/${request.user}/adduser?user=${user.email}">Add %{user.name} to yourself.</a>
+		</div>
 	</body>
 </html>
 

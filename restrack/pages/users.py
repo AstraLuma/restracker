@@ -3,8 +3,8 @@
 """
 Stuff dealing with users.
 """
-import hashlib
-from restrack.web import page, template, HTTPError
+import hashlib, sys
+from restrack.web import page, template, HTTPError, ActionNotAllowed
 from restrack.utils import struct, wrapprop, result2objs_table
 
 class User(struct):
@@ -58,19 +58,127 @@ WHERE email = %(email)s;
 	return template(req, 'user', user=data) # user is a variable that the template references
 
 def user_edit(req, user):
+	cur = req.db.cursor()
 	# Handles:
 	# * user/student/admin/club info
 	# * changing the type of user
 	# * making admins super
 	# * Adding club adminship
-	pass
+	cur.execute("""
+SELECT * FROM users 
+	LEFT OUTER JOIN admin ON email = aEmail 
+	LEFT OUTER JOIN student ON email = sEmail
+	LEFT OUTER JOIN club ON email = cEmail
+WHERE email = %(email)s;
+""", {'email': user})
+	userdata = list(result2objs_table(cur, User))[0][None]
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	post = req.post()
+	if post is not None:
+		# Save
+		cur.execute("BEGIN");
+		try:
+			password = None
+			print repr(post)
+			if post['oldpassword'] or (req.issuper() and post['password1']):
+				if post['password1'] != post['password2']:
+					return template(req, 'user-edit', user=userdata, msg='Mismatched passwords')
+				cur.execute("""
+					UPDATE users 
+					SET password=md5(%(password)s)
+					WHERE email=%(email)s AND password=md5(%(old)s);
+					""", 
+					{'email': user, 'old': post['oldpassword'], 'password': post['password1']}
+					)
+				assert cur.rowcount
+			
+			cur.execute("""
+				UPDATE users 
+				SET name=%(name)s
+				WHERE email=%(email)s;
+				""", 
+				{'name': post['name'], 'email': user}
+				)
+			assert cur.rowcount
+			if userdata.aemail and 'aemail' in post:
+				title = None
+				if post['title']:
+					title = post['title']
+				if request.issuper():
+					cur.execute("""
+						UPDATE admin 
+						SET title=%(title)s, super=%(super)s
+						WHERE aemail=%(email)s;
+						""", 
+						{'title': title, 'super': 'super' in post, 'email': user}
+						)
+				else:
+					cur.execute("""
+						UPDATE admin 
+						SET title=%(title)s
+						WHERE aemail=%(email)s;
+						""", 
+						{'title': title, 'email': user}
+						)
+				assert cur.rowcount
+			if userdata.semail and 'semail' in post:
+				year = major1 = major2 = None
+				if post['year']: year = int(post['year'])
+				if post['major1']: major1 = post['major1']
+				if post['major2']: major2 = post['major2']
+				if major2 and not major1:
+					major1, major2 = major2, None
+				cur.execute("""
+					UPDATE student 
+					SET year=%(year)i, major1=%(major1)s, major2=%(major2)s
+					WHERE semail=%(email)s;
+					""", 
+					{'year': year, 'major1': major1, 'major2': major2, 'email': user}
+					)
+				assert cur.rowcount
+			if userdata.cemail and 'cemail' in post:
+				cls = desc = None
+				if post['class']: cls = int(post['class'])
+				if post['description']: desc = post['description']
+				cur.execute("""
+					UPDATE club 
+					SET class=%(cls)i, description=%(desc)s 
+					WHERE cemail=%(email)s;
+					""", 
+					{'cls': cls, 'desc': desc, 'email': user}
+					)
+				assert cur.rowcount
+		finally:
+			if sys.exc_info()[0] is None:
+				cur.execute("COMMIT")
+			else:
+				cur.execute("ROLLBACK")
+	cur.execute("""
+SELECT * FROM users 
+	LEFT OUTER JOIN admin ON email = aEmail 
+	LEFT OUTER JOIN student ON email = sEmail
+	LEFT OUTER JOIN club ON email = cEmail
+WHERE email = %(email)s;
+""", {'email': user})
+	userdata = list(result2objs_table(cur, User))[0][None]
+	
+	return template(req, 'user-edit', user=userdata)
 
-@page('/user/edit', mustauth=True, methods=['GET','POST'])
+@page('/user/edit', mustauth=True)
 def editme(req):
+	"""
+	Edit the current user.
+	"""
 	return user_edit(req, req.user)
 
 @page('/user/(.+)/edit', mustauth=True, methods=['GET','POST'])
 def editthem(req, user):
+	"""
+	Edit another user.
+	"""
+	if not (req.user == user or req.issuper()):
+		raise ActionNotAllowed
 	return user_edit(req, user)
 
 @page('/user/create', methods=['GET','POST'])
