@@ -74,8 +74,17 @@ def callpage(req):
 			page, (_, pargs, kwargs, pageops) = repaths.items()[0]
 		else:
 			logging.getLogger(__name__+'.callpage')\
-				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths])
-			# FIXME: Come up with some algorithm to select a page
+				.warning("Multiple possible pages: %r", [page.__name__ for page in repaths])
+			cursize = 0
+			for func, (r, p, kw, ops) in repaths.iteritems():
+				m = r.search(req.apppath())
+				if m.span(0) > cursize:
+					cursize = m.span(0)
+					page, pargs, kwargs, pageops = func, p, kw, ops
+				elif m.span(0) == cursize:
+					logging.getLogger(__name__+'.callpage')\
+						.warning("Unselected possible page: %r", func.__name__)
+
 	
 	if page is None:
 		rv = template(req, 'error-404')
