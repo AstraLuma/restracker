@@ -30,8 +30,6 @@ class User(struct):
 
 @page('/user')
 def index(req):
-	req.header('Content-Type', 'text/html')
-	
 	cur = req.db.cursor()
 	cur.execute("""SELECT * FROM users ORDER BY name;""")
 	data = (o[None] for o in result2objs_table(cur, User))
@@ -40,8 +38,6 @@ def index(req):
 
 @page('/user/([^/]+)') #regex
 def details(req, userid): # The group from the regex is passed as a positional parameter
-	req.header('Content-Type', 'text/html')
-	
 	cur = req.db.cursor()
 	cur.execute("""
 SELECT * FROM users 
