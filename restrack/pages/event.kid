@@ -32,7 +32,8 @@ request.header('Content-Type', 'text/html')
 		
 		<h2>Comments</h2>
 		<div py:for="comment in comments" class="comment" id="comment${comment.cid}" style="margin: 1em">
-			<div>On ${comment.madeat}, <a href="/user/${comment.email">${comment.name}</a> 
+			<div>On ${comment.madeat}, <a
+href="/user/${comment.email}">${comment.name}</a> 
 				said<span py:if="comment.parent"> in reply to <a href="#comment${comment.parent}">comment #${comment.parent}</a></span>:</div>
 			<pre style="margin-left: 1em">${comment.txt}</pre>
 			<div py:if="request.user"><a href="/event/${event.eid}/comment?replyto=${comment.cid}">Reply</a></div>
