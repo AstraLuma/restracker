@@ -67,7 +67,7 @@ SELECT * FROM users
 	LEFT OUTER JOIN club ON email = cEmail
 WHERE email = %(email)s;
 """, {'email': user})
-	userdata = first(result2objs_table(cur, User))
+	userdata = first(result2obj(cur, User))
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	post = req.post()
@@ -167,7 +167,7 @@ SELECT * FROM users
 	LEFT OUTER JOIN club ON email = cEmail
 WHERE email = %(email)s;
 """, {'email': user})
-	userdata = first(result2objs_table(cur, User))
+	userdata = first(result2obj(cur, User))
 	
 	return template(req, 'user-edit', user=userdata)
 
