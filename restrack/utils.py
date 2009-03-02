@@ -5,7 +5,7 @@ Helpful functions, classes, etc. That don't really have a home.
 """
 import pgdb, itertools
 __all__ = ('blob', 'struct', 'wrapprop', 'itercursor', 'result2obj', 
-	'result2objs', 'result2objs_table', 'sendemail')
+	'result2objs', 'result2objs_table', 'sendemail', 'first')
 
 class blob(object):
 	"""
@@ -117,7 +117,7 @@ def result2obj(cursor, cls):
 	flds = [f[0] for f in cursor.description]
 	for row in itercursor(cursor):
 		vals = {}
-		for i,n in flds:
+		for i,n in enumerate(flds):
 			vals[n] = row[i]
 		yield cls(**vals)
 
@@ -198,3 +198,4 @@ def sendemail(req, to, subject, msg, headers=None):
 	s.sendmail(msg['From'], msg['To'], msg.as_string())
 	s.quit()
 
+first = lambda x: iter(x).next()
