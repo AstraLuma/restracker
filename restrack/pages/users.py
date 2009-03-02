@@ -149,6 +149,16 @@ WHERE email = %(email)s;
 					{'cls': cls, 'desc': desc, 'email': user}
 					)
 				assert cur.rowcount
+			
+			if 'mkadmin' in post and req.issuper() and not userdata.aemail and not userdata.cemail:
+				cur.execute("INSERT INTO admin (aemail) VALUES (%(email)s)", {'email': user})
+				assert cur.rowcount
+			elif 'mkstudent' in post and not userdata.semail and not userdata.cemail:
+				cur.execute("INSERT INTO student (semail) VALUES (%(email)s)", {'email': user})
+				assert cur.rowcount
+			elif 'mkclub' in post and req.issuper() and not userdata.semail and not userdata.aemail and not userdata.cemail:
+				cur.execute("INSERT INTO club (cemail) VALUES (%(email)s)", {'email': user})
+				assert cur.rowcount
 		finally:
 			if sys.exc_info()[0] is None:
 				cur.execute("COMMIT")
@@ -183,7 +193,31 @@ def editthem(req, user):
 
 @page('/user/create', methods=['GET','POST'])
 def create(req):
-	pass
+	post = req.post()
+	if post is not None:
+		email = post['email']
+		name = post['name'] or None
+		if post['password1'] != post['password2']:
+			return template(req, 'user-create', msg='Mismatched passwords')
+		password = post['password1']
+		if not email:
+			return template(req, 'user-create', msg='Email required')
+		cur = req.db.cursor()
+		cur.execute("""
+			INSERT INTO users (email, name, password) 
+			VALUES (%(email)s, %(name)s, md5(%(password)s))
+			""", 
+			{'email': email, 'name': name, 'password': post['password1']}
+			)
+		if cur.rowcount:
+			req.status(303)
+			req.header('Location', req.fullurl('/user/%s/edit' % email))
+			return
+		else:
+			return template(req, 'user-create', msg='Email already exists: %s' % email)
+	else:
+		# No POST
+		return template(req, 'user-create')
 
 @page('/login', methods=['GET', 'POST'])
 def login(req):

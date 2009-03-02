@@ -10,6 +10,8 @@ request.header('Content-Type', 'text/html')
 	<body>
 		<!--pre py:content="repr(user)" /-->
 		<h1>${user.name} - Edit</h1>
+		<div class="error" py:if="defined('msg')" py:content="msg" />
+		
 		<form action="/user/${user.email}/edit" method="POST">
 			<div class="infobit"><span>Email:</span> ${user.email}</div>
 			<div class="infobit">
@@ -50,15 +52,15 @@ request.header('Content-Type', 'text/html')
 				<input type="hidden" name="semail" value="${user.semail}" />
 				<div class="infobit">
 					<label for="year">Year:</label> 
-					<input type="text" name="year" value="${user.year or ''}" />
+					<input type="text" name="year" value="${user.year}" />
 				</div>
 				<div class="infobit">
 					<label for="major1">Major 1:</label> 
-					<input type="text" name="major1" value="${user.major1 or ''}" />
+					<input type="text" name="major1" value="${user.major1}" />
 				</div>
 				<div class="infobit">
 					<label for="major2">Major 2:</label> 
-					<input type="text" name="major2" value="${user.major2 or ''}" />
+					<input type="text" name="major2" value="${user.major2}" />
 				</div>
 			</fieldset>
 			<fieldset py:if="user.cemail">
@@ -66,15 +68,20 @@ request.header('Content-Type', 'text/html')
 				<input type="hidden" name="cemail" value="${user.cemail}" />
 				<div class="infobit">
 					<label for="description">Description:</label> 
-					<input type="text" name="description" value="${user.description or ''}" />
+					<input type="text" name="description" value="${user.description}" />
 				</div>
 				<div class="infobit">
 					<label for="class">SGA Class:</label> 
-					<input type="text" name="class" value="${user.class_ or ''}" />
+					<input type="text" name="class" value="${user.class_}" />
 				</div>
 			</fieldset>
 			<a href="/user/${user.email}">Details</a>
-			<input type="submit" value="Save" />
+			<input type="submit" value="Save" name="edit" />
+			<div py:if="not user.cemail">
+				<input py:if="not user.aemail and request.issuper()" type="submit" name="mkadmin" value="Make Admin" />
+				<input py:if="not user.semail" type="submit" name="mkstudent" value="Make Student" />
+				<input py:if="not user.aemail and not user.semail and request.issuper()" type="submit" name="mkclub" value="Make Club" />
+			</div>
 		</form>
 	</body>
 </html>
