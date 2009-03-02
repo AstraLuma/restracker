@@ -8,6 +8,7 @@ request.header('Content-Type', 'text/html')
 		<title>User Info - ${user.name}</title>
 	</head>
 	<body>
+		<div py:replace="up()" />
 		<!--pre py:content="repr(user)" /-->
 		<h1>${user.name}</h1>
 		<div class="infobit"><span>Email:</span> ${user.email}</div>

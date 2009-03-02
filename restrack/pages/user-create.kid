@@ -8,6 +8,7 @@ request.header('Content-Type', 'text/html')
 		<title>Create User</title>
 	</head>
 	<body>
+		<div py:replace="up()" />
 		<h1>Create User</h1>
 		<div class="error" py:if="defined('msg')" py:content="msg" />
 		

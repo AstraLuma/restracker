@@ -225,9 +225,9 @@ def login(req):
 	url = req.query().get('returnto', None)
 	post = req.post()
 	if post is not None:
-		url = post.get('returnto', [None])[0]
-		user = post['user'][0]
-		pword = post['password'][0]
+		url = post.get('returnto', None)
+		user = post['user']
+		pword = post['password']
 		hp = hashlib.md5()
 		hp.update(pword)
 		
@@ -237,7 +237,7 @@ def login(req):
 		if cur.rowcount == 0:
 			error = "User/password pair does not exist."
 		else:
-			req.session['user'] = user
+			req.session['user'] = user # This is the actual "login" code.
 			req.status(303)
 			req.header('Location', req.fullurl(url))
 			return

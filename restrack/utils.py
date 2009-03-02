@@ -4,7 +4,7 @@
 Helpful functions, classes, etc. That don't really have a home.
 """
 import pgdb, itertools
-__all__ = 'blob', 'struct', 'wrapprop', 'itercursor', 'result2objs', 'result2objs_table'
+__all__ = 'blob', 'struct', 'wrapprop', 'itercursor', 'result2objs', 'result2objs_table', 'sendemail'
 
 class blob(object):
 	"""
@@ -154,4 +154,34 @@ def result2objs_table(cursor, *pargs, **tableclass):
 				vals[n] = row[i]
 			rv[tbl] = cls(**vals)
 		yield rv
+
+import smtplib
+from email.MIMEText import MIMEText
+def sendemail(req, to, subject, msg, headers=None):
+	"""sendemail(Request, string, string, string, [dict]) -> None
+	Send an email to the given person.
+	
+	If Reply-To is not in headers and there is a logged-in user, it defaults to 
+	the current user.
+	"""
+	from restrack.config import config
+	
+	msg = MIMEText(msg)
+	msg['Subject'] = subject
+	msg['From'] = config.EMAIL_FROM
+	if req.user:
+		msg['Reply-to'] = req.user
+	msg['To'] = to
+	if headers:
+		msg.update(headers)
+	
+	if not config.SMTP_SERVER: return
+	# Establish an SMTP object and connect to your mail server
+	s = smtplib.SMTP()
+	s.connect(config.SMTP_SERVER)
+	if config.SMTP_USER:
+		s.login(config.SMTP_USER, config.SMTP_PASSWORD)
+	# Send the email - real from, real to, extra headers and content ...
+	s.sendmail(msg['From'], msg['To'], msg.as_string())
+	s.quit()
 

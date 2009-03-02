@@ -8,6 +8,7 @@ request.header('Content-Type', 'text/html')
 		<title>Modify User - ${user.name}</title>
 	</head>
 	<body>
+		<div py:replace="up()" />
 		<!--pre py:content="repr(user)" /-->
 		<h1>${user.name} - Edit</h1>
 		<div class="error" py:if="defined('msg')" py:content="msg" />

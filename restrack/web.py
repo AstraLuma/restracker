@@ -142,7 +142,18 @@ def template(req, name, **kwargs):
 	
 	logging.getLogger(__name__+'.template').info("%s -> %r", name, fn)
 	
-	tmpl = kid.Template(file=fn, request=req, **kwargs)
+	def up():
+		url = os.path.dirname(req.apppath())
+		link = kid.Element('a', href=url, title=url)
+		link.text = u'«Up'
+		
+		wrapper = kid.Element('div', 
+			style='text-transform: lowercase; font: bold 12pt sans-serif; margin: 0.1em; position: absolute; top: 2pt;', 
+			**{'class': 'uplink'})
+		wrapper.append(link)
+		return wrapper
+	
+	tmpl = kid.Template(file=fn, request=req, up=up, **kwargs)
 	logging.getLogger(__name__+'.template').info("%r", tmpl)
 	for k,v in extrakw.iteritems():
 		setattr(tmpl, k, v)
