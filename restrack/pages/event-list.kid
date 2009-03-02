@@ -5,13 +5,13 @@
 request.header('Content-Type', 'text/html')
 ?>
 	<head>
-		<title>Users</title>
+		<title>Events</title>
 	</head>
 	<body>
 		<div py:replace="up()" />
-		<h1>Users</h1>
+		<h1>Events</h1>
 		<ul>
-			<li py:for="user in users"><a href="/user/${user.email}">${user.name}</a></li>
+			<li py:for="event in events"><a href="/event/${event.eid}">${event.name}</a></li>
 		</ul>
 	</body>
 </html>

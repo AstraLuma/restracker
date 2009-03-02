@@ -74,8 +74,17 @@ def callpage(req):
 			page, (_, pargs, kwargs, pageops) = repaths.items()[0]
 		else:
 			logging.getLogger(__name__+'.callpage')\
-				.warning("Multiple possible pages: %r", [page.__name__ for page,_ in repaths])
-			# FIXME: Come up with some algorithm to select a page
+				.warning("Multiple possible pages: %r", [page.__name__ for page in repaths])
+			cursize = 0
+			for func, (r, p, kw, ops) in repaths.iteritems():
+				m = r.search(req.apppath())
+				if m.span(0) > cursize:
+					cursize = m.span(0)
+					page, pargs, kwargs, pageops = func, p, kw, ops
+				elif m.span(0) == cursize:
+					logging.getLogger(__name__+'.callpage')\
+						.warning("Unselected possible page: %r", func.__name__)
+
 	
 	if page is None:
 		rv = template(req, 'error-404')
@@ -86,8 +95,7 @@ def callpage(req):
 			req.status(405)
 			rv = template('error-405')
 		elif pageops['mustauth'] and req.user is None:
-			# TODO: Put up a login page
-			pass
+			rv = template(req, 'error-login', func=page, title="Must Log In", msg="You must be logged in to use this page")
 		else:
 			# 2. Call
 			try:
@@ -96,6 +104,13 @@ def callpage(req):
 				# 2a. Handle HTTPErrors
 				req.status(e.code, e.status)
 				rv = template(req, 'error-%i' % e.code, error=e)
+			except ActionNotAllowed, e:
+				rv = template(req, 'error-login', func=page, title="Not Allowed", msg="You do not have permissions to use this page")
+			except NotImplementedError:
+				rv = NotImplemented
+			if rv is NotImplemented:
+				req.status(500)
+				rv = template(req, 'error-notimplemented', func=page)
 	
 	# 3. Return
 	return rv
@@ -127,7 +142,18 @@ def template(req, name, **kwargs):
 	
 	logging.getLogger(__name__+'.template').info("%s -> %r", name, fn)
 	
-	tmpl = kid.Template(file=fn, request=req, **kwargs)
+	def up():
+		url = os.path.dirname(req.apppath())
+		link = kid.Element('a', href=url, title=url)
+		link.text = u'«Up'
+		
+		wrapper = kid.Element('div', 
+			style='text-transform: lowercase; font: bold 12pt sans-serif; margin: 0.1em; position: absolute; top: 2pt;', 
+			**{'class': 'uplink'})
+		wrapper.append(link)
+		return wrapper
+	
+	tmpl = kid.Template(file=fn, request=req, up=up, **kwargs)
 	logging.getLogger(__name__+'.template').info("%r", tmpl)
 	for k,v in extrakw.iteritems():
 		setattr(tmpl, k, v)

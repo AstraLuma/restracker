@@ -4,16 +4,21 @@
 Stuff dealing with rooms.
 """
 from restrack.web import page, template, HTTPError
+from restrack.utils import struct, result2obj, first
+
+class Reservation(struct):
+	__fields__ = ('rid', 'timebooked', 'starttime', 'endtime', 'roomnum', 
+		'semail', 'aemail', 'eid')
 
 @page('/event/(.+)/reservation/(.+)')
 def details(req, eid, rid):
-	pass
+	raise NotImplementedError
 
 @page('/event/(.+)/reservation/(.+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
-	pass
+	raise NotImplementedError
 
 @page('/event/(.+)/reservation/create', mustauth=True, methods=['GET','POST'])
 def create(req):
-	pass
+	raise NotImplementedError
 

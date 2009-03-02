@@ -225,11 +225,21 @@ class Request(object):
 		else:
 			return self.environ.get('PATH_INFO','')
 	
+	def returnurl(self):
+		"""req.returnurl() -> string
+		Returns the path to use for returnto URLs.
+		"""
+		url = self.getpath()
+		if self.environ.get('QUERY_STRING'):
+			url += '?' + self.environ['QUERY_STRING']
+		return url
+	
 	def post(self):
 		"""r.post() -> None|dict
 		Returns the POST data as a dictionary, or None if there was no POST.
 		"""
 		rv = self.postall()
+		print "rv=%r" % rv
 		if rv is None:
 			return None
 		else:
@@ -241,13 +251,19 @@ class Request(object):
 		Returns the POST data as an ordered sequence of name/value pairs, or 
 		None if there was no POST.
 		"""
-		if 'CONTENT_LENGTH' not in self.environ or not self.environ['CONTENT_LENGTH']: return
+		if 'CONTENT_LENGTH' not in self.environ: 
+			return
+		if not self.environ['CONTENT_LENGTH']:
+			return
+		if self.environ['REQUEST_METHOD'] == 'GET':
+			return
 		if self._postvars is None:
 			ctype, pdict = cgi.parse_header(self.environ['CONTENT_TYPE'])
 			clength = int(self.environ['CONTENT_LENGTH'])
 			qs = self.environ['wsgi.input'].read(clength)
 			self._postvars = cgi.parse_qs(qs, True)
-		return self._postvars
+		
+		return [(k,v) for k, vs in self._postvars.iteritems() for v in vs]
 	
 	def query(self):
 		"""r.query() -> dict
@@ -362,6 +378,17 @@ WHERE email = %(email)s;
 	def issuper(self):
 		if self._issuper is None: self._findusertypes()
 		return self._issuper
+	
+	_inclubs = None
+	def inclub(self, clubs):
+		if self.user is None: return False
+		clubs = set(clubs)
+		if self._inclubs is None:
+			cur = self.db.cursor()
+			cur.execute("SELECT cemail FROM memberof WHERE semail=%(email)s", {'email': self.user})
+			self._inclubs = set(r[0] for r in utils.itercursor(cur))
+		
+		return 0 == len(clubs - self._inclubs)
 
 def restracker_app(environ, start_response):
 	"""
