@@ -7,13 +7,13 @@ from restrack.web import page, template, HTTPError
 
 @page('/event/(.+)/reservation/(.+)')
 def details(req, eid, rid):
-	pass
+	raise NotImplementedError
 
 @page('/event/(.+)/reservation/(.+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
-	pass
+	raise NotImplementedError
 
 @page('/event/(.+)/reservation/create', mustauth=True, methods=['GET','POST'])
 def create(req):
-	pass
+	raise NotImplementedError
 

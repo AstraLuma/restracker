@@ -7,21 +7,21 @@ from restrack.web import page, template, HTTPError
 
 @page('/event')
 def index(req):
-	pass
+	raise NotImplementedError
 
 @page('/event/(.+)')
 def details(req, eid):
-	pass
+	raise NotImplementedError
 
 @page('/event/(.+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid):
-	pass
+	raise NotImplementedError
 
 @page('/event/search')
 def search(req):
-	pass
+	raise NotImplementedError
 
 @page('/event/create', mustauth=True, methods=['GET','POST'])
 def create(req):
-	pass
+	raise NotImplementedError
 

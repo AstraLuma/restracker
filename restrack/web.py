@@ -95,8 +95,7 @@ def callpage(req):
 			req.status(405)
 			rv = template('error-405')
 		elif pageops['mustauth'] and req.user is None:
-			# TODO: Put up a login page
-			pass
+			rv = template(req, 'error-login', func=page, title="Must Log In", msg="You must be logged in to use this page")
 		else:
 			# 2. Call
 			try:
@@ -105,6 +104,13 @@ def callpage(req):
 				# 2a. Handle HTTPErrors
 				req.status(e.code, e.status)
 				rv = template(req, 'error-%i' % e.code, error=e)
+			except ActionNotAllowed, e:
+				rv = template(req, 'error-login', func=page, title="Not Allowed", msg="You do not have permissions to use this page")
+			except NotImplementedError:
+				rv = NotImplemented
+			if rv is NotImplemented:
+				req.status(500)
+				rv = template(req, 'error-notimplemented', func=page)
 	
 	# 3. Return
 	return rv

@@ -225,6 +225,15 @@ class Request(object):
 		else:
 			return self.environ.get('PATH_INFO','')
 	
+	def returnurl(self):
+		"""req.returnurl() -> string
+		Returns the path to use for returnto URLs.
+		"""
+		url = self.getpath()
+		if self.environ.get('QUERY_STRING'):
+			url += '?' + self.environ['QUERY_STRING']
+		return url
+	
 	def post(self):
 		"""r.post() -> None|dict
 		Returns the POST data as a dictionary, or None if there was no POST.
