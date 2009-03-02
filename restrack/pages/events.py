@@ -4,20 +4,28 @@
 Stuff dealing with rooms.
 """
 from restrack.web import page, template, HTTPError
+from restrack.utils import struct, result2obj, first
+
+class Event(struct):
+	__fields__ = ('eid', 'name', 'description', 'expectedsize')
 
 @page('/event')
 def index(req):
-	raise NotImplementedError
+	cur = req.db.cursor()
+	cur.execute("""SELECT * FROM event ORDER BY name;""")
+	data = list(result2obj(cur, Event))
+	
+	return template(req, 'event-list', events=data)
 
-@page('/event/(.+)')
+@page(r'/event/(\d+)')
 def details(req, eid):
 	raise NotImplementedError
 
-@page('/event/(.+)/edit', mustauth=True, methods=['GET','POST'])
+@page(r'/event/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid):
 	raise NotImplementedError
 
-@page('/event/search')
+@page('/event/search', methods=['GET','POST'])
 def search(req):
 	raise NotImplementedError
 
