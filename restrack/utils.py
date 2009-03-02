@@ -4,7 +4,8 @@
 Helpful functions, classes, etc. That don't really have a home.
 """
 import pgdb, itertools
-__all__ = 'blob', 'struct', 'wrapprop', 'itercursor', 'result2objs', 'result2objs_table', 'sendemail'
+__all__ = ('blob', 'struct', 'wrapprop', 'itercursor', 'result2obj', 
+	'result2objs', 'result2objs_table', 'sendemail')
 
 class blob(object):
 	"""
@@ -107,6 +108,18 @@ def itercursor(cursor):
 	while r is not None:
 		yield r
 		r = cursor.fetchone()
+
+def result2obj(cursor, cls):
+	"""result2objs(dbCursor, class) -> object, ...
+	A more efficient way of saying:
+		>>> (r[None] for r in result2objs_table(cursor, cls))
+	"""
+	flds = [f[0] for f in cursor.description]
+	for row in itercursor(cursor):
+		vals = {}
+		for i,n in flds:
+			vals[n] = row[i]
+		yield cls(**vals)
 
 def result2objs(cursor, *tmap, **dmap):
 	"""result2objs(dbCursor, (slice, cls, attr, ...), ...) -> tuple, ...
