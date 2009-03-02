@@ -378,6 +378,17 @@ WHERE email = %(email)s;
 	def issuper(self):
 		if self._issuper is None: self._findusertypes()
 		return self._issuper
+	
+	_inclubs = None
+	def inclub(self, clubs):
+		if self.user is None: return False
+		clubs = set(clubs)
+		if self._inclubs is None:
+			cur = self.db.cursor()
+			cur.execute("SELECT cemail FROM memberof WHERE semail=%(email)s", {'email': self.user})
+			self._inclubs = set(r[0] for r in utils.itercursor(cur))
+		
+		return 0 == len(clubs - self._inclubs)
 
 def restracker_app(environ, start_response):
 	"""
