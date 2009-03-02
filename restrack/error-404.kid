@@ -9,6 +9,7 @@ request.header('Content-Type', 'text/html')
 	</head>
 	<body>
 		<img src="http://www.python.org/images/PythonPoweredSmall.gif" style="float: right;" />
+		<div py:replace="up()" />
 		<h1>Not Found</h1>
 		<p>The requested URL <tt py:content="request.getpath()" /> was not found on this server.</p>
 		<hr />

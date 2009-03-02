@@ -12,6 +12,7 @@ request.header('Content-Type', 'text/html')
 	</head>
 	<body>
 		<img src="http://www.python.org/images/PythonPoweredSmall.gif" style="float: right;" />
+		<div py:replace="up()" />
 		<h1>Page Not Implemented</h1>
 		<p>The function ${func.__name__} for URL ${request.apppath()} is not 
 		yet implemented.</p>

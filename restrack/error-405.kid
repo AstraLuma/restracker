@@ -9,6 +9,7 @@ request.header('Content-Type', 'text/html')
 	</head>
 	<body>
 		<img src="http://www.python.org/images/PythonPoweredSmall.gif" style="float: right;" />
+		<div py:replace="up()" />
 		<h1>Method Not Allowed</h1>
 		<p>The requested URL <tt py:content="request.getpath()" /> does not 
 			allow <tt py:content="request.environ['REQUEST_METHOD']" /> requests.</p>

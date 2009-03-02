@@ -11,6 +11,7 @@ request.header('Content-Type', 'text/html')
 		<title>${title}</title>
 	</head>
 	<body>
+		<div py:replace="up()" />
 		<h1>${title}</h1>
 		<p class="error">${msg}</p>
 		<form action="/login" method="POST">
