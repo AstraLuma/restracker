@@ -4,7 +4,7 @@
 Stuff dealing with rooms.
 """
 from restrack.web import page, template, HTTPError
-from restrack.utils import struct, result2objs_table
+from restrack.utils import struct, result2obj, first, itercursor
 
 class Room(struct):
 	__fields__ = ('occupancy','roomnum','building','displayname')
@@ -19,36 +19,50 @@ class Room(struct):
 @page('/room')
 def index(req):
 	cur = req.db.cursor()
-	cur.execute("""SELECT * FROM room ORDER BY building,roomnum;""")
-	data = (o[None] for o in result2objs_table(cur, Room))
+	cur.execute("""SELECT * FROM room ORDER BY building, roomnum;""")
+	data = result2obj(cur, Room)
 
-	return template(req, 'room-list',rooms=data)
+	return template(req, 'room-list', rooms=data)
 
 @page('/room/(.+)')
 def building_index(req, building):
-	pass
+	cur = req.db.cursor()
+	cur.execute("""
+SELECT * FROM room 
+	WHERE building=%(building)s 
+	ORDER BY roomnum
+""", {'building': building})
+	data = result2obj(cur, Room)
+
+	return template(req, 'room-list-building', rooms=data, building=building)
 
 @page('/room/(.+)/(.+)')
 def details(req, building, room):
 	cur = req.db.cursor()
-	cur.execute("""SELECT * FROM room WHERE roomnum=%(room)s and
-building=%(building)s""")
-	roomdata = list(result2objs_table(cur,Room))[0][None]
-	cur.execute("""SELECT equipname FROM isIn WHERE roomnum=%(room)s and
-building=%(building)s""")
-	equipdata = (o[0] for o in ittercursor(cur))
-	return template (req, 'room',room=roomdata,equipment=equipdata)
+	cur.execute("""
+SELECT * FROM room 
+	WHERE roomnum=%(room)s AND building=%(building)s
+""", {'room': room, 'building': building})
+	roomdata = first(result2obj(cur, Room))
+	cur.execute("""
+SELECT equipname FROM isIn 
+	WHERE roomnum=%(room)s AND building=%(building)s 
+	ORDER BY equipname
+""", {'room': room, 'building': building})
+	equipdata = [r[0] for r in itercursor(cur)]
+	
+	return template(req, 'room', room=roomdata, equipment=equipdata)
 
 @page('/room/(.+)/(.+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, building, room):
 	# Handle occupancy, equipment
-	pass
+	raise NotImplementedError
 
 @page('/room/search')
 def search(req):
-	pass
+	raise NotImplementedError
 
 @page('/room/create', mustauth=True, methods=['GET','POST'])
 def create(req):
-	pass
+	raise NotImplementedError
 

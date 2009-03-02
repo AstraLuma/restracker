@@ -8,20 +8,20 @@ request.header('Content-Type', 'text/html')
 		<title>Room Info - ${room.display}</title>
 	</head>
 	<body>
-		<!--pre py:content="repr(user)" /-->
+		<div py:replace="up()" />
 		<h1>${room.display}</h1>
-		<div class="infobit"><span>Room:</span> ${room.display}</div>
-			<legend>Room Information</legend>
-			<div class="infobit"
-py:if="room.building"><span>Building</span> ${room.building}</div>
-			<div class="infobit" 
-py:if="room:roomnum"><span>Room Number:</span> ${room.roomnum}</div>
-			<div class="infobit" 
-py:if="room:displayname"><span>Room Name:</span> ${room.displayname}</div>
-			<div class="infobit"
-py:if="room.occupancy"><span>Occupancy:</span> ${room.occupancy}</div>
-
-
+		<div class="infobit"><span>Building:</span> ${room.building}</div>
+		<div class="infobit"><span>Room Number:</span> ${room.roomnum}</div>
+		<div class="infobit" py:if="room.displayname">
+			<span>Room Name:</span> ${room.displayname}
+		</div>
+		<div class="infobit" py:if="room.occupancy">
+			<span>Occupancy:</span> ${room.occupancy}
+		</div>
+		
+		<div py:if="request.isadmin()">
+			<a href="/room/${room.building}/${room.roomnum}/edit">Edit</a>
+		</div>
 	</body>
 </html>
 
