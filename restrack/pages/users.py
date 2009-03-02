@@ -5,7 +5,7 @@ Stuff dealing with users.
 """
 import hashlib, sys
 from restrack.web import page, template, HTTPError, ActionNotAllowed
-from restrack.utils import struct, wrapprop, result2objs_table
+from restrack.utils import struct, wrapprop, result2obj, first
 
 class User(struct):
 	__fields__ = ('email', 'name',
@@ -32,7 +32,7 @@ class User(struct):
 def index(req):
 	cur = req.db.cursor()
 	cur.execute("""SELECT * FROM users ORDER BY name;""")
-	data = (o[None] for o in result2objs_table(cur, User))
+	data = list(result2obj(cur, User))
 	
 	return template(req, 'user-list', users=data)
 
@@ -48,7 +48,7 @@ WHERE email = %(email)s;
 """, {'email': userid})
 	if cur.rowcount == 0:
 		raise HTTPError(404)
-	data = list(result2objs_table(cur, User))[0][None]
+	data = first(result2obj(cur, User))
 	
 	# sent all at once
 	return template(req, 'user', user=data) # user is a variable that the template references
@@ -67,7 +67,7 @@ SELECT * FROM users
 	LEFT OUTER JOIN club ON email = cEmail
 WHERE email = %(email)s;
 """, {'email': user})
-	userdata = list(result2objs_table(cur, User))[0][None]
+	userdata = first(result2objs_table(cur, User))
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	post = req.post()
@@ -167,7 +167,7 @@ SELECT * FROM users
 	LEFT OUTER JOIN club ON email = cEmail
 WHERE email = %(email)s;
 """, {'email': user})
-	userdata = list(result2objs_table(cur, User))[0][None]
+	userdata = first(result2objs_table(cur, User))
 	
 	return template(req, 'user-edit', user=userdata)
 
