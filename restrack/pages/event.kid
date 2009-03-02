@@ -12,7 +12,9 @@ request.header('Content-Type', 'text/html')
 		<!--pre py:content="repr(user)" /-->
 		<h1>${event.name}</h1>
 		<p>${event.description}</p>
-		<div class="infobit" py:if="event.expectedsize"><span>Expected Size:</span> ${event.expectedsize}</div>
+		<div class="infobit" py:if="event.expectedsize">
+			<span>Expected Size:</span> ${event.expectedsize}
+		</div>
 		
 		<div py:if="request.inclub(c.email for c in clubs) or request.issuper()">
 			<a href="/event/${event.eid}/edit">Edit</a>
@@ -20,7 +22,9 @@ request.header('Content-Type', 'text/html')
 		
 		<h2>Running Clubs</h2>
 		<ul>
-			<li py:for="club in clubs"><a href="/user/${club.email}">${club.name}</a></li>
+			<li py:for="club in clubs">
+				<a href="/user/${club.email}">${club.name}</a>
+			</li>
 		</ul>
 		
 		<div py:if="equipment">
@@ -32,10 +36,14 @@ request.header('Content-Type', 'text/html')
 		
 		<h2>Comments</h2>
 		<div py:for="comment in comments" class="comment" id="comment${comment.cid}" style="margin: 1em">
-			<div>On ${comment.madeat}, <a href="/user/${comment.email">${comment.name}</a> 
-				said<span py:if="comment.parent"> in reply to <a href="#comment${comment.parent}">comment #${comment.parent}</a></span>:</div>
+			<div>
+On ${comment.madeat}, <a href="/user/${comment.email}">${comment.name}</a> 
+said<span py:if="comment.parent"> in reply to 
+<a href="#comment${comment.parent}">comment #${comment.parent}</a></span>:</div>
 			<pre style="margin-left: 1em">${comment.txt}</pre>
-			<div py:if="request.user"><a href="/event/${event.eid}/comment?replyto=${comment.cid}">Reply</a></div>
+			<div py:if="request.user">
+				<a href="/event/${event.eid}/comment?replyto=${comment.cid}">Reply</a>
+			</div>
 		</div>
 		
 		<div py:if="request.user"><a href="/event/${event.eid}/comment">Make Comment</a></div>
