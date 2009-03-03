@@ -1,5 +1,6 @@
 # -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
 # vim:tabstop=4:noexpandtab:
+# kate: tab-width 4;
 """
 The top-level WSGI work.
 """
@@ -381,14 +382,29 @@ WHERE email = %(email)s;
 	
 	_inclubs = None
 	def inclub(self, clubs):
+		"""r.inclub(list(string)) -> bool
+		Is the current user a member of one of the given clubs? Note that if 
+		the current user IS one of the clubs, this returns True.
+		"""
 		if self.user is None: return False
 		clubs = set(clubs)
+		if self.user in clubs: return True
 		if self._inclubs is None:
 			cur = self.db.cursor()
 			cur.execute("SELECT cemail FROM memberof WHERE semail=%(email)s", {'email': self.user})
 			self._inclubs = set(r[0] for r in utils.itercursor(cur))
 		
-		return 0 == len(clubs - self._inclubs)
+		return len(clubs) != len(clubs - self._inclubs)
+	
+	def execute(self, sql, **params):
+		"""r.execute(string, [name=object, ...]) -> dbCursor
+		Creates cursor, executes query, and returns cursor.
+		Note that unlike cursor.execute(), parameters are taken as keyword 
+		arguments not as a dict.
+		"""
+		cur = self.db.cursor()
+		cur.execute(sql, params)
+		return cur
 
 def restracker_app(environ, start_response):
 	"""
