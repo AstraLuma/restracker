@@ -1,0 +1,145 @@
+graph{
+rankdir=LR;
+
+group [shape=box];
+event [shape=box];
+user [shape=box];
+admin [shape=box];
+student [shape=box];
+room [shape=box];
+//session [shape=box];
+comment [shape=box];
+equipment [shape=box];
+
+isaadmin [shape=triangle,label=isa];
+isastudent [shape=triangle,label=isa];
+isagroup [shape=triangle,label=isa];
+
+isMemberOf [shape=diamond];
+reservation [shape=diamond]; //make this an entity and relations not one-to-one?
+//loggedIn [shape=diamond];
+eventComment [shape=diamond];
+madeby [shape=diamond];
+reply [shape=diamond];
+isIn [shape=diamond];
+uses [shape=diamond];
+runBy [shape=diamond];
+approved [shape=diamond];
+
+//stuff[peripheries=2];
+major [peripheries=2];
+
+//session--loggedIn [label="0,1"];
+//loggedIn--user [label="0,*"];
+
+eventComment--event [label="0,*"];
+comment--eventComment [label="1,1"];
+comment--madeby [label="1,1"];
+madeby--user [label="0,*"];
+
+
+
+equipment--isIn [label="0,*"];
+isIn--room [label="0,*"];
+
+event--runBy [label="1,*"];
+runBy--group [label="0,*"];
+event--uses [label="0,*"];
+uses--equipment [label="0,*"]; //why was this a 1,*?
+
+//primary key of reservation is room and time?
+student--reservation [label="0,*"];
+reservation--room [label="0,*"];
+reservation--event [label="0,*"]; //events can be in un-reservable places
+admin--approved [label="0,*"];
+approved--reservation [label="0,1"];
+
+//attributes
+subgraph cluster_users{
+style=invis;
+user--isastudent--student;
+user--isaadmin--admin;
+user--isagroup--group;
+
+
+student--isMemberOf [label="0,*"];
+isMemberOf--group [label="0,*"];
+
+
+subgraph cluster_usergraph {
+style=invis;
+
+name--user;
+email--user; //key
+password--user;
+}
+subgraph cluster_studentgraph{
+style=invis;
+
+student--year;
+student--major;
+}
+
+subgraph cluster_admingraph{
+style=invis;
+
+admin--privledges;
+admin--title;
+}
+
+subgraph cluster_groupgraph{
+style=invis;
+
+group--class;
+group--description;
+//group--groupName; //key
+//group--groupEmail; 
+}
+}
+
+subgraph cluster_roomgraph{
+style=invis;
+
+room--building; //key
+room--roomNum; //key
+room--occupancy;
+//stuff--room;
+}
+
+subgraph cluster_eventgraph{
+style=invis;
+
+event--eventName;
+event--eventDescription;
+event--eventId; //key
+event--expectedSize;
+}
+
+subgraph cluster_reservationgraph{
+style=invis;
+
+reservation--time;
+reservation--timeBooked;
+}
+
+eventComment--rating;
+
+subgraph cluster_commentgraph{
+style=invis;
+
+comment--reply [label="0,* parent"];
+reply--comment [label="0,1 child"];
+
+reply--commentRating;
+when--comment;
+txt--comment;
+comment--commentId; //key
+}
+
+subgraph cluster_equipmentgraph{
+style=invis;
+
+type--equipment;
+}
+quantity--isIn;
+}
