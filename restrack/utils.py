@@ -3,11 +3,14 @@
 """
 Helpful functions, classes, etc. That don't really have a home.
 """
-import pgdb, itertools
+import pgdb, itertools, datetime as pydt, time as pytime, re
 __all__ = ('blob', 'struct', 'wrapprop', 'itercursor', 'result2obj', 
 	'result2objs', 'result2objs_table', 'sendemail', 'first')
 
-class blob(object):
+class blob(object): 
+	# Must inherit from object:
+	# * str fails (pgdb never calls __pg_repr__), 
+	# * basestring fails (doesn't allow instantiatiation)
 	"""
 	A quick hack so that bytea isn't double-escaped.
 	
@@ -18,15 +21,50 @@ class blob(object):
 		>>> blob.load(cur.fetchone()[0])
 		"eggs"
 	"""
-	def __init__(self, data):
-		self.data = data
+	def __init__(self, *p):
+		self.__data = str(*p)
 	
 	def __pg_repr__(self):
-		return "E'%s'::bytea" % pgdb.escape_bytea(self.data)
+		return "E'%s'::bytea" % pgdb.escape_bytea(self.__data)
 	
 	@staticmethod
 	def load(data):
-		return pgdb.unescape_bytea(data)
+		return blob(pgdb.unescape_bytea(data))
+	
+	def __repr__(self):
+		return "blob(%r)" % self.__data
+	
+	def __str__(self):
+		return self.__data
+	
+	def __getattr__(self, name):
+		return getattr(self.__data, name)
+
+class datetime(pydt.datetime):
+	def __pg_repr__(self):
+		d = pgdb.Timestamp(self.year, self.month, self.day, self.hour, self.minute, self.second)
+		return "timestamp %s" % pgdb._quote(d)
+	
+	@staticmethod
+	def load(data):
+		FMT = "%Y-%m-%d %H:%M:%S"
+		# Strip off microseconds
+		p = re.compile(r"(.*)\.\d+")
+		m = p.match(data)
+		if m:
+			data = data[slice(*m.span(1))]
+		
+		if hasattr(datetime, 'strptime'):
+			# >=2.5
+			return datetime.strptime(data, FMT)
+		else:
+			# <2.5
+			return datetime(*(pytime.strptime(data, FMT)[0:6]))
+	
+	@staticmethod
+	def fromuser(txt):
+		raise NotImplementedError
+		return datetime(stuff)
 
 class struct(object):
 	"""

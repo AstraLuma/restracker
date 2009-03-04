@@ -6,7 +6,7 @@ The top-level WSGI work.
 """
 import sys, logging, urllib, pgdb, Cookie, random, time, pickle, cgi
 # Local imports
-import web, utils
+import web, utils, sqllog
 from config import config
 __all__ = 'Request', 'restracker_app'
 
@@ -98,7 +98,6 @@ class Request(object):
 			user=config.SQL_USER, password=config.SQL_PASSWORD
 			)
 		if config.get('SQL_LOGQUERIES', False):
-			import sqllog
 			sqllog.setuplog()
 			self.db = sqllog.ConnWrapper(self.db)
 		
@@ -118,7 +117,7 @@ class Request(object):
 			if data is None:
 				self._session_id = None
 			else:
-				self.session = pickle.loads(utils.blob.load(data[0]))
+				self.session = pickle.loads(str(utils.blob.load(data[0])))
 		if self._session_id is None:
 			while not self._initsession(): pass
 			self.db.commit()
