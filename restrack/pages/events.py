@@ -153,7 +153,7 @@ SET name=%(name)s, description=%(desc)s, expectedsize=%(size)s
 WHERE eid=%(eid)i""",
 			name=post['name'], desc=post['description'], size=size, eid=eid)
 		
-		elif 'club-delete' in post:
+		elif 'club-delete' in post and len(clubs) > 1:
 			# Broken?
 			if req.inclub(post['cemail']) or req.issuper():
 				req.execute("DELETE FROM runby WHERE eid=%(e)i AND cemail=%(c)s",

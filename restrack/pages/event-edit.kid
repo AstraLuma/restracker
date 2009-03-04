@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:py="http://purl.org/kid/ns#">
 <?python
 request.header('Content-Type', 'text/html')
+cemails = set(c.cemail for c in clubs)
 ?>
 	<head>
 		<title>Edit Event - ${event.name}</title>
@@ -35,16 +36,16 @@ request.header('Content-Type', 'text/html')
 			<ul>
 				<li py:for="club in clubs">
 					<a href="/user/${club.email}">${club.name}</a>
-					<form py:if="request.inclub([club.email]) or request.issuper()" action="/event/${event.eid}/edit" method="POST">
+					<form py:if="len(clubs) > 1 and (request.inclub([club.email]) or request.issuper())" action="/event/${event.eid}/edit" method="POST">
 						<input type="hidden" name="cemail" value="${club.cemail}" />
 						<input type="submit" name="club-delete" value="Delete" />
 					</form>
 				</li>
-				<li py:if="request.isstudent()">
+				<li py:if="request.isstudent() and len(set(c.cemail for c in userclubs) - cemails) > 0">
 					<form action="/event/${event.eid}/edit" method="POST">
 						<label for="cemail">Club Name:</label>
 						<select name="cemail">
-							<option py:for="club in userclubs" value="${club.cemail}">${club.name}</option>
+							<option py:for="club in userclubs" py:if="club.cemail not in cemails" value="${club.cemail}">${club.name}</option>
 						</select>
 						<input type="submit" name="club-add" value="Add" />
 					</form>
