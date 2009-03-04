@@ -22,6 +22,13 @@ request.header('Content-Type', 'text/html')
 			<div class="infobit" py:if="user.year"><span>Year:</span> ${user.year}</div>
 			<div class="infobit" py:if="user.majors"><span>Majors:</span> <span py:replace="', '.join(user.majors)" /></div>
 			<div class="infobit" py:if="not user.majors"><span>Majors:</span> Undeclared</div>
+			<div class="infobit" py:if="clubs"><span>Clubs:</span>
+				<ul>
+					<li py:for="club in clubs">
+						<a href="/user/${club.cemail}">${club.name}</a>
+					</li>
+				</ul>
+			</div>
 		</fieldset>
 		<fieldset py:if="user.cemail">
 			<legend>Club Info</legend>

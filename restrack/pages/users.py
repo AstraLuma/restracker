@@ -50,8 +50,14 @@ WHERE email = %(email)s;
 		raise HTTPError(404)
 	data = first(result2obj(cur, User))
 	
-	# sent all at once
-	return template(req, 'user', user=data) # user is a variable that the template references
+	clubs = None
+	if data.semail:
+		cur = req.execute("""SELECT * FROM memberof NATURAL JOIN club, users 
+	WHERE cemail=email AND semail=%(u)s""",
+			u=userid)
+		clubs = list(result2obj(cur, User))
+	
+	return template(req, 'user', user=data, clubs=clubs) # user is a variable that the template references
 
 def user_edit(req, user):
 	cur = req.db.cursor()
