@@ -17,7 +17,7 @@ def index(req):
 			yield '<li><a href="%(url)s">%(url)s</a></li>' % {'url':r}
 	yield '</ul>'
 
-@page('/test')
+#@page('/test')
 def test(req): # req == Request
 	req.header('Content-Type', 'text/plain')
 	
@@ -55,17 +55,17 @@ def info(req):
 			yield '%s = %r\n' % (attr, value)
 	yield 'postall() = %r\n' % (req.postall())
 
-@page('/spam')
+#@page('/spam')
 def spam(req):
 	raise HTTPError(404) # For responses other than 200
 
-@page('/eggs')
+#@page('/eggs')
 def eggs(req):
 	req.status(302) # Alternative method for setting the response status code
 	req.header('Location', req.fullurl('/test'))
 	# No content, don't have to return anything
 
-@page('/teapot')
+#@page('/teapot')
 def eggs(req):
 	req.status(418)
 	req.header('Content-Type', 'text/plain')
@@ -75,7 +75,7 @@ Here is my handle, here is my spout
 When I get all steamed up hear me shout.
 Tip me over and pour me out."""
 
-@page('/error')
+#@page('/error')
 def mkerror(req):
 	raise Exception, "A random exception"
 
