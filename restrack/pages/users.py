@@ -52,8 +52,8 @@ WHERE email = %(email)s;
 	
 	clubs = None
 	if data.semail:
-		cur = req.execute("""SELECT * FROM memberof NATURAL JOIN club, users 
-	WHERE cemail=email AND semail=%(u)s""",
+		cur = req.execute("""SELECT * FROM memberof NATURAL JOIN clubusers 
+	WHERE semail=%(u)s""",
 			u=userid)
 		clubs = list(result2obj(cur, User))
 	

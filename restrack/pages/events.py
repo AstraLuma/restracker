@@ -30,19 +30,17 @@ def details(req, eid):
 	except:
 		raise HTTPError(404)
 	
-	cur = req.db.cursor()
-	cur.execute("SELECT * FROM event WHERE eid=%(id)i", {'id': eid})
+	cur = req.execute("SELECT * FROM event WHERE eid=%(id)i", id=eid)
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	event = first(result2obj(cur, Event))
 	
-	cur.execute("""
-SELECT * FROM runBy NATURAL JOIN club, users 
-	WHERE cemail=email AND eid=%(id)i
-	ORDER BY name""", {'id': eid})
+	cur = req.execute(
+		"SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=%(id)i ORDER BY name", 
+		id=eid)
 	clubs = list(result2obj(cur, User))
 	
-	cur.execute("""
+	cur = req.execute("""
 SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 		SELECT count(r2.RID) AS conflicts, r1.RID
 			FROM reservation AS r1, reservation AS r2
@@ -52,14 +50,17 @@ SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 			GROUP BY r1.RID
 		) AS conflicting NATURAL LEFT OUTER JOIN room
 	WHERE reservation.eid = %(event)i
-	ORDER BY starttime""", {'event': eid})
-	print repr(cur.description)
+	ORDER BY starttime""", event=eid)
 	reservations = list(result2obj(cur, Reservation))
 	
-	cur.execute("SELECT * FROM comments NATURAL JOIN users WHERE EID=%(id)i ORDER BY madeat", {'id': eid})
+	cur = req.execute(
+		"SELECT * FROM comments NATURAL JOIN users WHERE EID=%(id)i ORDER BY madeat", 
+		id=eid)
 	comments = list(result2obj(cur, Comment))
 	
-	cur.execute("SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", {'id': eid})
+	cur = req.execute(
+		"SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", 
+		id=eid)
 	equipment = [r[0] for r in itercursor(cur)]
 	
 	return template(req, 'event', 
@@ -89,15 +90,15 @@ def comment(req, eid):
 		txt = post['txt'].replace('\r\n', '\n').replace('\r', '\n')
 		
 		if replyto is None:
-			cur.execute("""
+			cur = req.execute("""
 INSERT INTO comments (eid, madeat, email, txt)
-	VALUES (%(eid)i, NOW(), %(user)s, %(txt)s)
-""", {'eid': eid, 'user': req.user, 'txt': txt})
+	VALUES (%(eid)i, NOW(), %(user)s, %(txt)s)""",
+				eid=eid, user=req.user, txt=txt)
 		else:
-			cur.execute("""
+			cur = req.execute("""
 INSERT INTO comments (eid, madeat, email, txt, parent)
-	VALUES (%(eid)i, NOW(), %(user)s, %(txt)s, %(replyto)i)
-""", {'eid': eid, 'user': req.user, 'txt': txt, 'replyto': replyto})
+	VALUES (%(eid)i, NOW(), %(user)s, %(txt)s, %(replyto)i)""", 
+				eid=eid, user=req.user, txt=txt, replyto=replyto)
 		
 		assert cur.rowcount
 		cid = cur.lastrowid
@@ -112,7 +113,9 @@ INSERT INTO comments (eid, madeat, email, txt, parent)
 				r2 = int(get['replyto'])
 			except: pass
 			else:
-				cur.execute("SELECT * FROM comments NATURAL JOIN users WHERE cid=%(id)i", {'id': r2})
+				cur.execute(
+					"SELECT * FROM comments NATURAL JOIN users WHERE cid=%(id)i", 
+					id=r2)
 				parent = first(result2obj(cur, Event))
 				quoted = '\n'.join('> '+l for l in parent.txt.split('\n')) + '\n'
 		return template(req, 'event-comment', event=event, parent=parent, quoted=quoted)
@@ -129,13 +132,14 @@ def edit(req, eid):
 		raise HTTPError(404)
 	event = first(result2obj(cur, Event))
 	
-	cur = req.execute("""
-SELECT * FROM runBy NATURAL JOIN club, users 
-	WHERE cemail=email AND eid=%(id)i
-	ORDER BY name""", id=eid)
+	cur = req.execute(
+		"SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=%(id)i ORDER BY name", 
+		id=eid)
 	clubs = list(result2obj(cur, User))
 	
-	cur = req.execute("SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", id=eid)
+	cur = req.execute(
+		"SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", 
+		id=eid)
 	equipment = [r[0] for r in itercursor(cur)]
 	
 	if not (req.inclub(c.email for c in clubs) or req.issuper()):
@@ -177,9 +181,8 @@ WHERE eid=%(eid)i""",
 		userclubs = None
 		if req.isstudent():
 			cur = req.execute("""
-SELECT * FROM users, club NATURAL JOIN memberof 
-	WHERE email=cemail AND semail=%(email)s
-	ORDER BY name""", email=req.user)
+SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=%(email)s ORDER BY name""", 
+				email=req.user)
 			userclubs = list(result2obj(cur, User))
 		return template(req, 'event-edit', 
 			event=event, clubs=clubs, equipment=equipment, userclubs=userclubs)
