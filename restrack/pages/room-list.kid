@@ -11,7 +11,7 @@ from itertools import groupby
 	<body>
 		<div py:replace="up()" />
 		<h1>Rooms</h1>
-
+		<a href="/room/search">Search</a>
 		<ul>
 			<li py:for="building, rms in groupby(rooms, key=lambda o: o.building)">
 				<a href="/room/${building}">${building}</a>
@@ -22,6 +22,7 @@ from itertools import groupby
 				</ul>
 			</li>
 		</ul>
+		<a py:if="request.isadmin()" href="/room/create">Create New</a>
 	</body>
 </html>
 

@@ -13,6 +13,7 @@ request.header('Content-Type', 'text/html')
 		<ul>
 			<li py:for="user in users"><a href="/user/${user.email}">${user.name}</a></li>
 		</ul>
+		<a py:if="not request.isuser() or request.issuper()" href="/user/create">Create New</a>
 	</body>
 </html>
 

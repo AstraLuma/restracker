@@ -10,9 +10,11 @@ request.header('Content-Type', 'text/html')
 	<body>
 		<div py:replace="up()" />
 		<h1>Events</h1>
+		<a href="/event/search">Search</a>
 		<ul>
 			<li py:for="event in events"><a href="/event/${event.eid}">${event.name}</a></li>
 		</ul>
+		<a py:if="request.isstudent() or request.isclub() or request.issuper()" href="/event/create">Create New</a>
 	</body>
 </html>
 
