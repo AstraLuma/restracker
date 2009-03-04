@@ -8,11 +8,14 @@ from restrack.web import page, template, HTTPError
 import users, events, reservations, rooms, statistics
 
 @page('/')
+@page('/index.html')
 def index(req):
 	req.header('Content-Type', 'text/html')
 	import restrack.web as web
 	yield '<ul>'
 	for r, f, _ in sorted(web._pages, key=lambda r: r[0]):
+		if r in ('/', '/index.html'):
+			continue
 		if isinstance(r, basestring):
 			yield '<li><a href="%(url)s">%(url)s</a></li>' % {'url':r}
 	yield '</ul>'

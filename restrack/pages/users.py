@@ -184,7 +184,7 @@ def editme(req):
 	"""
 	return user_edit(req, req.user)
 
-@page('/user/(.+)/edit', mustauth=True, methods=['GET','POST'])
+@page('/user/([^/]+)/edit', mustauth=True, methods=['GET','POST'])
 def editthem(req, user):
 	"""
 	Edit another user.
@@ -198,6 +198,8 @@ def create(req):
 	post = req.post()
 	if post is not None:
 		email = post['email']
+		if '/' not in email:
+			return template(req, 'user-create', msg='Invalid character: emails cannot contain "/"')
 		name = post['name'] or None
 		if post['password1'] != post['password2']:
 			return template(req, 'user-create', msg='Mismatched passwords')

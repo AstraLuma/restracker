@@ -24,7 +24,7 @@ def index(req):
 
 	return template(req, 'room-list', rooms=data)
 
-@page('/room/(.+)')
+@page('/room/([^/]+)')
 def building_index(req, building):
 	cur = req.db.cursor()
 	cur.execute("""
@@ -36,7 +36,7 @@ SELECT * FROM room
 
 	return template(req, 'room-list-building', rooms=data, building=building)
 
-@page('/room/(.+)/(.+)')
+@page('/room/([^/]+)/([^/]+)')
 def details(req, building, room):
 	cur = req.db.cursor()
 	cur.execute("""
@@ -53,7 +53,7 @@ SELECT equipname FROM isIn
 	
 	return template(req, 'room', room=roomdata, equipment=equipdata)
 
-@page('/room/(.+)/(.+)/edit', mustauth=True, methods=['GET','POST'])
+@page('/room/([^/]+)/([^/]+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, building, room):
 	# Handle occupancy, equipment
 	raise NotImplementedError
