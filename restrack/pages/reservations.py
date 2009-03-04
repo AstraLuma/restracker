@@ -37,6 +37,10 @@ def details(req, eid, rid):
 def edit(req, eid, rid):
 	raise NotImplementedError
 
+@page('/event/(.+)/reservation/(.+)/approve', mustauth=True, methods=['GET','POST'])
+def edit(req, eid, rid):
+	raise NotImplementedError
+
 @page('/event/(.+)/reservation/create', mustauth=True, methods=['GET','POST'])
 def create(req):
 	raise NotImplementedError

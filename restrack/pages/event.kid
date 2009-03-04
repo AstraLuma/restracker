@@ -31,11 +31,17 @@ request.header('Content-Type', 'text/html')
 		<ul>
 			<li py:for="resv in reservations">
 				<a href="/event/${event.eid}/reservation/${resv.rid}">
-					${resv.format()}
-				</a>
+					${resv.format()}</a>
+				<span py:if="resv.aemail">Approved</span>
 				<span py:if="resv.conflicts">Conflict!</span>
+				<span py:if="not resv.conflicts and not resv.aemail and request.isadmin()">
+					<a href="/event/${event.eid}/reservation/${resv.rid}/approve">Approve</a>
+				</span>
 			</li>
 		</ul>
+		<div py:if="request.inclub(c.cemail for c in clubs) or request.issuper()">
+			<a href="/event/${event.eid}/reservation/create">Add New</a>
+		</div>
 		
 		<div py:if="equipment">
 			<h2>Equipment</h2>
