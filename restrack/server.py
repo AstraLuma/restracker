@@ -381,6 +381,14 @@ WHERE email = %(email)s;
 		return self._issuper
 	
 	_inclubs = None
+	def getclubs(self):
+		if self.user is None: return []
+		if self._inclubs is None:
+			cur = self.db.cursor()
+			cur.execute("SELECT cemail FROM memberof WHERE semail=%(email)s", {'email': self.user})
+			self._inclubs = set(r[0] for r in utils.itercursor(cur))
+		return list(self._inclubs)
+	
 	def inclub(self, clubs):
 		"""r.inclub(list(string)) -> bool
 		Is the current user a member of one of the given clubs? Note that if 
@@ -389,11 +397,7 @@ WHERE email = %(email)s;
 		if self.user is None: return False
 		clubs = set(clubs)
 		if self.user in clubs: return True
-		if self._inclubs is None:
-			cur = self.db.cursor()
-			cur.execute("SELECT cemail FROM memberof WHERE semail=%(email)s", {'email': self.user})
-			self._inclubs = set(r[0] for r in utils.itercursor(cur))
-		
+		self.getclubs()
 		return len(clubs) != len(clubs - self._inclubs)
 	
 	def execute(self, sql, **params):
