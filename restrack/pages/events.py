@@ -43,16 +43,17 @@ SELECT * FROM runBy NATURAL JOIN club, users
 	clubs = list(result2obj(cur, User))
 	
 	cur.execute("""
-SELECT * FROM reservation NATURAL JOIN (
+SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 		SELECT count(r2.RID) AS conflicts, r1.RID
 			FROM reservation AS r1, reservation AS r2
 			WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) 
 				AND r1.EID=%(event)i AND r2.EID!=%(event)i
 				AND r1.roomNum=r2.roomNum AND r1.building=r2.building 
 			GROUP BY r1.RID
-		) AS conflicting
+		) AS conflicting NATURAL LEFT OUTER JOIN room
 	WHERE reservation.eid = %(event)i
 	ORDER BY starttime""", {'event': eid})
+	print repr(cur.description)
 	reservations = list(result2obj(cur, Reservation))
 	
 	cur.execute("SELECT * FROM comments NATURAL JOIN users WHERE EID=%(id)i ORDER BY madeat", {'id': eid})
@@ -61,7 +62,9 @@ SELECT * FROM reservation NATURAL JOIN (
 	cur.execute("SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", {'id': eid})
 	equipment = [r[0] for r in itercursor(cur)]
 	
-	return template(req, 'event', event=event, clubs=clubs, equipment=equipment, comments=comments)
+	return template(req, 'event', 
+		event=event, clubs=clubs, equipment=equipment, comments=comments, 
+		reservations=reservations)
 
 @page(r'/event/(\d+)/comment', mustauth=True, methods=['GET','POST'])
 def comment(req, eid):
@@ -146,21 +149,23 @@ SELECT * FROM runBy NATURAL JOIN club, users
 				size = int(post['expectedsize'])
 			
 			req.execute("""UPDATE event 
-SET name=%(name)s, description=%(desc)s, expectedsize=%(size)s""",
-			name=post['name'], desc=post['description'], size=size)
+SET name=%(name)s, description=%(desc)s, expectedsize=%(size)s 
+WHERE eid=%(eid)i""",
+			name=post['name'], desc=post['description'], size=size, eid=eid)
 		
 		elif 'club-delete' in post:
 			# Broken?
 			if req.inclub(post['cemail']) or req.issuper():
-				req.execute("""DELETE FROM runby WHERE eid=%(e)i AND cemail=%(c)s""",
+				req.execute("DELETE FROM runby WHERE eid=%(e)i AND cemail=%(c)s",
 					e=eid, c=post['cemail'])
 		elif 'club-add' in post:
-			if (req.isstudent() and req.inclub([post['cemail']])) or req.isclub() or req.issuper():
-				req.execute("""INSERT INTO runby (eid, cemail) VALUES (%(e)i, %(c)s)""",
+			if (req.isstudent() and req.inclub([post['cemail']])) \
+					or req.isclub() or req.issuper():
+				req.execute("INSERT INTO runby (eid, cemail) VALUES (%(e)i, %(c)s)",
 					e=eid, c=post['cemail'])
 		
 		elif 'equip-delete' in post:
-			req.execute("""DELETE FROM uses WHERE eid=%(e)i AND equipname=%(eq)s""",
+			req.execute("DELETE FROM uses WHERE eid=%(e)i AND equipname=%(eq)s",
 				e=eid, eq=post['equipname'])
 		elif 'equip-add' in post:
 			req.execute("""INSERT INTO uses (eid, equipname) VALUES (%(e)i, %(eq)s)""",
@@ -171,9 +176,13 @@ SET name=%(name)s, description=%(desc)s, expectedsize=%(size)s""",
 	else:
 		userclubs = None
 		if req.isstudent():
-			cur = req.execute("SELECT * FROM users, club NATURAL JOIN memberof WHERE email=cemail AND semail=%(email)s", email=req.user)
+			cur = req.execute("""
+SELECT * FROM users, club NATURAL JOIN memberof 
+	WHERE email=cemail AND semail=%(email)s
+	ORDER BY name""", email=req.user)
 			userclubs = list(result2obj(cur, User))
-		return template(req, 'event-edit', event=event, clubs=clubs, equipment=equipment, userclubs=userclubs)
+		return template(req, 'event-edit', 
+			event=event, clubs=clubs, equipment=equipment, userclubs=userclubs)
 
 @page('/event/search', methods=['GET','POST'])
 def search(req):

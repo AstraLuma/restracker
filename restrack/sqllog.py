@@ -2,6 +2,8 @@
 # vim:tabstop=4:noexpandtab:
 """
 Defines classes for logging SQL queries.
+
+Also contains some hacks for getting types to work.
 """
 import logging
 __all__ = 'ConnWrapper',
@@ -58,3 +60,20 @@ def setuplog():
 	l.addHandler(lh)
 	setup = True
 
+### THERE BE DRAGONS HERE ###
+
+import pgdb
+import utils
+
+_oldTypeCache = pgdb.pgdbTypeCache
+class pgdbTypeCache(_oldTypeCache):
+	def typecast(self, typ, value):
+		# pgdb doesn't do timestamps correctly
+		if typ == pgdb.BINARY:
+			return utils.blob.load(value)
+		elif typ == pgdb.DATETIME:
+			return utils.datetime.load(value)
+		else:
+			return _oldTypeCache.typecast(self, typ, value)
+
+pgdb.pgdbTypeCache = pgdbTypeCache
