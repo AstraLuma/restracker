@@ -1,9 +1,10 @@
 # -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
 # vim:tabstop=4:noexpandtab:
+# kate: tab-width 4;
 """
 Stuff dealing with rooms.
 """
-from restrack.web import page, template, HTTPError
+from restrack.web import page, template, HTTPError, ActionNotAllowed
 from restrack.utils import struct, result2obj, first, itercursor
 from users import User
 from reservations import Reservation
@@ -119,9 +120,60 @@ def edit(req, eid):
 		eid = int(eid)
 	except:
 		raise HTTPError(404)
-#	if not (req.inclub(c.email for c in clubs) or req.issuper()):
-#		raise ActionNotAllowed
-	raise NotImplementedError
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(id)i", id=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
+	
+	cur = req.execute("""
+SELECT * FROM runBy NATURAL JOIN club, users 
+	WHERE cemail=email AND eid=%(id)i
+	ORDER BY name""", id=eid)
+	clubs = list(result2obj(cur, User))
+	
+	cur = req.execute("SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", id=eid)
+	equipment = [r[0] for r in itercursor(cur)]
+	
+	if not (req.inclub(c.email for c in clubs) or req.issuper()):
+		raise ActionNotAllowed
+	
+	post = req.post()
+	if post:
+		if 'basicinfo' in post:
+			size = None
+			if post['expectedsize']:
+				size = int(post['expectedsize'])
+			
+			req.execute("""UPDATE event 
+SET name=%(name)s, description=%(desc)s, expectedsize=%(size)s""",
+			name=post['name'], desc=post['description'], size=size)
+		
+		elif 'club-delete' in post:
+			# Broken?
+			if req.inclub(post['cemail']) or req.issuper():
+				req.execute("""DELETE FROM runby WHERE eid=%(e)i AND cemail=%(c)s""",
+					e=eid, c=post['cemail'])
+		elif 'club-add' in post:
+			if (req.isstudent() and req.inclub([post['cemail']])) or req.isclub() or req.issuper():
+				req.execute("""INSERT INTO runby (eid, cemail) VALUES (%(e)i, %(c)s)""",
+					e=eid, c=post['cemail'])
+		
+		elif 'equip-delete' in post:
+			req.execute("""DELETE FROM uses WHERE eid=%(e)i AND equipname=%(eq)s""",
+				e=eid, eq=post['equipname'])
+		elif 'equip-add' in post:
+			req.execute("""INSERT INTO uses (eid, equipname) VALUES (%(e)i, %(eq)s)""",
+				e=eid, eq=post['equipname'])
+		
+		req.status(303)
+		req.header('Location', req.fullurl('/event/%i/edit' % (eid)))
+	else:
+		userclubs = None
+		if req.isstudent():
+			cur = req.execute("SELECT * FROM users, club NATURAL JOIN memberof WHERE email=cemail AND semail=%(email)s", email=req.user)
+			userclubs = list(result2obj(cur, User))
+		return template(req, 'event-edit', event=event, clubs=clubs, equipment=equipment, userclubs=userclubs)
 
 @page('/event/search', methods=['GET','POST'])
 def search(req):
