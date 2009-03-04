@@ -27,6 +27,16 @@ request.header('Content-Type', 'text/html')
 			</li>
 		</ul>
 		
+		<h2>Reservations</h2>
+		<ul>
+			<li py:for="resv in reservations">
+				<a href="/event/${event.eid}/reservation/${resv.rid}">
+					${resv.format()}
+				</a>
+				<span py:if="resv.conflicts">Conflict!</span>
+			</li>
+		</ul>
+		
 		<div py:if="equipment">
 			<h2>Equipment</h2>
 			<ul>
