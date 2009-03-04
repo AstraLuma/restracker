@@ -1,0 +1,21 @@
+code:
+-event create
+-reservation display
+-reservation edit
+-reservation create
+-room edit
+-room search
+-room create
+
+write up:
+-queries list
+-describe permissions
+-screenshots of a path a user would take
+-who did what
+-editing paper and making sure everything is done
+
+other:
+-README on how to install the server
+-document code
+-testing- output from logs
+-make sure everyone is comfortable talking about everything
