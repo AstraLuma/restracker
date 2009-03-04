@@ -1,0 +1,197 @@
+\documentclass{article}
+\usepackage{graphicx,verbatim}
+
+\title{ResTracker}
+\author{Team 16\\Stephanie Fuller (sfuller@wpi.edu)\\Jamie Bliss (jebliss@wpi.edu)\\Sam
+LaFleche (shl@wpi.edu)}
+
+\begin{document}
+
+\maketitle
+
+\section{Description}
+As it currently stands the WPI administration does not have a good tool for
+managing what rooms have been reserved by student organizations. Room
+reservations are often lost, forgotten about, or double booked leading to
+frustration on the part of organizations and difficulty running events. Having a
+single database where room reservations could be tracked, added and deleted
+would mitigate this problem.
+
+\section{ER Model}
+\scalebox{.42}{\includegraphics[angle=90]{ERmodel.eps}}
+
+\section{Requirements}
+
+\begin{itemize}
+\item Users are broken up into Administrators, Super Administrators, Anonymous Users, Students, and Groups
+\item All users have names, email addresses, and passwords.
+\item Students also have a graduation year and major(s).
+\item Administrators have titles and Super Administrator privileges or not. 
+\item Groups have descriptions and what class (class 1, class 2, class 3, etc.).
+\item Events have a name, description, ID, and expected size.
+\item Events have sponsoring groups, name, description, and room reservation(s).
+\item There are rooms. Rooms have buildings, room numbers, and occupancy.
+\item There is equipment. Equipment is a type of equipment.
+\item Equipment can be in rooms and can be used for events.
+\item When equipment is in a room there is a quantity.
+\item A reservation shall include who booked it, what administrator
+approved it (if any), when it was booked, when it is being reserved,
+and the event it is for.
+\item The system notifies the group and user which created it with any
+changes to an event or reservation.
+\item All changes (eg additions, deletions, and mutations) shall be
+logged, including the user who made the change, the event that was
+changed, and the old and new data.
+\item The database shall be usable by multiple users at once.
+\item The database shall have a UI capable of showing relevant information.
+\item For each reservation the student who made the reservation must
+be a member of the group the reservation is for.
+\item Events can have any number of comments on them, including none.
+\item Comments must be on exactly one event.
+\item Each comment is made only by one user.
+\item Events are run by one or more clubs. There cannot be an event run by no
+club, but more than one club can run the event. This is as is currently done for
+events at WPI.  
+\item Groups can run any number of events including none. New clubs can have not
+run any events yet. 
+\item Events may or may not use equipment.
+\item Equipment may or may not be used.
+\item Students can make reservations, but do not have to do so.
+\item Rooms may be reserved, but do not have to be.
+\item Rooms cannot be booked for more than one event at the same time. 
+\item Events can be in public, non-reservable places.
+\item Events can be in more than one room. Large events can have multiple rooms
+reserved for it.
+\item Reservations can either be approved or not yet approved.
+\item Students can be members of as many clubs as they want to be, including 0.
+\item Groups can have as many members as they want, including potentially 0 if
+it is a newly created club or members have not yet joined for the year.
+\item Anonymous users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Anonymous users can create user accounts.
+\item Student users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Student users can request group membership.
+\item Student users can comment on events and comments.
+\item Student users can create events for groups they are members for.
+\item Student users can edit the events they create.
+\item Student users can make reservations for the events they create.
+\item Student users can edit the reservations for the events they create.
+\item Group users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Group users can edit events they sponsor.
+\item Group users can edit the reservations for the events they sponsor.
+\item Group users can comment on events and comments.
+\item Group users can add students to a group.
+\item Administrator users can view events, rooms, equipment, clubs, reservations, comments, and users.
+\item Administrator users can approve reservations.
+\item Administrator users can comment on events and comments.
+\item Administrator users can update room information.
+\item Super Administrator users can perform any action Administrators can.
+\item Super Administrator users can view, add, update and delete: rooms, events, equipment, users, reservations and comments.
+\item Users shall be able to search for a room.
+\item Users shall be able to get a list of what rooms a group has
+reserved and when they are reserved for.
+\item Administrators shall be able to view recent changes to the database.
+\item An administrator must approve a reservation before it is official.
+\end{itemize}
+
+\section{Queries}
+\subsection{Retrieval}
+
+The following items can be queried on for either an identifying list of items,
+or for a detailed list of the information and relations in the database about each item:
+\begin{itemize}
+\item room - includes equipment
+\item equipment - includes rooms in
+\item clubs - include events sponsored 
+\item events - include comments, equipment used
+\item users - include events they're in charge of
+\item reservation 
+\end{itemize}
+
+Rooms can be queried based on available times such that only rooms with no approved reservations at those times are returned.
+If there are unapproved reservations for that room at that time that is also returned.
+
+Rooms can be queried based on the presence of specific equipment in them.
+
+Rooms can be queried based on occupancy range (or just minimum occupancy).
+
+Reservations can be queried such that all overlapping reservations are returned along with their events.
+
+A user can request statistic pages from the database. These include statistics on:
+\begin{itemize}
+\item most commonly used rooms
+\item favorite events based on rating of comments about the event
+\item which student majors run the most events
+\end{itemize}
+
+\subsection{Updates}
+The following operations are supported:
+\begin{itemize}
+\item Create a user
+\item Change user information
+\item Turn a user into a student, administrator, or a club
+\item Make an administrator super
+\item Add student to a club
+\item Comment on an event
+\item Create an event
+\item Add, change, and remove equipment in a room
+\item Add, change, and remove equipment used by an event
+\item Add and remove a reservation
+\item Approve a reservation
+\item Remove approval of a reservation
+\item Add and remove clubs to events
+\item Create a room
+\item Change room information
+\item Create and update sessions
+\item Clean old sessions
+\item Super Administrators (presumably skilled users) may run additional queries via direct database access
+\end{itemize}
+
+\section{SQL queries}
+\subsection{Retrevial}
+\verbatiminput{queries.txt}
+
+\subsection{Updates}
+\verbatiminput{updates.txt}
+
+\section{Application Layer Decisions}
+Python is the language being used to implement the front end of the system. Jamie is familiar with this language
+and it is known to be easy to implement web interfaces with it. Jamie has provided Sam and Stephanie with code examples
+to help gain familiarity with the language.
+
+PostgresSQL is being used for the database because it is free, like MySQL, but has many advanced features, like ORACLE,
+including foreign key checking.
+
+The basic interface opens with a list of upcoming events. From there users can log in and once they have done so they are presented
+with links to pages that allow them to query and update the database as is appropriate to their user type. Items related to them,
+such as events they are running or need to approve, are also presented on log in.
+
+
+\section{Advanced Features}
+There are a few advanced features that if implemented would be a boon to the system. The use or triggers to detect
+when a new reservation conflicts with a previous one and mark them would allow users to tell immediately when there
+might be a scheduling problem. It is possible the system may even want to index reservations that conflict with others
+as these will be looked at frequently, at least as long as they exist, so that the conflict may be analyzed and resolved.
+Triggers could also be used to check database consistency when information is added or removed.
+
+
+\section{Division of Labor}
+The project team met several times for this project phase. The devision of work on is as follows:
+
+Sam:
+\begin{itemize}
+
+\end{itemize}
+
+Stephanie:
+\begin{itemize}
+
+\end{itemize}
+
+Jamie:
+\begin{itemize}
+
+\end{itemize}
+
+
+\end{document}
+
