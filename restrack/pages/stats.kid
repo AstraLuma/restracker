@@ -12,15 +12,26 @@ request.header('Content-Type', 'text/html')
 		<h1>Top Ten Lists </h1>
 		<h2>Most used buildings</h2>
 		<table>
-			<tr py:for="room in usedrooms"><td>${room.c}</td><td><a href="/room/${room.building}/${room.roomnum}">${room.building} ${room.roomnum}</a></td></tr>
+			<tr py:for="room in usedrooms">
+				<td>${room.c}</td>
+				<!--FIXME: Use Room.display-->
+				<td><a href="/room/${room.building}/${room.roomnum}">${room.building} ${room.roomnum}</a></td>
+			</tr>
 		</table>
 		<h2>Students who run most events</h2>
 		<table>
-			<tr py:for="student in studentsevents"><td>${student.c}</td><td><a href="/user/${student.semail}" >${student.semail}</a></td></tr>
+			<tr py:for="student in studentsevents">
+				<td>${student.c}</td>
+				<!--FIXME: Use User.name-->
+				<td><a href="/user/${student.semail}" >${student.semail}</a></td>
+			</tr>
 		</table>
 		<h2>Majors which run most events</h2>
 		<table>
-			<tr py:for="major in majorevents"><td>${major.count}</td><td>${major.major}</td></tr>
+			<tr py:for="major in majorevents">
+				<td>${major.count}</td>
+				<td>${major.major or '(Undeclared)'}</td>
+			</tr>
 		</table>
 
 </body>
