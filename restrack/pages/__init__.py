@@ -5,7 +5,7 @@ Some example pages.
 """
 import os
 from restrack.web import page, template, HTTPError
-import users, events, reservations, rooms
+import users, events, reservations, rooms, statistics
 
 @page('/')
 def index(req):
