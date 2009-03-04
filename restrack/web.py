@@ -41,14 +41,62 @@ def page(regex, **options):
 	return _
 
 def findpages(path):
+	"""findpages(string) -> (bool, func, regex, match, ops)
+	Finds all pages that could _possibly_ match the path.
+	"""
 	for r, f, ops in _pages:
 		if isinstance(r, basestring):
 			if r == path:
-				yield False, f, None, (), {}, ops
+				yield False, f, None, None, ops
 		else:
-			m = r.search(path)
+			m = r.match(path)
 			if m:
-				yield True, f, r, m.groups(), m.groupdict(), ops
+				yield True, f, r, m, ops
+
+def findpage(path):
+	"""findpage(string) -> func, ops, pargs, kwargs
+	Given a path, finds the appropriate registered caller, plus the arguments 
+	to pass to it.
+	"""
+	log = logging.getLogger(__name__+'.findpage')
+	repaths = {}
+	# 1. Find any functions that match.
+	#    Plain strings that match exactly cause us to exit.
+	for isre, func, regex, match, ops in findpages(path):
+		if not isre:
+			return func, ops, (), {}
+		else:
+			repaths[func] = regex, match, ops
+	else:
+		# 1a. If we're empty, exit now.
+		if len(repaths) < 1: # Nothing found
+			return None, {}, (), {}
+		# 1b. If we have one, return it
+		elif len(repaths) == 1:
+			func, (_, m, ops) = repaths.items()[0]
+			return func, ops, m.groups(), m.groupdict()
+	
+	log.warning("Multiple possible pages for %r: %r", path, [page.__name__ for page in repaths])
+	
+	# 2. Find the regex that matches the longest portion.
+	cursize = 0
+	curfunc = None
+	for func, (r, m, ops) in repaths.items():
+		if m.span(0) > cursize:
+			cursize = m.span(0)
+			if curfunc is not None:
+				del repaths[curfunc]
+			curfunc = func
+		elif m.span(0) < cursize:
+			del repaths[func]
+	else:
+		assert len(repaths) > 0, "Got rid of everything"
+	
+		if len(repaths) == 1:
+			func, (_, m, ops) = repaths.items()[0]
+			return func, ops, m.groups(), m.groupdict()
+	
+	raise RuntimeError, "Ran out of algorithms! We still have pages for %r: %r" % (path, repaths.keys())
 
 def callpage(req):
 	"""callpage(Request) -> iterable
@@ -56,35 +104,8 @@ def callpage(req):
 	HTTPError, and returns something that can be returned to the WSGI server.
 	"""
 	# 1. Find callable & assemble args
-	page = pargs = kwargs = None
-	repaths = {}
-	pageops = {}
-	# about PATH_INFO:
-	# wsgiref and mod_wsgi set it to be the part after the path to this app
-	for isre, func, regex, p, kw, ops in findpages(req.apppath()):
-		if not isre:
-			page, pargs, kwargs, pageops = func, p, kw, ops
-			break
-		else:
-			repaths[func] = regex, p, kw, ops
-	else:
-		if len(repaths) < 1:
-			pass # None found
-		elif len(repaths) == 1:
-			page, (_, pargs, kwargs, pageops) = repaths.items()[0]
-		else:
-			logging.getLogger(__name__+'.callpage')\
-				.warning("Multiple possible pages: %r", [page.__name__ for page in repaths])
-			cursize = 0
-			for func, (r, p, kw, ops) in repaths.iteritems():
-				m = r.search(req.apppath())
-				if m.span(0) > cursize:
-					cursize = m.span(0)
-					page, pargs, kwargs, pageops = func, p, kw, ops
-				elif m.span(0) == cursize:
-					logging.getLogger(__name__+'.callpage')\
-						.warning("Unselected possible page: %r", func.__name__)
-
+	page, pageops, pargs, kwargs = findpage(req.apppath())
+	logging.getLogger(__name__+'.callpage').info("%r -> %r", req.apppath(), page)
 	
 	if page is None:
 		rv = template(req, 'error-404')
