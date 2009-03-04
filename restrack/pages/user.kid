@@ -41,7 +41,8 @@ request.header('Content-Type', 'text/html')
 		</div>
 		
 		<div py:if="request.isclub() and user.semail">
-			<a href="/club/${request.user}/adduser?user=${user.email}">Add %{user.name} to yourself.</a>
+			<a py:if="request.user not in [c.cemail for c in clubs]" href="/user/${request.user}/adduser?user=${user.email}">Add ${user.name} to yourself</a>
+			<span py:if="request.user in [c.cemail for c in clubs]">${user.name} is already a member of you</span>
 		</div>
 	</body>
 </html>

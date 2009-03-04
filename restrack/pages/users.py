@@ -52,8 +52,8 @@ WHERE email = %(email)s;
 	
 	clubs = None
 	if data.semail:
-		cur = req.execute("""SELECT * FROM memberof NATURAL JOIN club, users 
-	WHERE cemail=email AND semail=%(u)s""",
+		cur = req.execute("""SELECT * FROM memberof NATURAL JOIN clubusers 
+	WHERE semail=%(u)s""",
 			u=userid)
 		clubs = list(result2obj(cur, User))
 	
@@ -77,6 +77,14 @@ WHERE email = %(email)s;
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	post = req.post()
+	
+	clubs = None
+	if userdata.semail:
+		curs = req.execute("""SELECT * FROM memberof NATURAL JOIN clubusers 
+	WHERE semail=%(u)s""",
+			u=user)
+		clubs = list(result2obj(cur, User))
+	
 	if post is not None:
 		# Save
 		cur.execute("BEGIN");
@@ -175,7 +183,7 @@ WHERE email = %(email)s;
 """, {'email': user})
 	userdata = first(result2obj(cur, User))
 	
-	return template(req, 'user-edit', user=userdata)
+	return template(req, 'user-edit', user=userdata, clubs=clubs)
 
 @page('/user/edit', mustauth=True)
 def editme(req):
@@ -184,7 +192,7 @@ def editme(req):
 	"""
 	return user_edit(req, req.user)
 
-@page('/user/(.+)/edit', mustauth=True, methods=['GET','POST'])
+@page('/user/([^/]+)/edit', mustauth=True, methods=['GET','POST'])
 def editthem(req, user):
 	"""
 	Edit another user.
@@ -198,6 +206,8 @@ def create(req):
 	post = req.post()
 	if post is not None:
 		email = post['email']
+		if '/' in email:
+			return template(req, 'user-create', msg='Invalid character: emails cannot contain "/"')
 		name = post['name'] or None
 		if post['password1'] != post['password2']:
 			return template(req, 'user-create', msg='Mismatched passwords')
