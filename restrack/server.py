@@ -221,9 +221,17 @@ class Request(object):
 		Returns the path component of the URL, sans application base.
 		"""
 		if 'lighttpd' in self.environ['SERVER_SOFTWARE']:
-			return self.getpath()
+			# lighttpd does things differently
+			rv = self.getpath()
 		else:
-			return self.environ.get('PATH_INFO','')
+			# For most servers, this works
+			rv = self.environ.get('PATH_INFO','')
+		
+		# Remove trailing slash, if it exists
+		if rv[-1] == '/' and rv != '/':
+			rv = rv[:-1]
+		
+		return rv
 	
 	def returnurl(self):
 		"""req.returnurl() -> string
