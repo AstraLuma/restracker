@@ -22,16 +22,19 @@ student
 #	studentsevents = [r[0] for r in itercursor(cur)]
 	studentsevents = result2obj(studentcur,struct)
 
-	majorcur=req.execute("""SELECT major, count1+count2 AS count
-        FROM 
-                (SELECT count(*) AS count1, major1 AS major
-                FROM reservation NATURAL JOIN student GROUP BY major1) AS
-someone             
-        NATURAL JOIN
-                (SELECT count(*) AS count2, major2 AS major
-                FROM reservation NATURAL JOIN student GROUP BY major2) AS
-something           
-ORDER BY count DESC LIMIT 10;""")
+	majorcur=req.execute("""
+SELECT major, count(rid) AS count
+	FROM 
+		(
+			(SELECT rid, major1 AS major FROM reservation NATURAL JOIN student 
+				WHERE major1 IS NOT NULL)
+		UNION
+			(SELECT rid, major2 AS major FROM reservation NATURAL JOIN student 
+				WHERE major2 IS NOT NULL)
+		) AS counts
+	GROUP BY major
+	ORDER BY count DESC 
+	LIMIT 10;""")
 #	majorevents = [r[0] for r in itercursor(cur)]
 	majorevents = result2obj(majorcur,struct)
 
