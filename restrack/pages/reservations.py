@@ -29,19 +29,41 @@ class Reservation(struct):
 			rv += '%s %s' % (self.building, self.roomnum)
 		return rv
 
-@page('/event/(.+)/reservation/(.+)')
+@page(r'/event/(\d+)/reservation')
+def index(req, eid):
+	try:
+		eid = int(eid)
+	except:
+		raise HTTPError(404)
+	raise NotImplementedError
+
+@page(r'/event/(\d+)/reservation/(\d+)')
 def details(req, eid, rid):
+	try:
+		eid = int(eid)
+		rid = int(rid)
+	except:
+		raise HTTPError(404)
 	raise NotImplementedError
 
-@page('/event/(.+)/reservation/(.+)/edit', mustauth=True, methods=['GET','POST'])
+@page(r'/event/(\d+)/reservation/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
 	raise NotImplementedError
 
-@page('/event/(.+)/reservation/(.+)/approve', mustauth=True, methods=['GET','POST'])
+@page(r'/event/(\d+)/reservation/(\d+)/approve', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
+	try:
+		eid = int(eid)
+		rid = int(rid)
+	except:
+		raise HTTPError(404)
 	raise NotImplementedError
 
-@page('/event/(.+)/reservation/create', mustauth=True, methods=['GET','POST'])
-def create(req):
+@page(r'/event/(\d+)/reservation/create', mustauth=True, methods=['GET','POST'])
+def create(req, eid):
+	try:
+		eid = int(eid)
+	except:
+		raise HTTPError(404)
 	raise NotImplementedError
 
