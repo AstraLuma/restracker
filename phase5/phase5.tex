@@ -161,18 +161,25 @@ to help gain familiarity with the language.
 PostgresSQL is being used for the database because it is free, like MySQL, but has many advanced features, like ORACLE,
 including foreign key checking.
 
-The basic interface opens with a list of upcoming events. From there users can log in and once they have done so they are presented
-with links to pages that allow them to query and update the database as is appropriate to their user type. Items related to them,
-such as events they are running or need to approve, are also presented on log in.
+The basic interface leads presents the user with various ways to browse or update the database, as well as a log in feature.
+Database elements found while browsing are themselves links to their contained information.
+For example clicking \event will lead you to a list of events, clicking on one of them will lead you to a page containing
+an event description, expected size, comments, equipment, and links to the running club and necessary reservations,
+which themselves are pages with appropriate information displayed.
 
+This user interface is very minimalist and could be expanded in the future. That being said it should sufficiently display
+all information a user needs to access in a way that is easy to find.
 
-\section{Advanced Features}
-There are a few advanced features that if implemented would be a boon to the system. The use or triggers to detect
-when a new reservation conflicts with a previous one and mark them would allow users to tell immediately when there
-might be a scheduling problem. It is possible the system may even want to index reservations that conflict with others
-as these will be looked at frequently, at least as long as they exist, so that the conflict may be analyzed and resolved.
-Triggers could also be used to check database consistency when information is added or removed.
+\section{Additional Exploration}
+This system makes use of temporary tables to manage searching for rooms based any number of equipment elements. This is
+useful because there can be an arbitrary amount of equipment present in a search and making tables of the appropriate size
+allows us to easily manage this.
 
+\section{README}
+The project system is web-based and can be found at http://jebliss.res.wpi.net:88/.
+It is navigated by clicking the appropriate links for various queries, logging in, etc.
+The current version of the GUI is very simple, but it's use should still be apparent to even the inexperienced user.
+% Instructions for starting your own server?
 
 \section{Division of Labor}
 The project team met several times for this project phase. The devision of work on is as follows:

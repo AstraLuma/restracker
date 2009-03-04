@@ -64,17 +64,19 @@ endTime) AND roomNum='1946' AND building='CC'
 6:00:00', TIMESTAMP '2009-04-07 24:00:00')
 			OVERLAPS (r.startTime, r.endTime)); 
 
+
 BEGIN;
 CREATE TEMPORARY TABLE "search" (equipname VARCHAR(32)) ON COMMIT DROP;
 	INSERT INTO "search" VALUES ('chairs');
 	SELECT * 
 	FROM room 
-	WHERE NOT EXIST 
+	WHERE NOT EXISTS 
 		((SELECT * FROM search) EXCEPT 
 			(SELECT equipname 
 			FROM isIN 
 			WHERE roomNum='1946' and building='CC'));
 COMMIT;
+
 
 	SELECT room.* 
 	FROM room 

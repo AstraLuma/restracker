@@ -93,22 +93,23 @@ Random statistics:
 Most used rooms:
 	SELECT count(*),building,roomNum 
 	FROM room NATURAL JOIN reservation 
-	GROUP BY building,roomNum;
+	GROUP BY building,roomNum ORDER BY count(*) DESC LIMIT 10;
 
 Students who run most events:
 	SELECT count(*),sEmail FROM reservation NATURAL JOIN student 
-	GROUP BY sEmail;
+	GROUP BY sEmail ORDER BY count(*) DESC LIMIT 10;
 
 Majors which runs most events:
-	SELECT count1+count2 AS count 
+	SELECT major, count1+count2 AS count 
 	FROM 
 		(SELECT count(*) AS count1, major1 AS major 
 		FROM reservation NATURAL JOIN students GROUP BY major1) AS
 someone
-	NATURAL JOIN
+	FULL OUTER JOIN
 		(SELECT count(*) AS count2, major2 AS major 
 		FROM reservation NATURAL JOIN students GROUP BY major2) AS
-something;
+something
+ORDER BY count DESC LIMIT 10;
 
 
 All equipment currently used:
