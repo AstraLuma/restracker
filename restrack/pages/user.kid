@@ -35,6 +35,13 @@ request.header('Content-Type', 'text/html')
 			<div class="infobit" py:if="user.description"><span>Description:</span> ${user.description}</div>
 			<div class="infobit" py:if="user.class_"><span>SGA Class:</span> ${user.class_}</div>
 		</fieldset>
+		<fieldset py:if="user.cemail">
+			<legend>Events Ran</legend>
+			<ul>
+				<li py:for="event in events"><a href="/event/${event.eid}">${event.name}: ${event.description}</a>
+				</li>
+			</ul>
+		</fieldset>
 		
 		<div py:if="request.user == user.email or request.issuper()">
 			<a href="/user/${user.email}/edit">Edit</a>

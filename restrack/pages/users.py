@@ -56,8 +56,12 @@ WHERE email = %(email)s;
 	WHERE semail=%(u)s""",
 			u=userid)
 		clubs = list(result2obj(cur, User))
+	events=None
+	if data.cemail:
+		eventscur = req.execute("""SELECT * FROM event NATURAL JOIN runBy WHERE cEmail=%(user)s;""",user=userid)
+		events = result2obj(eventscur,struct)
 	
-	return template(req, 'user', user=data, clubs=clubs) # user is a variable that the template references
+	return template(req, 'user', user=data, clubs=clubs,events=events) # user is a variable that the template references
 
 def user_edit(req, user):
 	cur = req.db.cursor()
