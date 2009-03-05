@@ -13,7 +13,7 @@ from itertools import groupby
 		<h1>Unapproved Reservations</h1>
 			<table>
 				<tr py:for="reservation in reservations">
-					<td> <a href="/event/${reservation.eid}/reservation/${reservation.rid}">${reservation.eid}</a></td>
+					<td> <a href="/event/${reservation.eid}/reservation/${reservation.rid}">${reservation.name}</a></td>
 					<td> ${reservation.building} ${reservation.roomnum} </td>
 					<td> ${reservation.starttime} </td>
 					<td> ${reservation.endtime} </td>

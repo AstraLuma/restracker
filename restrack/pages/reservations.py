@@ -193,7 +193,7 @@ def create(req, eid):
 
 @page(r'/reservations')
 def index(req):
-	cur = req.execute("""SELECT reservation.* FROM reservation NATURAL JOIN
+	cur = req.execute("""SELECT reservation.*, event.name FROM reservation NATURAL JOIN
 event WHERE aEmail IS NULL AND startTime >
                 now() ORDER BY startTime;""")
 	reservations = list(result2obj(cur, Reservation))
