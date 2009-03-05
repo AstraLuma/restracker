@@ -5,6 +5,7 @@ Stuff dealing with rooms.
 """
 from restrack.web import page, template, HTTPError
 from restrack.utils import struct, result2obj, first
+from events import Event
 
 class Reservation(struct):
 	__fields__ = ('rid', 'timebooked', 'starttime', 'endtime', 'roomnum', 
@@ -35,7 +36,19 @@ def index(req, eid):
 		eid = int(eid)
 	except:
 		raise HTTPError(404)
-	raise NotImplementedError
+	
+	cur = req.execute("""
+SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
+		SELECT COUNT(against) AS conflicts, rid
+			FROM resconflicts NATURAL JOIN reservation 
+			WHERE EID=%(event)i 
+			GROUP BY rid
+		) AS conflicting NATURAL LEFT OUTER JOIN room
+	WHERE reservation.eid = %(event)i
+	ORDER BY starttime""", event=eid)
+	reservations = list(result2obj(cur, Reservation))
+	
+	return template(req, 'reservation-list', reservations=reservations)
 
 @page(r'/event/(\d+)/reservation/(\d+)')
 def details(req, eid, rid):
@@ -57,7 +70,27 @@ def edit(req, eid, rid):
 		rid = int(rid)
 	except:
 		raise HTTPError(404)
-	raise NotImplementedError
+	
+	if not req.isadmin():
+		raise ActionNotAllowed
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	event = first(result2obj(cur, Event))
+	
+	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	resv = first(result2obj(cur, Reservation))
+	
+	cur = req.execute(
+		"SELECT * FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room WHERE against=%(r)i",
+		r=rid)
+	confs = list(result2obj(cur, Reservation))
+	
+	post = req.post()
+	if post and not resv.aemail:
+		pass
+	
+	return template(req, 'reservation-approve', event=event, reservation=resv, 
+		conflicts=confs)
 
 @page(r'/event/(\d+)/reservation/create', mustauth=True, methods=['GET','POST'])
 def create(req, eid):
