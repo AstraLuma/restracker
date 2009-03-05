@@ -17,6 +17,7 @@ class Comment(struct):
 
 @page('/event')
 def index(req):
+	"""Creates a link to all events, ordered by name."""
 	cur = req.db.cursor()
 	cur.execute("SELECT * FROM event ORDER BY name;")
 	data = list(result2obj(cur, Event))
@@ -25,22 +26,22 @@ def index(req):
 
 @page(r'/event/(\d+)')
 def details(req, eid):
+	"""Populates all the detail pages for specific events."""
 	from reservations import Reservation
 	try:
 		eid = int(eid)
 	except:
 		raise HTTPError(404)
-	
 	cur = req.execute("SELECT * FROM event WHERE eid=%(id)i", id=eid)
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	event = first(result2obj(cur, Event))
-	
+	#who runs
 	cur = req.execute(
 		"SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=%(id)i ORDER BY name", 
 		id=eid)
 	clubs = list(result2obj(cur, User))
-	
+	#find reservations, mark conflicts
 	cur = req.execute("""
 SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 		SELECT COUNT(against) AS conflicts, rid
@@ -51,12 +52,12 @@ SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 	WHERE reservation.eid = %(event)i
 	ORDER BY starttime""", event=eid)
 	reservations = list(result2obj(cur, Reservation))
-	
+	#comments ordered by time made
 	cur = req.execute(
 		"SELECT * FROM comments NATURAL JOIN users WHERE EID=%(id)i ORDER BY madeat", 
 		id=eid)
 	comments = list(result2obj(cur, Comment))
-	
+	#equipment present ordered by name
 	cur = req.execute(
 		"SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname", 
 		id=eid)
@@ -68,6 +69,7 @@ SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 
 @page(r'/event/(\d+)/comment', mustauth=True, methods=['GET','POST'])
 def comment(req, eid):
+	"""Handle comment functionality such as displaying what comments reply to each other correctly."""
 	try:
 		eid = int(eid)
 	except:
@@ -80,7 +82,7 @@ def comment(req, eid):
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	event = first(result2obj(cur, Event))
-	
+	#manage how comments link to each other
 	if post:
 		replyto=None
 		if 'replyto' in post:
@@ -121,6 +123,7 @@ INSERT INTO comments (eid, madeat, email, txt, parent)
 
 @page(r'/event/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid):
+	"""Change information on the event."""
 	try:
 		eid = int(eid)
 	except:
@@ -188,6 +191,7 @@ SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=%(email)s ORDER BY na
 
 @page('/event/create', mustauth=True, methods=['GET','POST'])
 def create(req):
+	"""Handles the form for creating a new event and adding it to the database."""
 	if not (req.isstudent() or req.isclub() or req.issuper()):
 		raise ActionNotAllowed
 	
