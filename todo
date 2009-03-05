@@ -8,6 +8,7 @@ code:
 -room create
 -event search (on substring)
 -what events a club runs
+-logging to comments when changes are made
 
 write up:
 -queries list
