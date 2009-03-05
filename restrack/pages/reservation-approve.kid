@@ -29,7 +29,7 @@ request.header('Content-Type', 'text/html')
 			</ul>
 		</div>
 		<div py:if="not reservation.aemail and canapprove">
-			<div>Are you sure you want to approve this event?</div>
+			<div>Are you sure you want to approve this reservation?</div>
 			<form action="/event/${event.eid}/reservation/${reservation.rid}/approve" method="POST">
 				<div>
 					<input type="submit" name="yes" value="Yes" />

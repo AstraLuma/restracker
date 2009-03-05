@@ -71,10 +71,18 @@ def details(req, eid, rid):
 		rid = int(rid)
 	except:
 		raise HTTPError(404)
+	
 	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
 	resv = first(result2obj(cur, Reservation))
 	
+	if resv.eid != eid:
+		raise HTTPError(404)
+	
 	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
 	event = first(result2obj(cur, Event))
 	
 	cur = req.execute("""SELECT * 
@@ -87,10 +95,36 @@ def details(req, eid, rid):
 
 @page(r'/event/(\d+)/reservation/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
-	raise NotImplementedError
+	try:
+		eid = int(eid)
+		rid = int(rid)
+	except:
+		raise HTTPError(404)
+	
+	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	resv = first(result2obj(cur, Reservation))
+	
+	if resv.eid != eid:
+		raise HTTPError(404)
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
+	
+	if not (req.user == resv.semail or req.issuper()):
+		raise ActionNotAllowed
+	
+	post = req.post()
+	if post:
+		raise NotImplementedError
+	
+	return template(req, 'reservation-edit', event=event, reservation=resv)
 
 @page(r'/event/(\d+)/reservation/(\d+)/approve', mustauth=True, methods=['GET','POST'])
-def edit(req, eid, rid):
+def approve(req, eid, rid):
 	try:
 		eid = int(eid)
 		rid = int(rid)
@@ -100,11 +134,18 @@ def edit(req, eid, rid):
 	if not req.isadmin():
 		raise ActionNotAllowed
 	
-	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
-	event = first(result2obj(cur, Event))
-	
 	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
 	resv = first(result2obj(cur, Reservation))
+	
+	if resv.eid != eid:
+		raise HTTPError(404)
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
 	
 	cur = req.execute("""SELECT * 
 	FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room 
@@ -123,8 +164,8 @@ def edit(req, eid, rid):
 		
 		if 'yes' in post and canapprove:
 			cur = req.execute(
-				"UPDATE reservation SET aemail=%(a)s WHERE eid=%(e)i AND rid=%(r)i",
-				a=req.user, e=eid, r=rid)
+				"UPDATE reservation SET aemail=%(a)s WHERE rid=%(r)i",
+				a=req.user, r=rid)
 			assert cur.rowcount
 			
 		req.status(303)
@@ -133,6 +174,54 @@ def edit(req, eid, rid):
 	
 	return template(req, 'reservation-approve', event=event, reservation=resv, 
 		conflicts=confs)
+
+@page(r'/event/(\d+)/reservation/(\d+)/delete', mustauth=True, methods=['GET','POST'])
+def delete(req, eid, rid):
+	try:
+		eid = int(eid)
+		rid = int(rid)
+	except:
+		raise HTTPError(404)
+	
+	if not req.isadmin():
+		raise ActionNotAllowed
+	
+	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	resv = first(result2obj(cur, Reservation))
+	
+	if resv.eid != eid:
+		raise HTTPError(404)
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
+	
+	cur = req.execute(
+		"SELECT COUNT(*) FROM runby WHERE eid=%(e)i AND cemail=%(c)s", 
+		e=eid, c=req.user)
+	isclub = first(itercursor(cur))[0]
+	
+	# running groups, booking user, admin
+	if not (isclub or req.user == resv.semail or req.isadmin()):
+		raise ActionNotAllowed
+	
+	post = req.post()
+	if post:
+		if 'yes' in post:
+			cur = req.execute(
+				"DELETE reservation WHERE rid=%(r)i", r=rid)
+			assert cur.rowcount
+			req.status(303)
+			req.header('Location', req.fullurl('/event/%i'%eid))
+		else:
+			req.status(303)
+			req.header('Location', req.fullurl('/event/%i/reservation/%i'%(eid,rid)))
+		return
+		
+	return template(req, 'reservation-delete', event=event, reservation=resv)
 
 @page(r'/event/(\d+)/reservation/create', mustauth=True, methods=['GET','POST'])
 def create(req, eid):
@@ -190,13 +279,4 @@ def create(req, eid):
 	
 	return template(req, 'reservation-create', event=event, 
 		building=building, roomnum=roomnum, starttime=st, endtime=et)
-
-@page(r'/reservations')
-def index(req):
-	cur = req.execute("""SELECT reservation.*, event.name FROM reservation NATURAL JOIN
-event WHERE aEmail IS NULL AND startTime >
-                now() ORDER BY startTime;""")
-	reservations = list(result2obj(cur, Reservation))
-	
-	return template(req, 'unapproved-reservations', reservations=reservations)
 
