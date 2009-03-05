@@ -11,6 +11,14 @@ class Reservation(struct):
 	__fields__ = ('rid', 'timebooked', 'starttime', 'endtime', 'roomnum', 
 		'building', 'semail', 'aemail', 'eid')
 	
+	def start(self):
+		FMT = "%m-%d-%Y %I:%M%p"
+		return self.starttime.strftime(FMT)
+	
+	def end(self):
+		FMT = "%m-%d-%Y %I:%M%p"
+		return self.endtime.strftime(FMT)
+	
 	def format(self):
 		DFMT = "%m-%d-%Y "
 		TFMT = "%I:%M%p"
@@ -57,7 +65,20 @@ def details(req, eid, rid):
 		rid = int(rid)
 	except:
 		raise HTTPError(404)
-	raise NotImplementedError
+	
+	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	resv = first(result2obj(cur, Reservation))
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	event = first(result2obj(cur, Event))
+	
+	cur = req.execute("""SELECT * 
+	FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room 
+	WHERE against=%(r)i
+	ORDER BY starttime""", r=rid)
+	confs = list(result2obj(cur, Reservation))
+	
+	return template(req, 'reservation', reservation=resv, event=event, conflicts=confs)
 
 @page(r'/event/(\d+)/reservation/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
@@ -80,9 +101,10 @@ def edit(req, eid, rid):
 	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
 	resv = first(result2obj(cur, Reservation))
 	
-	cur = req.execute(
-		"SELECT * FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room WHERE against=%(r)i",
-		r=rid)
+	cur = req.execute("""SELECT * 
+	FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room 
+	WHERE against=%(r)i
+	ORDER BY starttime""", r=rid)
 	confs = list(result2obj(cur, Reservation))
 	
 	post = req.post()
