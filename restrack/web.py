@@ -78,7 +78,8 @@ def findpage(path):
 	
 	log.warning("Multiple possible pages for %r: %r", path, [page.__name__ for page in repaths])
 	
-	# 2. Find the regex that matches the longest portion.
+	# 2. Find the regex that matches the longest portion. 
+	#    (I think this doesn't matter in match mode.)
 	cursize = 0
 	curfunc = None
 	for func, (r, m, ops) in repaths.items():

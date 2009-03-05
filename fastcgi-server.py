@@ -19,7 +19,10 @@ f.close()
 
 try:
 	ws = WSGIServer(restrack.server.restracker_app, bindAddress='/tmp/restracker.sock')
-	if ws.run():
-		os.execv(__file__, sys.argv)
+	rerun = ws.run()
 finally:
 	os.unlink('/tmp/restracker.pid')
+
+if rerun:
+	os.spawnv(__file__, sys.argv)
+

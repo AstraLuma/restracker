@@ -84,6 +84,25 @@ request.header('Content-Type', 'text/html')
 				<input py:if="not user.aemail and not user.semail and request.issuper()" type="submit" name="mkclub" value="Make Club" />
 			</div>
 		</form>
+		<fieldset py:if="user.semail">
+			<legend>Membership Management</legend>
+			<ul>
+				<li py:for="club in clubs">
+					<a href="/user/${club.email}">${club.name}</a>
+					<form action="/user/${user.email}/edit" method="POST">
+						<input type="hidden" name="cemail" value="${club.email}" />
+						<input type="submit" name="club-remove" value="Remove" />
+					</form>
+				</li>
+				<li py:if="request.issuper()">
+					<form action="/user/${user.email}/edit" method="POST">
+						<label for="cemail">Club Email:</label>
+						<input type="text" name="cemail" />
+						<input type="submit" name="club-add" value="Add" />
+					</form>
+				</li>
+			</ul>
+		</fieldset>
 	</body>
 </html>
 

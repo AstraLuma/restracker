@@ -44,4 +44,21 @@ SELECT major, COUNT(rid) AS count
 		usedrooms=usedrooms, studentsevents=studentsevents, 
 		majorevents=majorevents)
 
-
+@page('/queries')
+def querylist(req):
+	import os, re
+	req.header('Content-Type', 'text/plain')
+	def tryeval(expr):
+		try:
+			return eval(expr)
+		except:
+			return expr
+	try:
+		f = open(os.path.join(os.path.dirname(__file__), '..', '..', 'queries.log'), 'rU')
+	except (IOError, OSError):
+		yield "No queries are available at this time."
+	else:
+		query = re.compile(r"sql\..+?: (.+)\n?$")
+		queries = set(query.match(l).group(1) for l in f if query.match(l))
+		for q in map(tryeval, sorted(queries)):
+			yield q+'\n'

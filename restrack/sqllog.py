@@ -30,6 +30,12 @@ class CurWrapper(object):
 	def __getattr__(self, name):
 		return getattr(self.__obj, name)
 	
+	def _reduce(self, sql):
+		#TODO: reduce whitespace to single space
+		import re
+		sql = re.sub("[ \t\r\n]+", ' ', sql)
+		return sql.strip()
+	
 	def callproc(self, procname, *pargs, **kwargs):
 		if operation not in self.__proc:
 			logging.getLogger('sql.callproc').info("%s", procname)
@@ -38,25 +44,26 @@ class CurWrapper(object):
 	
 	def execute(self, operation, *pargs, **kwargs):
 		if operation not in self.__exec:
-			logging.getLogger('sql.execute').info("%s", operation)
+			logging.getLogger('sql.execute').info("%s", self._reduce(operation))
 			self.__exec.add(operation)
 		return self.__obj.execute(operation, *pargs, **kwargs)
 	
 	def executemany(self, operation, *pargs, **kwargs):
 		if operation not in self.__many:
-			logging.getLogger('sql.executemany').info("%s", operation)
+			logging.getLogger('sql.executemany').info("%s", self._reduce(operation))
 			self.__many.add(operation)
 		return self.__obj.executemany(operation, *pargs, **kwargs)
 
 setup = False
 def setuplog():
+	import os
 	global setup
 	if setup: return
 	l = logging.getLogger('sql')
 	l.propogate = False
 	l.setLevel(logging.INFO)
-	lh = logging.FileHandler('queries.log')
-	lh.setFormatter(logging.Formatter("%(name)s: %(message)s"))
+	lh = logging.FileHandler(os.path.join(os.path.dirname(__file__), '..', 'queries.log'))
+	lh.setFormatter(logging.Formatter("%(name)s: %(message)r"))
 	l.addHandler(lh)
 	setup = True
 
