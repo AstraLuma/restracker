@@ -4,6 +4,7 @@
 """
 Stuff dealing with rooms.
 """
+import sys
 from restrack.web import page, template, HTTPError, ActionNotAllowed
 from restrack.utils import struct, result2obj, first, itercursor
 from users import User
@@ -191,7 +192,65 @@ def search(req):
 
 @page('/event/create', mustauth=True, methods=['GET','POST'])
 def create(req):
-	if not (req.isstudent() or req.issuper()):
+	if not (req.isstudent() or req.isclub() or req.issuper()):
 		raise ActionNotAllowed
-	raise NotImplementedError
+	
+	clubs = None
+	if req.isstudent():
+		cur = req.execute(
+			"SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=%(u)s",
+			u=req.user)
+		clubs = list(result2obj(cur, User))
+	elif req.issuper():
+		cur = req.execute("SELECT * FROM clubusers")
+		clubs = list(result2obj(cur, User))
+	
+	post = req.post()
+	if post:
+		name = post['name']
+		desc = post['description']
+		size = None
+		if post['expectedsize']:
+			size = int(post['expectedsize'])
+		
+		if req.isclub():
+			clubs = [req.user]
+		else:
+			clubs = [v for n,v in req.postall() if n == 'cemail']
+		
+		equipment = post['equipment'].split()
+		
+		if len(clubs) and name and desc:
+			cur = req.db.cursor();
+			cur.execute("BEGIN")
+			try:
+				cur.execute("""INSERT INTO event (name, description, expectedsize)
+					VALUES (%(name)s, %(desc)s, %(size)s)
+					RETURNING eid""",
+					{'name': name, 'desc': desc, 'size': size})
+				assert cur.rowcount
+				eid = first(itercursor(cur))[0]
+				
+				for c in clubs:
+					cur.execute(
+						"INSERT INTO runby (eid, cemail) VALUES (%(e)i, %(c)s)",
+						{'e': eid, 'c': c})
+					assert cur.rowcount
+				
+				for e in equipment:
+					cur.execute(
+						"INSERT INTO uses (eid, equipname) VALUES (%(e)i, %(q)s)",
+						{'e': eid, 'q': e})
+					assert cur.rowcount
+			finally:
+				if sys.exc_info()[0] is None:
+					cur.execute("COMMIT")
+				else:
+					cur.execute("ROLLBACK")
+			
+			req.status(303)
+			req.header("Location", req.fullurl("/event/%i" % eid))
+			return
+	
+	return template(req, 'event-create', clubs=clubs)
 
