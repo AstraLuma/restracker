@@ -233,6 +233,10 @@ def create(req):
 		# No POST
 		return template(req, 'user-create')
 
+@page('/user/([^/]+)/adduser')
+def adduser(req, userid):
+	raise NotImplementedError
+
 @page('/login', methods=['GET', 'POST'])
 def login(req):
 	error = None
