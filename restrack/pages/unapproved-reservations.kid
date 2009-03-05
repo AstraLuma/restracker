@@ -10,7 +10,7 @@ from itertools import groupby
 	</head>
 	<body>
 		<div py:replace="up()" />
-		<h1>Reservations</h1>
+		<h1>Unapproved Reservations</h1>
 			<table>
 				<tr py:for="reservation in reservations">
 					<td> <a href="/event/${reservation.eid}/reservation/${reservation.rid}">${reservation.eid}</a></td>
