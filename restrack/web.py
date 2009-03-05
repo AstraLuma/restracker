@@ -115,7 +115,7 @@ def callpage(req):
 		if meth == 'HEAD': meth = 'GET' # HEAD is GET, but don't send the body
 		if meth not in pageops['methods']:
 			req.status(405)
-			rv = template('error-405')
+			rv = template(req, 'error-405')
 		elif pageops['mustauth'] and req.user is None:
 			rv = template(req, 'error-login', func=page, title="Must Log In", msg="You must be logged in to use this page")
 		else:
