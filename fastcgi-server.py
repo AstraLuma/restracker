@@ -20,6 +20,12 @@ f.close()
 try:
 	ws = WSGIServer(restrack.server.restracker_app, bindAddress='/tmp/restracker.sock')
 	if ws.run():
+		# Close fd's
+		for fd in xrange(3, 1024):
+			try:
+				os.close(fd)
+			except OSError:
+				pass
 		os.execv(__file__, sys.argv)
 finally:
 	os.unlink('/tmp/restracker.pid')
