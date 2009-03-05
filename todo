@@ -4,8 +4,10 @@ code:
 -reservation edit
 -reservation create
 -room edit
--room search
+-room search (on equipment, on times)
 -room create
+-event search (on substring)
+-what events a club runs
 
 write up:
 -queries list
