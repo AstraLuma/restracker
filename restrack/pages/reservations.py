@@ -58,6 +58,10 @@ def details(req, eid, rid):
 	except:
 		raise HTTPError(404)
 	raise NotImplementedError
+	reservationcur= req.execute(""" """)
+	reservations = result2obj(reservationcur,Reservation))
+
+	return template(req, 'reservation', reservations=reservations)
 
 @page(r'/event/(\d+)/reservation/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):

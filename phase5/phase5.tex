@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{graphicx,verbatim}
+\usepackage{graphicx,verbatim,url}
 
 \title{ResTracker}
 \author{Team 16\\Stephanie Fuller (sfuller@wpi.edu)\\Jamie Bliss (jebliss@wpi.edu)\\Sam
@@ -148,29 +148,39 @@ The following operations are supported:
 
 \section{SQL queries}
 \begin{itemize}
-\item INSERT INTO sessions (id, expires) VALUES (%(id)s, %(exp)s)
-\item SELECT * FROM comments NATURAL JOIN users WHERE EID=%(id)i ORDER BY madeat
+\item INSERT INTO sessions (id, expires) VALUES (\%(id)s, \%(exp)s)
+\item SELECT * FROM comments NATURAL JOIN users WHERE EID=\%(id)i ORDER BY madeat
 \item SELECT * FROM event ORDER BY name
-\item SELECT * FROM event WHERE eid=%(id)i
-\item SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=%(u)s
-\item SELECT * FROM reservation NATURAL LEFT OUTER JOIN ( SELECT COUNT(against) AS conflicts, rid FROM resconflicts NATURAL JOIN reservation WHERE EID=%(event)i GROUP BY rid ) AS conflicting NATURAL LEFT OUTER JOIN room WHERE reservation.eid = %(event)i ORDER BY starttime
-\item SELECT * FROM reservation NATURAL LEFT OUTER JOIN ( SELECT count(r2.RID) AS conflicts, r1.RID FROM reservation AS r1, reservation AS r2 WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) AND r1.EID=%(event)i AND r2.EID!=%(event)i AND r1.roomNum=r2.roomNum AND r1.building=r2.building GROUP BY r1.RID ) AS conflicting NATURAL LEFT OUTER JOIN room WHERE reservation.eid = %(event)i ORDER BY starttime
+\item SELECT * FROM event WHERE eid=\%(id)i
+\item SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=\%(u)s
+\item SELECT * FROM reservation NATURAL LEFT OUTER JOIN ( SELECT COUNT(against)
+AS conflicts, rid FROM resconflicts NATURAL JOIN reservation WHERE EID=\%(event)i GROUP BY rid ) AS conflicting NATURAL LEFT OUTER JOIN room WHERE reservation.eid= \%(event)i ORDER BY starttime
+\item SELECT * FROM reservation NATURAL LEFT OUTER JOIN ( SELECT count(r2.RID)
+AS conflicts, r1.RID FROM reservation AS r1, reservation AS r2 WHERE
+(r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) AND
+r1.EID=\%(event)i AND r2.EID!=\%(event)i AND r1.roomNum=r2.roomNum AND
+r1.building=r2.building GROUP BY r1.RID ) AS conflicting NATURAL LEFT OUTER JOIN
+room WHERE reservation.eid = \%(event)i ORDER BY starttime
 \item SELECT * FROM room ORDER BY building, roomnum
-\item SELECT * FROM room WHERE building=%(building)s ORDER BY roomnum
-\item SELECT * FROM room WHERE roomnum=%(room)s AND building=%(building)s
-\item SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=%(id)i ORDER BY name
-\item SELECT * FROM users LEFT OUTER JOIN admin ON email = aEmail LEFT OUTER JOIN student ON email = sEmail LEFT OUTER JOIN club ON email = cEmail WHERE email = %(email)s
+\item SELECT * FROM room WHERE building=\%(building)s ORDER BY roomnum
+\item SELECT * FROM room WHERE roomnum=\%(room)s AND building=\%(building)s
+\item SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=\%(id)i ORDER BY name
+\item SELECT * FROM users LEFT OUTER JOIN admin ON email = aEmail LEFT OUTER
+JOIN student ON email = sEmail LEFT OUTER JOIN club ON email = cEmail WHERE
+email = \%(email)s
 \item SELECT * FROM users ORDER BY name
-\item SELECT * FROM users WHERE email=%(user)s AND password=%(hash)s
+\item SELECT * FROM users WHERE email=\%(user)s AND password=\%(hash)s
 \item SELECT COUNT(*) AS c, building, roomnum FROM room NATURAL JOIN reservation GROUP BY building, roomnum ORDER BY COUNT(*) DESC LIMIT 10
 \item SELECT COUNT(*) AS c, semail FROM reservation NATURAL JOIN student GROUP BY semail ORDER BY COUNT(*) DESC LIMIT 10
-\item SELECT cemail FROM memberof WHERE semail=%(email)s
-\item SELECT data FROM sessions WHERE id=%(id)s
-\item SELECT email, aemail, super, semail, cemail FROM users LEFT OUTER JOIN admin ON email = aEmail LEFT OUTER JOIN student ON email = sEmail LEFT OUTER JOIN club ON email = cEmail WHERE email = %(email)s
-\item SELECT equipname FROM isIn WHERE roomnum=%(room)s AND building=%(building)s ORDER BY equipname
-\item SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname
+\item SELECT cemail FROM memberof WHERE semail=\%(email)s
+\item SELECT data FROM sessions WHERE id=\%(id)s
+\item SELECT email, aemail, super, semail, cemail FROM users LEFT OUTER JOIN
+admin ON email = aEmail LEFT OUTER JOIN student ON email = sEmail LEFT OUTER
+JOIN club ON email = cEmail WHERE email = \%(email)s
+\item SELECT equipname FROM isIn WHERE roomnum=\%(room)s AND building=\%(building)s ORDER BY equipname
+\item SELECT equipname FROM uses WHERE EID=\%(id)i ORDER BY equipname
 \item SELECT major, COUNT(rid) AS count FROM ( (SELECT rid, major1 AS major FROM reservation NATURAL JOIN student) UNION (SELECT rid, major2 AS major FROM reservation NATURAL JOIN student WHERE major2 IS NOT NULL) ) AS counts GROUP BY major ORDER BY count DESC LIMIT 10
-\item UPDATE sessions SET data=%(data)s WHERE id=%(id)s
+\item UPDATE sessions SET data=\%(data)s WHERE id=\%(id)s
 \end{itemize}
 
 \section{Application Layer Decisions}
@@ -183,7 +193,7 @@ including foreign key checking.
 
 The basic interface leads presents the user with various ways to browse or update the database, as well as a log in feature.
 Database elements found while browsing are themselves links to their contained information.
-For example clicking \event will lead you to a list of events, clicking on one of them will lead you to a page containing
+For example clicking $\backslash$event will lead you to a list of events, clicking on one of them will lead you to a page containing
 an event description, expected size, comments, equipment, and links to the running club and necessary reservations,
 which themselves are pages with appropriate information displayed.
 
@@ -196,7 +206,7 @@ useful because there can be an arbitrary amount of equipment present in a search
 allows us to easily manage this.
 
 \section{README}
-The project system is web-based and can be found at http://jebliss.res.wpi.net:88/.
+The project system is web-based and can be found at \url{http://jebliss.res.wpi.net:88/}
 It is navigated by clicking the appropriate links for various queries, logging in, etc.
 The current version of the GUI is very simple, but it's use should still be apparent to even the inexperienced user.
 % Instructions for starting your own server?
@@ -206,17 +216,17 @@ The project team met several times for this project phase. The devision of work 
 
 Sam:
 \begin{itemize}
-
+\item
 \end{itemize}
 
 Stephanie:
 \begin{itemize}
-
+\item
 \end{itemize}
 
 Jamie:
 \begin{itemize}
-
+\item
 \end{itemize}
 
 
