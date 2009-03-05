@@ -1,0 +1,49 @@
+PREREQUISITES
+=============
+* Python 2.4
+* PostgreSQL 8.3
+* kid templating engine <http://pypi.python.org/pypi/kid/0.9.6>
+* PyGreSQL PostgreSQL-Python connector 
+  <http://pypi.python.org/pypi/PyGreSQL/3.8.1>
+* A method to host WSGI applications
+
+INSTALLATION
+============
+This is a rough outline of what would be needed to set up a full-blown server 
+and application instance.
+
+A. Database
+-----------
+1. Create a new database. Make sure that the (eventual) server user can access 
+   it.
+2. Load currentddl.sql into the database.
+3. Edit restrack/site-config.py with the database name.
+
+B. Server
+---------
+This part varies the most. Basically, you need a way to host a WSGI application 
+and serve it to the web.
+
+The simplest way is to use Python 2.5 and run test-server.py. This should only 
+be used for testing and application development
+
+The simplest way that's recomended for a production environment is to install 
+lighttpd and flup and use the included config (lighttpd-fcgi.conf) and 
+application server (fastcgi-server.py). Run the application server as the user 
+that can access the database and run lighttpd as root.
+
+During development, we tried mod_wsgi. It seems to work alright, but reloading 
+is really weird. The application file we used is modwsgi.wsgi.
+
+At this point, the application should run, despite not being very useful.
+
+C. Final Configuration
+----------------------
+1. Go to the create user page (/user/create) and create the admin user.
+2. Run the following query:
+	=> INSERT INTO admin (aemail, super) VALUES ('youremail@sample.com', TRUE);
+   This will make you into a SuperAdmin, giving you permissions to everything 
+   else and the ability to bootstrap all the other data needed.
+3. Start adding data. Things like rooms, clubs, and admins probably need 
+   populating.
+
