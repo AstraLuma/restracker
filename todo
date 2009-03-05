@@ -1,6 +1,5 @@
 code:
 -reservation edit
--reservation create
 -room edit
 -room search (on equipment, on times)
 -room create
