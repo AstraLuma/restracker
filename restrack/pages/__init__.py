@@ -10,6 +10,7 @@ import users, events, reservations, rooms, statistics
 @page('/')
 @page('/index.html')
 def index(req):
+	"""Generates the front page."""
 	req.header('Content-Type', 'text/html')
 	import restrack.web as web
 	yield '<ul>'
@@ -22,6 +23,7 @@ def index(req):
 
 #@page('/test')
 def test(req): # req == Request
+	"""Generates a test page for debugging purposes. Not part of final design."""
 	req.header('Content-Type', 'text/plain')
 	
 	# Possibly sent in chunks
@@ -30,6 +32,7 @@ def test(req): # req == Request
 
 @page('/info', methods=['GET', 'POST'])
 def info(req):
+	"""Displays debugging info from the server."""
 	req.header('Content-Type', 'text/plain')
 	
 	for attr in [a for a in dir(req) if a[0] != '_']:
@@ -60,16 +63,19 @@ def info(req):
 
 #@page('/spam')
 def spam(req):
+	"""Testing stuff."""
 	raise HTTPError(404) # For responses other than 200
 
 #@page('/eggs')
 def eggs(req):
+	"""More testing information."""
 	req.status(302) # Alternative method for setting the response status code
 	req.header('Location', req.fullurl('/test'))
 	# No content, don't have to return anything
 
 #@page('/teapot')
 def eggs(req):
+	"""More testing information."""
 	req.status(418)
 	req.header('Content-Type', 'text/plain')
 	yield """
@@ -80,6 +86,7 @@ Tip me over and pour me out."""
 
 #@page('/error')
 def mkerror(req):
+	"""More testing information."""
 	raise Exception, "A random exception"
 
 
