@@ -36,3 +36,5 @@ EMAIL_FROM = 'restracker@astro73.com'
 SMTP_SERVER = 'smtp.wpi.edu'
 SMTP_USER = None
 SMTP_PASSWORD = None
+
+SQL_LOGQUERIES = True
