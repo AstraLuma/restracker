@@ -1,5 +1,4 @@
 code:
--reservation display
 -reservation edit
 -reservation create
 -room edit
