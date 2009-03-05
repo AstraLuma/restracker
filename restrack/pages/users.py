@@ -80,100 +80,102 @@ WHERE email = %(email)s;
 	
 	clubs = None
 	if userdata.semail:
-		curs = req.execute("""SELECT * FROM memberof NATURAL JOIN clubusers 
+		cur = req.execute("""SELECT * FROM memberof NATURAL JOIN clubusers 
 	WHERE semail=%(u)s""",
 			u=user)
 		clubs = list(result2obj(cur, User))
 	
 	if post is not None:
 		# Save
-		cur.execute("BEGIN");
-		try:
-			password = None
-			print repr(post)
-			if post['oldpassword'] or (req.issuper() and post['password1']):
-				if post['password1'] != post['password2']:
-					return template(req, 'user-edit', user=userdata, msg='Mismatched passwords')
+		if 'club-remove' in post and userdata.semail: #TODO: Add permissions checking
+			raise NotImplemented
+		elif 'mkadmin' in post and req.issuper() and not userdata.aemail and not userdata.cemail:
+			cur = req.execute("INSERT INTO admin (aemail) VALUES (%(email)s)", email=user)
+			assert cur.rowcount
+		elif 'mkstudent' in post and not userdata.semail and not userdata.cemail:
+			cur = req.execute("INSERT INTO student (semail) VALUES (%(email)s)", email=user)
+			assert cur.rowcount
+		elif 'mkclub' in post and req.issuper() and not userdata.semail and not userdata.aemail and not userdata.cemail:
+			cur = req.execute("INSERT INTO club (cemail) VALUES (%(email)s)", email=user)
+			assert cur.rowcount
+		else:
+			cur.execute("BEGIN");
+			try:
+				password = None
+				print repr(post)
+				if post['oldpassword'] or (req.issuper() and post['password1']):
+					if post['password1'] != post['password2']:
+						return template(req, 'user-edit', user=userdata, msg='Mismatched passwords')
+					cur.execute("""
+						UPDATE users 
+						SET password=md5(%(password)s)
+						WHERE email=%(email)s AND password=md5(%(old)s);
+						""", 
+						{'email': user, 'old': post['oldpassword'], 'password': post['password1']}
+						)
+					assert cur.rowcount
+			
 				cur.execute("""
 					UPDATE users 
-					SET password=md5(%(password)s)
-					WHERE email=%(email)s AND password=md5(%(old)s);
+					SET name=%(name)s
+					WHERE email=%(email)s;
 					""", 
-					{'email': user, 'old': post['oldpassword'], 'password': post['password1']}
+					{'name': post['name'], 'email': user}
 					)
 				assert cur.rowcount
-			
-			cur.execute("""
-				UPDATE users 
-				SET name=%(name)s
-				WHERE email=%(email)s;
-				""", 
-				{'name': post['name'], 'email': user}
-				)
-			assert cur.rowcount
-			if userdata.aemail and 'aemail' in post:
-				title = None
-				if post['title']:
-					title = post['title']
-				if request.issuper():
+				if userdata.aemail and 'aemail' in post:
+					title = None
+					if post['title']:
+						title = post['title']
+					if request.issuper():
+						cur.execute("""
+							UPDATE admin 
+							SET title=%(title)s, super=%(super)s
+							WHERE aemail=%(email)s;
+							""", 
+							{'title': title, 'super': 'super' in post, 'email': user}
+							)
+					else:
+						cur.execute("""
+							UPDATE admin 
+							SET title=%(title)s
+							WHERE aemail=%(email)s;
+							""", 
+							{'title': title, 'email': user}
+							)
+					assert cur.rowcount
+				if userdata.semail and 'semail' in post:
+					year = major1 = major2 = None
+					if post['year']: year = int(post['year'])
+					if post['major1']: major1 = post['major1']
+					if post['major2']: major2 = post['major2']
+					if major2 and not major1:
+						major1, major2 = major2, None
 					cur.execute("""
-						UPDATE admin 
-						SET title=%(title)s, super=%(super)s
-						WHERE aemail=%(email)s;
+						UPDATE student 
+						SET year=%(year)i, major1=%(major1)s, major2=%(major2)s
+						WHERE semail=%(email)s;
 						""", 
-						{'title': title, 'super': 'super' in post, 'email': user}
+						{'year': year, 'major1': major1, 'major2': major2, 'email': user}
 						)
+					assert cur.rowcount
+				if userdata.cemail and 'cemail' in post:
+					cls = desc = None
+					if post['class']: cls = int(post['class'])
+					if post['description']: desc = post['description']
+					cur.execute("""
+						UPDATE club 
+						SET class=%(cls)i, description=%(desc)s 
+						WHERE cemail=%(email)s;
+						""", 
+						{'cls': cls, 'desc': desc, 'email': user}
+						)
+					assert cur.rowcount
+			finally:
+				if sys.exc_info()[0] is None:
+					cur.execute("COMMIT")
 				else:
-					cur.execute("""
-						UPDATE admin 
-						SET title=%(title)s
-						WHERE aemail=%(email)s;
-						""", 
-						{'title': title, 'email': user}
-						)
-				assert cur.rowcount
-			if userdata.semail and 'semail' in post:
-				year = major1 = major2 = None
-				if post['year']: year = int(post['year'])
-				if post['major1']: major1 = post['major1']
-				if post['major2']: major2 = post['major2']
-				if major2 and not major1:
-					major1, major2 = major2, None
-				cur.execute("""
-					UPDATE student 
-					SET year=%(year)i, major1=%(major1)s, major2=%(major2)s
-					WHERE semail=%(email)s;
-					""", 
-					{'year': year, 'major1': major1, 'major2': major2, 'email': user}
-					)
-				assert cur.rowcount
-			if userdata.cemail and 'cemail' in post:
-				cls = desc = None
-				if post['class']: cls = int(post['class'])
-				if post['description']: desc = post['description']
-				cur.execute("""
-					UPDATE club 
-					SET class=%(cls)i, description=%(desc)s 
-					WHERE cemail=%(email)s;
-					""", 
-					{'cls': cls, 'desc': desc, 'email': user}
-					)
-				assert cur.rowcount
-			
-			if 'mkadmin' in post and req.issuper() and not userdata.aemail and not userdata.cemail:
-				cur.execute("INSERT INTO admin (aemail) VALUES (%(email)s)", {'email': user})
-				assert cur.rowcount
-			elif 'mkstudent' in post and not userdata.semail and not userdata.cemail:
-				cur.execute("INSERT INTO student (semail) VALUES (%(email)s)", {'email': user})
-				assert cur.rowcount
-			elif 'mkclub' in post and req.issuper() and not userdata.semail and not userdata.aemail and not userdata.cemail:
-				cur.execute("INSERT INTO club (cemail) VALUES (%(email)s)", {'email': user})
-				assert cur.rowcount
-		finally:
-			if sys.exc_info()[0] is None:
-				cur.execute("COMMIT")
-			else:
-				cur.execute("ROLLBACK")
+					cur.execute("ROLLBACK")
 	cur.execute("""
 SELECT * FROM users 
 	LEFT OUTER JOIN admin ON email = aEmail 
