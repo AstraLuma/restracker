@@ -4,8 +4,11 @@ code:
 -reservation edit
 -reservation create
 -room edit
--room search
+-room search (on equipment, on times)
 -room create
+-event search (on substring)
+-what events a club runs
+-logging to comments when changes are made
 
 write up:
 -queries list
@@ -19,3 +22,4 @@ other:
 -document code
 -testing- output from logs
 -make sure everyone is comfortable talking about everything
+-put together scripts for loading data and such
