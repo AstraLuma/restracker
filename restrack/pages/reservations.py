@@ -45,6 +45,11 @@ def index(req, eid):
 	except:
 		raise HTTPError(404)
 	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(id)i", id=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
+	
 	cur = req.execute("""
 SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 		SELECT COUNT(against) AS conflicts, rid
@@ -56,7 +61,7 @@ SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 	ORDER BY starttime""", event=eid)
 	reservations = list(result2obj(cur, Reservation))
 	
-	return template(req, 'reservation-list', reservations=reservations)
+	return template(req, 'reservation-list', event=event, reservations=reservations)
 
 @page(r'/event/(\d+)/reservation/(\d+)')
 def details(req, eid, rid):
