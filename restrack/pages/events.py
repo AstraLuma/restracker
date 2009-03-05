@@ -42,12 +42,10 @@ def details(req, eid):
 	
 	cur = req.execute("""
 SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
-		SELECT count(r2.RID) AS conflicts, r1.RID
-			FROM reservation AS r1, reservation AS r2
-			WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) 
-				AND r1.EID=%(event)i AND r2.EID!=%(event)i
-				AND r1.roomNum=r2.roomNum AND r1.building=r2.building 
-			GROUP BY r1.RID
+		SELECT COUNT(against) AS conflicts, rid
+			FROM resconflicts NATURAL JOIN reservation 
+			WHERE EID=%(event)i 
+			GROUP BY rid
 		) AS conflicting NATURAL LEFT OUTER JOIN room
 	WHERE reservation.eid = %(event)i
 	ORDER BY starttime""", event=eid)
