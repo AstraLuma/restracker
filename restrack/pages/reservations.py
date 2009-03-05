@@ -87,7 +87,22 @@ def edit(req, eid, rid):
 	
 	post = req.post()
 	if post and not resv.aemail:
-		pass
+		# in 2.5, we could just use any()/all()
+		canapprove = True
+		for c in confs:
+			if c.aemail:
+				canapprove = False
+				break
+		
+		if 'yes' in post and canapprove:
+			cur = req.execute(
+				"UPDATE reservation SET aemail=%(a)s WHERE eid=%(e)i AND rid=%(r)i",
+				a=req.user, e=eid, r=rid)
+			assert cur.rowcount
+			
+		req.status(303)
+		req.header('Location', req.fullurl('/event/%i/reservation/%i'%(eid,rid)))
+		return
 	
 	return template(req, 'reservation-approve', event=event, reservation=resv, 
 		conflicts=confs)
