@@ -280,3 +280,10 @@ def create(req, eid):
 	return template(req, 'reservation-create', event=event, 
 		building=building, roomnum=roomnum, starttime=st, endtime=et)
 
+@page(r'/reservations')
+def index(req):
+	cur = req.execute("""SELECT reservation.*, event.name FROM reservation NATURAL JOIN event WHERE aEmail IS NULL AND startTime > now() ORDER BY startTime;""")
+	reservations = list(result2obj(cur, Reservation))
+
+	return template(req, 'unapproved-reservations', reservations=reservations)
+

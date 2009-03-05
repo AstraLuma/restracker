@@ -10,7 +10,6 @@ request.header('Content-Type', 'text/html')
 	<body>
 		<div py:replace="up()" />
 		<h1>Events</h1>
-		<a href="/event/search">Search</a>
 		<ul>
 			<li py:for="event in events"><a href="/event/${event.eid}">${event.name}</a></li>
 		</ul>
