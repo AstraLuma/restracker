@@ -233,6 +233,17 @@ def create(req):
 		# No POST
 		return template(req, 'user-create')
 
+@page('/user/([^/]+)/adduser')
+def adduser(req, userid):
+	cur = req.execute("SELECT * FROM clubusers WHERE email = %(email)s", email=userid)
+	user = first(result2obj(cur, User))
+	if not user.cemail:
+		raise HTTPError(404)
+	if not (req.user == userid or req.issuper()):
+		raise ActionNotAllowed
+	
+	raise NotImplementedError
+
 @page('/login', methods=['GET', 'POST'])
 def login(req):
 	error = None

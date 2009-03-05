@@ -3,7 +3,7 @@
 """
 Stuff dealing with rooms.
 """
-from restrack.web import page, template, HTTPError
+from restrack.web import page, template, HTTPError, ActionNotAllowed
 from restrack.utils import struct, result2obj, first, itercursor
 
 class Room(struct):
@@ -64,5 +64,23 @@ def search(req):
 
 @page('/room/create', mustauth=True, methods=['GET','POST'])
 def create(req):
-	raise NotImplementedError
+	if not req.isadmin():
+		raise ActionNotAllowed
+	
+	post = req.post()
+	if post:
+		building = post['building']
+		roomnum = int(post['roomnum'])
+		dn = post['display']
+		occ = None
+		if post['occupancy']:
+			occ = int(post['occupancy'])
+		cur = req.execute("""INSERT INTO room (building, roomnum, displayname, occupancy)
+			VALUES (%(b)s, %(rn)s, %(dn)s, %(o)s)""",
+			b=building, rn=roomnum, dn=dn, o=occ)
+		assert cur.rowcount
+		req.status(303)
+		req.header('Location', req.fullurl('/room/%s/%s' % (building, roomnum)))
+	
+	return template(req, 'room-create')
 

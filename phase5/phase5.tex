@@ -91,6 +91,7 @@ it is a newly created club or members have not yet joined for the year.
 reserved and when they are reserved for.
 \item Administrators shall be able to view recent changes to the database.
 \item An administrator must approve a reservation before it is official.
+\item Users shall only be able to see actions they can perform.
 \end{itemize}
 
 \section{Queries}
@@ -193,6 +194,7 @@ including foreign key checking.
 
 The basic interface leads presents the user with various ways to browse or update the database, as well as a log in feature.
 Database elements found while browsing are themselves links to their contained information.
+Links are only shown to actions or pages a user has access privileges to.
 For example clicking $\backslash$event will lead you to a list of events, clicking on one of them will lead you to a page containing
 an event description, expected size, comments, equipment, and links to the running club and necessary reservations,
 which themselves are pages with appropriate information displayed.
@@ -211,22 +213,47 @@ It is navigated by clicking the appropriate links for various queries, logging i
 The current version of the GUI is very simple, but it's use should still be apparent to even the inexperienced user.
 % Instructions for starting your own server?
 
+\section{Walkthrough}
+The following shows a typical use case for the system.
+A normal user logs in, creates an event and a reservation for it, then logs out.
+Then an admin logs in and approves the reservation.
+\includegraphics{\walkthrough\1.jpg}
+\includegraphics{\walkthrough\2.jpg}
+\includegraphics{\walkthrough\3.jpg}
+\includegraphics{\walkthrough\4.jpg}
+\includegraphics{\walkthrough\5.jpg}
+\includegraphics{\walkthrough\6.jpg}
+\includegraphics{\walkthrough\7.jpg}
+\includegraphics{\walkthrough\8.jpg}
+\includegraphics{\walkthrough\9.jpg}
+\includegraphics{\walkthrough\10.jpg}
+\includegraphics{\walkthrough\11.jpg}
+\includegraphics{\walkthrough\12.jpg}
+\includegraphics{\walkthrough\13.jpg}
+\includegraphics{\walkthrough\14.jpg}
+\includegraphics{\walkthrough\15.jpg}
+\includegraphics{\walkthrough\16.jpg}
+\includegraphics{\walkthrough\17.jpg}
+\includegraphics{\walkthrough\18.jpg}
+% someone check this formating
+
 \section{Division of Labor}
 The project team met several times for this project phase. The devision of work on is as follows:
 
 Sam:
 \begin{itemize}
-\item
+\item wrote documentation
 \end{itemize}
 
 Stephanie:
 \begin{itemize}
-\item
+\item wrote the system that deals with rooms
+\item wrote the statistics page
 \end{itemize}
 
 Jamie:
 \begin{itemize}
-\item
+\item Spearheaded system implementation. Has been working on it since phase 1.
 \end{itemize}
 
 

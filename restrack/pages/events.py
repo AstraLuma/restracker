@@ -186,10 +186,6 @@ SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=%(email)s ORDER BY na
 		return template(req, 'event-edit', 
 			event=event, clubs=clubs, equipment=equipment, userclubs=userclubs)
 
-@page('/event/search', methods=['GET','POST'])
-def search(req):
-	raise NotImplementedError
-
 @page('/event/create', mustauth=True, methods=['GET','POST'])
 def create(req):
 	if not (req.isstudent() or req.isclub() or req.issuper()):

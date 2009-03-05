@@ -1,15 +1,24 @@
 # -*- tab-width: 4; use-tabs: 1; coding: utf-8 -*-
 # vim:tabstop=4:noexpandtab:
 """
-Stuff dealing with rooms.
+Stuff dealing with reservations.
 """
-from restrack.web import page, template, HTTPError
-from restrack.utils import struct, result2obj, first
+from restrack.web import page, template, HTTPError, ActionNotAllowed
+from restrack.utils import struct, result2obj, first, itercursor
 from events import Event
+from users import User
 
 class Reservation(struct):
 	__fields__ = ('rid', 'timebooked', 'starttime', 'endtime', 'roomnum', 
 		'building', 'semail', 'aemail', 'eid')
+	
+	def start(self):
+		FMT = "%m-%d-%Y %I:%M%p"
+		return self.starttime.strftime(FMT)
+	
+	def end(self):
+		FMT = "%m-%d-%Y %I:%M%p"
+		return self.endtime.strftime(FMT)
 	
 	def format(self):
 		DFMT = "%m-%d-%Y "
@@ -37,6 +46,11 @@ def index(req, eid):
 	except:
 		raise HTTPError(404)
 	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(id)i", id=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
+	
 	cur = req.execute("""
 SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 		SELECT COUNT(against) AS conflicts, rid
@@ -48,7 +62,7 @@ SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 	ORDER BY starttime""", event=eid)
 	reservations = list(result2obj(cur, Reservation))
 	
-	return template(req, 'reservation-list', reservations=reservations)
+	return template(req, 'reservation-list', event=event, reservations=reservations)
 
 @page(r'/event/(\d+)/reservation/(\d+)')
 def details(req, eid, rid):
@@ -57,11 +71,19 @@ def details(req, eid, rid):
 		rid = int(rid)
 	except:
 		raise HTTPError(404)
-	raise NotImplementedError
-	reservationcur= req.execute(""" """)
-	reservations = result2obj(reservationcur,Reservation))
-
-	return template(req, 'reservation', reservations=reservations)
+	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
+	resv = first(result2obj(cur, Reservation))
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(e)i", e=eid)
+	event = first(result2obj(cur, Event))
+	
+	cur = req.execute("""SELECT * 
+	FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room 
+	WHERE against=%(r)i
+	ORDER BY starttime""", r=rid)
+	confs = list(result2obj(cur, Reservation))
+	
+	return template(req, 'reservation', reservation=resv, event=event, conflicts=confs)
 
 @page(r'/event/(\d+)/reservation/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
@@ -84,9 +106,10 @@ def edit(req, eid, rid):
 	cur = req.execute("SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i", r=rid)
 	resv = first(result2obj(cur, Reservation))
 	
-	cur = req.execute(
-		"SELECT * FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room WHERE against=%(r)i",
-		r=rid)
+	cur = req.execute("""SELECT * 
+	FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room 
+	WHERE against=%(r)i
+	ORDER BY starttime""", r=rid)
 	confs = list(result2obj(cur, Reservation))
 	
 	post = req.post()
@@ -117,5 +140,54 @@ def create(req, eid):
 		eid = int(eid)
 	except:
 		raise HTTPError(404)
-	raise NotImplementedError
+	
+	if not (req.isstudent() or req.issuper()):
+		raise ActionNotAllowed
+	
+	cur = req.execute("SELECT * FROM event WHERE eid=%(id)i", id=eid)
+	if cur.rowcount == 0:
+		raise HTTPError(404)
+	event = first(result2obj(cur, Event))
+	
+	cur = req.execute(
+		"SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=%(id)i ORDER BY name", 
+		id=eid)
+	clubs = list(result2obj(cur, User))
+	
+	if not (req.inclub(c.cemail for c in clubs) or req.issuper()):
+		raise ActionNotAllowed
+	
+	post = req.post()
+	if post:
+		if req.issuper():
+			semail = post['semail']
+		else:
+			semail = req.user
+		
+		building = post['building']
+		roomnum = post['roomnum']
+		#FIXME: Parse datetimes
+		st = post['starttime']
+		et = post['endtime']
+		
+		cur = req.execute("""INSERT INTO reservation 
+			(eid, semail, timebooked, starttime, endtime, roomnum, building)
+			VALUES
+			(%(e)i, %(s)s, NOW(), %(st)s, %(et)s, %(rn)s, %(build)s)
+			RETURNING rid""", e=eid, s=semail, st=st, et=et, rn=roomnum, 
+			build=building)
+		assert cur.rowcount
+		rid = first(itercursor(cur))[0]
+		
+		req.status(303)
+		req.header('Location', req.fullurl('/event/%i/reservation/%i' % (eid, rid)))
+	
+	query = req.query()
+	building = query.get('building', None)
+	roomnum = query.get('roomnum', None)
+	st = query.get('starttime', None)
+	et = query.get('endtime', None)
+	
+	return template(req, 'reservation-create', event=event, 
+		building=building, roomnum=roomnum, starttime=st, endtime=et)
 
