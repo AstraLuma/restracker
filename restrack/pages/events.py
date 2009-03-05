@@ -8,7 +8,6 @@ import sys
 from restrack.web import page, template, HTTPError, ActionNotAllowed
 from restrack.utils import struct, result2obj, first, itercursor
 from users import User
-from reservations import Reservation
 
 class Event(struct):
 	__fields__ = ('eid', 'name', 'description', 'expectedsize')
@@ -26,6 +25,7 @@ def index(req):
 
 @page(r'/event/(\d+)')
 def details(req, eid):
+	from reservations import Reservation
 	try:
 		eid = int(eid)
 	except:
