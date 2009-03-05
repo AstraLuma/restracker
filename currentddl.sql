@@ -24,6 +24,26 @@ CREATE PROCEDURAL LANGUAGE plpgsql;
 
 SET search_path = public, pg_catalog;
 
+--
+-- Name: reserv_overlaps(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION reserv_overlaps() RETURNS trigger
+    AS $$DECLARE
+	confs integer;
+BEGIN
+	IF NEW.aemail IS NULL THEN
+		RETURN NEW;
+	END IF;
+	SELECT COUNT(rid) INTO confs FROM reservation WHERE rid<>NEW.rid AND (NEW.starttime, NEW.endtime) OVERLAPS (starttime, endtime) AND aemail IS NOT NULL;
+	IF confs > 0 THEN
+		RAISE EXCEPTION 'This reservation is approved and conflicts with another approved reservation';
+	END IF;
+	RETURN NEW;
+END;$$
+    LANGUAGE plpgsql;
+
+
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -840,6 +860,16 @@ ALTER TABLE ONLY users
 
 ALTER TABLE ONLY uses
     ADD CONSTRAINT uses_pkey PRIMARY KEY (eid, equipname);
+
+
+--
+-- Name: roverlaps; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER roverlaps
+    AFTER INSERT OR UPDATE ON reservation
+    FOR EACH ROW
+    EXECUTE PROCEDURE reserv_overlaps();
 
 
 --
