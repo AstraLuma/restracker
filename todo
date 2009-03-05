@@ -1,5 +1,4 @@
 code:
--event create
 -reservation display
 -reservation edit
 -reservation create
