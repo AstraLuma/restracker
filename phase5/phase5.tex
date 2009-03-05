@@ -148,6 +148,8 @@ The following operations are supported:
 \end{itemize}
 
 \section{SQL queries}
+
+\begin{comment}
 \begin{itemize}
 \item INSERT INTO sessions (id, expires) VALUES (\%(id)s, \%(exp)s)
 \item SELECT * FROM comments NATURAL JOIN users WHERE EID=\%(id)i ORDER BY madeat
@@ -183,6 +185,8 @@ JOIN club ON email = cEmail WHERE email = \%(email)s
 \item SELECT major, COUNT(rid) AS count FROM ( (SELECT rid, major1 AS major FROM reservation NATURAL JOIN student) UNION (SELECT rid, major2 AS major FROM reservation NATURAL JOIN student WHERE major2 IS NOT NULL) ) AS counts GROUP BY major ORDER BY count DESC LIMIT 10
 \item UPDATE sessions SET data=\%(data)s WHERE id=\%(id)s
 \end{itemize}
+\end{comment}
+\verbatiminput{../currentqueries.txt}
 
 \section{Application Layer Decisions}
 Python is the language being used to implement the front end of the system. Jamie is familiar with this language
@@ -238,95 +242,63 @@ The following shows a typical use case for the system.
 A normal user logs in, creates an event and a reservation for it, then logs out.
 Then an admin logs in and approves the reservation.
 
-\begin{figure}[h]
 \includegraphics{walkthrough/1.eps}
-\caption{Initial access screen.}
-\end{figure}
+{\center Initial access screen.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/2.eps}
-\caption{User logs in using the "login" link.}
-\end{figure}
+{\center User logs in using the "login" link.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/1.eps}
-\caption{Back to the top page, now logged in.}
-\end{figure}
+{\center Back to the top page, now logged in.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/4.eps}}
-\caption{Create an event through the "event/create" link.}
-\end{figure}
+{\center Create an event through the "event/create" link.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/5.eps}}
-\caption{Confirming an event brings you to the event's page.}
-\end{figure}
+{\center Confirming an event brings you to the event's page.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/6.eps}}
-\caption{Create reservation for the event through the "Add New" link.}
-\end{figure}
+{\center Create reservation for the event through the "Add New" link.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/7.eps}}
-\caption{Hitting the "Create" link brings you to the reservation page.}
-\end{figure}
+{\center Hitting the "Create" link brings you to the reservation page.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/8.eps}}
-\caption{Go back up.}
-\end{figure}
+{\center Go back up.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/9.eps}
-\caption{Go back up.}
-\end{figure}
+{\center Go back up.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/10.eps}
-\caption{Go back up.}
-\end{figure}
+{\center Go back up.}
 
-\begin{figure}[h]
-\includegraphics{walkthrough/11.eps}
-\caption{Go back up.}
-\end{figure}
+\includegraphics{walkthrough/1.eps}
+{\center Go back up.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/12.eps}
-\caption{Log out using the "logout" link.}
-\end{figure}
+{\center Log out using the "logout" link.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/13.eps}
-\caption{Now an admin logs in useing the "login" link.}
-\end{figure}
+{\center Now an admin logs in useing the "login" link.}
 
-\begin{figure}[h]
-\includegraphics{walkthrough/14.eps}
-\caption{Back to the top page, now logged in.}
-\end{figure}
+\includegraphics{walkthrough/1.eps}
+{\center Back to the top page, now logged in.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/15.eps}
-\caption{Go into the events listing through the "events" link.}
-\end{figure}
+{\center Go into the events listing through the "events" link.}
 
-\begin{figure}[h]
 \includegraphics{walkthrough/16.eps}
-\caption{Navigated to Example Event page through appropriate link.}
-\end{figure}
+{\center Navigated to Example Event page through appropriate link.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/17.eps}}
-\caption{Approve the event through the "Approve" link.}
-\end{figure}
+{\center Approve the event through the "Approve" link.}
 
-\begin{figure}[h]
 \scalebox{.75}{\includegraphics{walkthrough/18.eps}}
-\caption{Confirm the reservation and you're back to the reservation, now approved.}
-\end{figure}
+{\center Confirm the reservation and you're back to the reservation, now approved.}
+
+\section{Current DDL}
+\verbatiminput{../shortddl.sql}
+
 
 \end{document}
 

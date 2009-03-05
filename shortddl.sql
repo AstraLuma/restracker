@@ -18,9 +18,12 @@ BEGIN
 	IF NEW.aemail IS NULL THEN
 		RETURN NEW;
 	END IF;
-	SELECT COUNT(rid) INTO confs FROM reservation WHERE rid<>NEW.rid AND (NEW.starttime, NEW.endtime) OVERLAPS (starttime, endtime) AND aemail IS NOT NULL;
+	SELECT COUNT(rid) INTO confs FROM reservation 
+	WHERE rid<>NEW.rid AND (NEW.starttime, NEW.endtime) 
+	OVERLAPS (starttime, endtime) AND aemail IS NOT NULL;
 	IF confs > 0 THEN
-		RAISE EXCEPTION 'This reservation is approved and conflicts with another approved reservation';
+		RAISE EXCEPTION 'This reservation is approved and conflicts with 
+		another approved reservation';
 	END IF;
 	RETURN NEW;
 END;$$
@@ -60,7 +63,9 @@ COMMENT ON COLUMN users.password IS 'An MD5 hash of the password.';
 COMMENT ON COLUMN users.name IS 'The display name of the user.';
 
 CREATE VIEW adminusers AS
-    SELECT admin.aemail, admin.title, admin.super, users.email, users.password, users.name FROM (admin JOIN users ON (((admin.aemail)::text = (users.email)::text)));
+    SELECT admin.aemail, admin.title, admin.super, 
+	users.email, users.password, users.name 
+	FROM (admin JOIN users ON (((admin.aemail)::text = (users.email)::text)));
 
 CREATE TABLE club (
     cemail character varying(32) NOT NULL,
@@ -77,7 +82,9 @@ COMMENT ON COLUMN club.description IS 'A short description of the group.';
 COMMENT ON COLUMN club.class IS 'The SGA class (0-6). 0=Not really a group.';
 
 CREATE VIEW clubusers AS
-    SELECT club.cemail, club.description, club.class, users.email, users.password, users.name FROM (club JOIN users ON (((club.cemail)::text = (users.email)::text)));
+    SELECT club.cemail, club.description, club.class, 
+	users.email, users.password, users.name 
+	FROM (club JOIN users ON (((club.cemail)::text = (users.email)::text)));
 
 CREATE TABLE comments (
     cid integer NOT NULL,
@@ -117,13 +124,16 @@ CREATE TABLE event (
     eid integer NOT NULL
 );
 
-COMMENT ON TABLE event IS 'Some event a group is throwing. The date/time it is thrown is dependent on its reservations.';
+COMMENT ON TABLE event IS 'Some event a group is throwing. 
+	The date/time it is thrown is dependent on its reservations.';
 
-COMMENT ON COLUMN event.description IS 'A long textual description of an event. Can be multiple paragraphs, etc.';
+COMMENT ON COLUMN event.description IS 'A long textual description of an event. 
+	Can be multiple paragraphs, etc.';
 
 COMMENT ON COLUMN event.name IS 'The short display name of the event.';
 
-COMMENT ON COLUMN event.expectedsize IS 'About how many people are expected to show for the event.';
+COMMENT ON COLUMN event.expectedsize IS 'About how many people are expected 
+	to show for the event.';
 
 COMMENT ON COLUMN event.eid IS 'An arbitrary numeric identifier.';
 
@@ -140,7 +150,8 @@ CREATE TABLE isin (
     roomnum character varying(5) NOT NULL,
     building character varying(3) NOT NULL,
     quantity integer,
-    CONSTRAINT isin_equipname_check CHECK (("position"((equipname)::text, '/'::text) = 0))
+    CONSTRAINT isin_equipname_check 
+	CHECK (("position"((equipname)::text, '/'::text) = 0))
 );
 
 COMMENT ON TABLE isin IS 'Equipment that a room has intrinsic to it.';
@@ -179,7 +190,8 @@ CREATE TABLE reservation (
 
 COMMENT ON TABLE reservation IS 'A particular room & time for an event.
 
-Note: reservation.student must be a member of one of the reservation.forevent.runby clubs.';
+Note: reservation.student must be a member of one of
+the reservation.forevent.runby clubs.';
 
 COMMENT ON COLUMN reservation.rid IS 'An arbitrary numeric identifier.';
 
@@ -195,12 +207,17 @@ COMMENT ON COLUMN reservation.building IS 'The building the requested room is in
 
 COMMENT ON COLUMN reservation.semail IS 'The user who made the reservation.';
 
-COMMENT ON COLUMN reservation.aemail IS 'The administrator who approved the reservation, making it official. NULL if it is unapproved.';
+COMMENT ON COLUMN reservation.aemail IS 'The administrator who approved the reservation, 
+	making it official. NULL if it is unapproved.';
 
 COMMENT ON COLUMN reservation.eid IS 'The event this reservation is for.';
 
 CREATE VIEW resconflicts AS
-    SELECT r1.rid AS against, r2.rid FROM reservation r1, reservation r2 WHERE ((("overlaps"(r1.starttime, r1.endtime, r2.starttime, r2.endtime) AND (r1.eid <> r2.eid)) AND ((r1.roomnum)::text = (r2.roomnum)::text)) AND ((r1.building)::text = (r2.building)::text));
+    SELECT r1.rid AS against, r2.rid 
+	FROM reservation r1, reservation r2 
+	WHERE ((("overlaps"(r1.starttime, r1.endtime, r2.starttime, r2.endtime) 
+	AND (r1.eid <> r2.eid)) AND ((r1.roomnum)::text = (r2.roomnum)::text)) 
+	AND ((r1.building)::text = (r2.building)::text));
 
 CREATE SEQUENCE reservation_rid_seq
     INCREMENT BY 1
@@ -219,15 +236,18 @@ CREATE TABLE room (
     CONSTRAINT room_roomnum_check CHECK (("position"((roomnum)::text, '/'::text) = 0))
 );
 
-COMMENT ON TABLE room IS 'A place that can be reserved. May have equipment intrinsic to it.';
+COMMENT ON TABLE room IS 'A place that can be reserved. 
+May have equipment intrinsic to it.';
 
 COMMENT ON COLUMN room.occupancy IS 'About how many people the room can hold.';
 
 COMMENT ON COLUMN room.roomnum IS 'The room number.';
 
-COMMENT ON COLUMN room.building IS 'The abbrev. of the building the room is in. (eg, FL, CC, KH)';
+COMMENT ON COLUMN room.building IS 'The abbrev. of the building the room 
+is in. (eg, FL, CC, KH)';
 
-COMMENT ON COLUMN room.displayname IS 'The well-known name of the room. eg The Morgan Room instead of CC 208.';
+COMMENT ON COLUMN room.displayname IS 'The well-known name of the room. 
+eg The Morgan Room instead of CC 208.';
 
 CREATE TABLE runby (
     cemail character varying(32) NOT NULL,
@@ -250,9 +270,11 @@ COMMENT ON TABLE sessions IS 'Handles web sessions.';
 
 COMMENT ON COLUMN sessions.id IS 'The gibberish identifier.';
 
-COMMENT ON COLUMN sessions.data IS 'The Pickle''d python dict of the session.';
+COMMENT ON COLUMN sessions.data IS 'The Pickle''d 
+python dict of the session.';
 
-COMMENT ON COLUMN sessions.expires IS 'When the cookie for the session expires.';
+COMMENT ON COLUMN sessions.expires IS 'When the cookie 
+for the session expires.';
 
 CREATE TABLE student (
     semail character varying(32) NOT NULL,
@@ -272,13 +294,17 @@ COMMENT ON COLUMN student.major1 IS 'One of student''s majors, if they have at l
 COMMENT ON COLUMN student.major2 IS 'The other of the student''s majors, if they have 2.';
 
 CREATE VIEW studentusers AS
-    SELECT student.semail, student.year, student.major1, student.major2, users.email, users.password, users.name FROM (student JOIN users ON (((student.semail)::text = (users.email)::text)));
+    SELECT student.semail, student.year, student.major1, student.major2, 
+	users.email, users.password, users.name 
+	FROM (student JOIN users ON
+ (((student.semail)::text = (users.email)::text)));
 
 CREATE TABLE uses (
     eid integer NOT NULL,
     equipname character varying(32) NOT NULL,
     quantity integer,
-    CONSTRAINT uses_equipname_check CHECK (("position"((equipname)::text, '/'::text) = 0))
+    CONSTRAINT uses_equipname_check 
+CHECK (("position"((equipname)::text, '/'::text) = 0))
 );
 
 COMMENT ON TABLE uses IS 'Equipment used by a particular event.';
@@ -289,11 +315,14 @@ COMMENT ON COLUMN uses.equipname IS 'The equipment being used.';
 
 COMMENT ON COLUMN uses.quantity IS 'How much equipment is being used.';
 
-ALTER TABLE comments ALTER COLUMN cid SET DEFAULT nextval('comments_cid_seq'::regclass);
+ALTER TABLE comments 
+ALTER COLUMN cid SET DEFAULT nextval('comments_cid_seq'::regclass);
 
-ALTER TABLE event ALTER COLUMN eid SET DEFAULT nextval('event_eid_seq'::regclass);
+ALTER TABLE event 
+ALTER COLUMN eid SET DEFAULT nextval('event_eid_seq'::regclass);
 
-ALTER TABLE reservation ALTER COLUMN rid SET DEFAULT nextval('reservation_rid_seq'::regclass);
+ALTER TABLE reservation 
+ALTER COLUMN rid SET DEFAULT nextval('reservation_rid_seq'::regclass);
 
 ALTER TABLE ONLY admin
     ADD CONSTRAINT admin_pkey PRIMARY KEY (aemail);
@@ -308,7 +337,8 @@ ALTER TABLE ONLY event
     ADD CONSTRAINT event_pkey PRIMARY KEY (eid);
 
 ALTER TABLE ONLY isin
-    ADD CONSTRAINT isin_pkey PRIMARY KEY (equipname, roomnum, building);
+    ADD CONSTRAINT isin_pkey 
+PRIMARY KEY (equipname, roomnum, building);
 
 ALTER TABLE ONLY memberof
     ADD CONSTRAINT memberof_pkey PRIMARY KEY (semail, cemail);
@@ -355,7 +385,8 @@ ALTER TABLE ONLY comments
     ADD CONSTRAINT comments_parent_fkey FOREIGN KEY (parent) REFERENCES comments(cid);
 
 ALTER TABLE ONLY isin
-    ADD CONSTRAINT isin_roomnum_fkey FOREIGN KEY (roomnum, building) REFERENCES room(roomnum, building);
+    ADD CONSTRAINT isin_roomnum_fkey 
+	FOREIGN KEY (roomnum, building) REFERENCES room(roomnum, building);
 
 ALTER TABLE ONLY memberof
     ADD CONSTRAINT memberof_cemail_fkey FOREIGN KEY (cemail) REFERENCES club(cemail);
@@ -370,10 +401,12 @@ ALTER TABLE ONLY reservation
     ADD CONSTRAINT reservation_eid_fkey FOREIGN KEY (eid) REFERENCES event(eid);
 
 ALTER TABLE ONLY reservation
-    ADD CONSTRAINT reservation_roomnum_fkey FOREIGN KEY (roomnum, building) REFERENCES room(roomnum, building);
+    ADD CONSTRAINT reservation_roomnum_fkey 
+FOREIGN KEY (roomnum, building) REFERENCES room(roomnum, building);
 
 ALTER TABLE ONLY reservation
-    ADD CONSTRAINT reservation_semail_fkey FOREIGN KEY (semail) REFERENCES student(semail);
+    ADD CONSTRAINT reservation_semail_fkey 
+FOREIGN KEY (semail) REFERENCES student(semail);
 
 ALTER TABLE ONLY runby
     ADD CONSTRAINT runby_cemail_fkey FOREIGN KEY (cemail) REFERENCES club(cemail);
