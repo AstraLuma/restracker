@@ -172,7 +172,6 @@ The following operations are supported:
 \item SELECT major, COUNT(rid) AS count FROM ( (SELECT rid, major1 AS major FROM reservation NATURAL JOIN student) UNION (SELECT rid, major2 AS major FROM reservation NATURAL JOIN student WHERE major2 IS NOT NULL) ) AS counts GROUP BY major ORDER BY count DESC LIMIT 10
 \item UPDATE sessions SET data=%(data)s WHERE id=%(id)s
 \end{itemize}
-\verbatiminput{queries.txt}
 
 \section{Application Layer Decisions}
 Python is the language being used to implement the front end of the system. Jamie is familiar with this language
