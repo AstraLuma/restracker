@@ -56,12 +56,13 @@ class CurWrapper(object):
 
 setup = False
 def setuplog():
+	import os
 	global setup
 	if setup: return
 	l = logging.getLogger('sql')
 	l.propogate = False
 	l.setLevel(logging.INFO)
-	lh = logging.FileHandler('queries.log')
+	lh = logging.FileHandler(os.path.join(os.path.dirname(__file__), '..', 'queries.log'))
 	lh.setFormatter(logging.Formatter("%(name)s: %(message)r"))
 	l.addHandler(lh)
 	setup = True
