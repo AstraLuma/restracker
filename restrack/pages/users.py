@@ -30,6 +30,7 @@ class User(struct):
 
 @page('/user')
 def index(req):
+	"""Create the index page for users."""
 	cur = req.db.cursor()
 	cur.execute("""SELECT * FROM users ORDER BY name;""")
 	data = list(result2obj(cur, User))
@@ -38,6 +39,7 @@ def index(req):
 
 @page('/user/([^/]+)') #regex
 def details(req, userid): # The group from the regex is passed as a positional parameter
+	"""Create the details page for specific users."""
 	cur = req.db.cursor()
 	cur.execute("""
 SELECT * FROM users 
@@ -64,6 +66,7 @@ WHERE email = %(email)s;
 	return template(req, 'user', user=data, clubs=clubs,events=events) # user is a variable that the template references
 
 def user_edit(req, user):
+	"""Edit a user in the database."""
 	cur = req.db.cursor()
 	# Handles:
 	# * user/student/admin/club info
@@ -209,6 +212,7 @@ def editthem(req, user):
 
 @page('/user/create', methods=['GET','POST'])
 def create(req):
+	"""Create a new user in the database."""
 	post = req.post()
 	if post is not None:
 		email = post['email']
@@ -239,6 +243,7 @@ def create(req):
 
 @page('/user/([^/]+)/adduser')
 def adduser(req, userid):
+	"""Add a user to a club."""
 	cur = req.execute("SELECT * FROM clubusers WHERE email = %(email)s", email=userid)
 	user = first(result2obj(cur, User))
 	if not user.cemail:
@@ -250,6 +255,7 @@ def adduser(req, userid):
 
 @page('/login', methods=['GET', 'POST'])
 def login(req):
+	"""Log a user into the system for a session."""
 	error = None
 	url = req.query().get('returnto', None)
 	post = req.post()
@@ -276,6 +282,7 @@ def login(req):
 
 @page('/logout')
 def logout(req):
+	"""Log a user out of the system."""
 	if 'user' in req.session:
 		del req.session['user']
 	url = req.query().get('returnto', None)
