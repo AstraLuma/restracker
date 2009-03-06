@@ -56,7 +56,24 @@ SELECT equipname FROM isIn
 @page('/room/([^/]+)/([^/]+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, building, room):
 	# Handle occupancy, equipment
-	raise NotImplementedError
+	if not req.isadmin():
+		raise ActionNotAllowed
+	
+	cur = req.execute("SELECT * FROM room WHERE building=%(b)s AND roomnum=%(r)s",
+		b=building, r=room)
+	if not cur.rowcount:
+		raise HTTPError(404)
+	rdata = first(result2obj(cur, Room))
+	
+	cur = req.execute("SELECT equipname FROM isin WHERE building=%(b)s AND roomnum=%(r)s",
+		b=building, r=room)
+	equipment = [r[0] for r in itercursor(cur)]
+	
+	post = req.post()
+	if post:
+		raise NotImplementedError
+	
+	return template(req, 'room-edit', room=rdata, equipment=equipment)
 
 @page('/room/search')
 def search(req):
