@@ -1,4 +1,4 @@
 #!/bin/sh
 DUMPOPS="-E utf-8 -F plain -Osx"
-exec pg_dump -f currentddl.sql $DUMPOPS restracker
-#pg_dump $DUMPOPS restracker | grep -v -- -- | uniq
+#exec pg_dump -f currentddl.sql $DUMPOPS restracker
+pg_dump $DUMPOPS restracker | grep -v -- -- | uniq > shortddl.sql
