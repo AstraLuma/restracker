@@ -13,14 +13,17 @@ class Reservation(struct):
 		'building', 'semail', 'aemail', 'eid')
 	
 	def start(self):
+		"""Format and return the start time."""
 		FMT = "%m-%d-%Y %I:%M%p"
 		return self.starttime.strftime(FMT)
 	
 	def end(self):
+		"""Format and return the end time."""
 		FMT = "%m-%d-%Y %I:%M%p"
 		return self.endtime.strftime(FMT)
 	
 	def format(self):
+		"""Format the reservation."""
 		DFMT = "%m-%d-%Y "
 		TFMT = "%I:%M%p"
 		
@@ -41,6 +44,7 @@ class Reservation(struct):
 
 @page(r'/event/(\d+)/reservation')
 def index(req, eid):
+	"""Format the reservation page."""
 	try:
 		eid = int(eid)
 	except:
@@ -50,7 +54,7 @@ def index(req, eid):
 	if cur.rowcount == 0:
 		raise HTTPError(404)
 	event = first(result2obj(cur, Event))
-	
+	#find conflicts
 	cur = req.execute("""
 SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 		SELECT COUNT(against) AS conflicts, rid
@@ -66,6 +70,7 @@ SELECT * FROM reservation NATURAL LEFT OUTER JOIN (
 
 @page(r'/event/(\d+)/reservation/(\d+)')
 def details(req, eid, rid):
+	"""Details page for a specific reservation."""
 	try:
 		eid = int(eid)
 		rid = int(rid)
@@ -95,6 +100,7 @@ def details(req, eid, rid):
 
 @page(r'/event/(\d+)/reservation/(\d+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, eid, rid):
+	"""Edit a specific reservation."""
 	try:
 		eid = int(eid)
 		rid = int(rid)
@@ -125,6 +131,7 @@ def edit(req, eid, rid):
 
 @page(r'/event/(\d+)/reservation/(\d+)/approve', mustauth=True, methods=['GET','POST'])
 def approve(req, eid, rid):
+	"""Approve an event with conflict checking."""
 	try:
 		eid = int(eid)
 		rid = int(rid)
@@ -177,6 +184,7 @@ def approve(req, eid, rid):
 
 @page(r'/event/(\d+)/reservation/(\d+)/delete', mustauth=True, methods=['GET','POST'])
 def delete(req, eid, rid):
+	"""Delete a reservation from the database."""
 	try:
 		eid = int(eid)
 		rid = int(rid)
@@ -225,6 +233,7 @@ def delete(req, eid, rid):
 
 @page(r'/event/(\d+)/reservation/create', mustauth=True, methods=['GET','POST'])
 def create(req, eid):
+	"""Create a new reservation."""
 	try:
 		eid = int(eid)
 	except:
@@ -282,6 +291,7 @@ def create(req, eid):
 
 @page(r'/reservations')
 def index(req):
+	"""Creates an index page for reservations."""
 	cur = req.execute("""SELECT reservation.*, event.name FROM reservation NATURAL JOIN event WHERE aEmail IS NULL AND startTime > now() ORDER BY startTime;""")
 	reservations = list(result2obj(cur, Reservation))
 

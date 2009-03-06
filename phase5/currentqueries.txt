@@ -1,0 +1,47 @@
+DELETE FROM memberOf WHERE semail=%(email)s AND cemail=%(cemail)s
+DELETE FROM runby WHERE eid=%(e)i AND cemail=%(c)s
+DELETE FROM uses WHERE eid=%(e)i AND equipname=%(eq)s
+INSERT INTO admin (aemail) VALUES (%(email)s)
+INSERT INTO comments (eid, madeat, email, txt) VALUES (%(eid)i, NOW(), %(user)s, %(txt)s)
+INSERT INTO event (name, description, expectedsize) VALUES (%(name)s, %(desc)s, %(size)s) RETURNING eid
+INSERT INTO memberOf VALUES (%(semail)s, %(cemail)s)
+INSERT INTO reservation (eid, semail, timebooked, starttime, endtime, roomnum, building) VALUES (%(e)i, %(s)s, NOW(), %(st)s, %(et)s, %(rn)s, %(build)s) RETURNING rid
+INSERT INTO room (building, roomnum, displayname, occupancy) VALUES (%(b)s, %(rn)s, %(dn)s, %(o)s)
+INSERT INTO runby (eid, cemail) VALUES (%(e)i, %(c)s)
+INSERT INTO sessions (id, expires) VALUES (%(id)s, %(exp)s)
+INSERT INTO student (semail) VALUES (%(email)s)
+INSERT INTO users (email, name, password) VALUES (%(email)s, %(name)s, md5(%(password)s))
+INSERT INTO uses (eid, equipname) VALUES (%(e)i, %(eq)s)
+SELECT * FROM clubusers
+SELECT * FROM comments NATURAL JOIN users WHERE EID=%(id)i ORDER BY madeat
+SELECT * FROM event NATURAL JOIN runBy WHERE cEmail=%(user)s;
+SELECT * FROM event ORDER BY name;
+SELECT * FROM event WHERE eid=%(e)i
+SELECT * FROM event WHERE eid=%(id)i
+SELECT * FROM memberof NATURAL JOIN clubusers WHERE semail=%(u)s
+SELECT * FROM resconflicts NATURAL JOIN reservation NATURAL JOIN room WHERE against=%(r)i ORDER BY starttime
+SELECT * FROM reservation NATURAL JOIN room WHERE rid=%(r)i
+SELECT * FROM reservation NATURAL LEFT OUTER JOIN ( SELECT COUNT(against) AS conflicts, rid FROM resconflicts NATURAL JOIN reservation WHERE EID=%(event)i GROUP BY rid ) AS conflicting NATURAL LEFT OUTER JOIN room WHERE reservation.eid = %(event)i ORDER BY starttime
+SELECT * FROM reservation NATURAL LEFT OUTER JOIN ( SELECT count(r2.RID) AS conflicts, r1.RID FROM reservation AS r1, reservation AS r2 WHERE (r1.startTime, r1.endTime) OVERLAPS (r2.startTime, r2.endTime) AND r1.EID=%(event)i AND r2.EID!=%(event)i AND r1.roomNum=r2.roomNum AND r1.building=r2.building GROUP BY r1.RID ) AS conflicting NATURAL LEFT OUTER JOIN room WHERE reservation.eid = %(event)i ORDER BY starttime
+SELECT * FROM room ORDER BY building, roomnum;
+SELECT * FROM room WHERE building=%(building)s ORDER BY roomnum
+SELECT * FROM room WHERE roomnum=%(room)s AND building=%(building)s
+SELECT * FROM runBy NATURAL JOIN clubusers WHERE eid=%(id)i ORDER BY name
+SELECT * FROM users LEFT OUTER JOIN admin ON email = aEmail LEFT OUTER JOIN student ON email = sEmail LEFT OUTER JOIN club ON email = cEmail WHERE email = %(email)s;
+SELECT * FROM users ORDER BY name;
+SELECT * FROM users WHERE email=%(user)s AND password=%(hash)s
+SELECT COUNT(*) AS c, building, roomnum FROM room NATURAL JOIN reservation GROUP BY building, roomnum ORDER BY COUNT(*) DESC LIMIT 10;
+SELECT COUNT(*) AS c, semail FROM reservation NATURAL JOIN student GROUP BY semail ORDER BY COUNT(*) DESC LIMIT 10;
+SELECT cemail FROM memberof WHERE semail=%(email)s
+SELECT data FROM sessions WHERE id=%(id)s
+SELECT email, aemail, super, semail, cemail FROM users LEFT OUTER JOIN admin ON email = aEmail LEFT OUTER JOIN student ON email = sEmail LEFT OUTER JOIN club ON email = cEmail WHERE email = %(email)s;
+SELECT equipname FROM isIn WHERE roomnum=%(room)s AND building=%(building)s ORDER BY equipname
+SELECT equipname FROM uses WHERE EID=%(id)i ORDER BY equipname
+SELECT major, COUNT(rid) AS count FROM ( (SELECT rid, major1 AS major FROM reservation NATURAL JOIN student) UNION (SELECT rid, major2 AS major FROM reservation NATURAL JOIN student WHERE major2 IS NOT NULL) ) AS counts GROUP BY major ORDER BY count DESC LIMIT 10;
+SELECT reservation.*, event.name FROM reservation NATURAL JOIN event WHERE aEmail IS NULL AND startTime > now() ORDER BY startTime;
+UPDATE event SET name=%(name)s, description=%(desc)s, expectedsize=%(size)s WHERE eid=%(eid)i
+UPDATE reservation SET aemail=%(a)s WHERE eid=%(e)i AND rid=%(r)i
+UPDATE reservation SET aemail=%(a)s WHERE rid=%(r)i
+UPDATE sessions SET data=%(data)s WHERE id=%(id)s
+UPDATE student SET year=%(year)i, major1=%(major1)s, major2=%(major2)s WHERE semail=%(email)s;
+UPDATE users SET name=%(name)s WHERE email=%(email)s;

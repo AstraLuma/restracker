@@ -9,7 +9,9 @@ from restrack.utils import struct, result2obj, first, itercursor
 
 @page('/stats')
 def index(req):
+	"""Create the index page for use statistics."""
 	#FIXME: Join against room so we can use Room
+	#most used rooms
 	roomscur = req.execute("""SELECT COUNT(*) AS c, building, roomnum
 	FROM room NATURAL JOIN reservation 
 	GROUP BY building, roomnum 
@@ -19,13 +21,14 @@ def index(req):
 	
 	
 	# FIXME: Join against users so we can use User
+	# students who run events
 	studentcur =req.execute("""SELECT COUNT(*) AS c, semail 
 	FROM reservation NATURAL JOIN student
 	GROUP BY semail 
 	ORDER BY COUNT(*) DESC 
 	LIMIT 10;""")
 	studentsevents = result2obj(studentcur,struct)
-
+	#majors which run events
 	majorcur=req.execute("""
 SELECT major, COUNT(rid) AS count
 	FROM 
@@ -46,6 +49,7 @@ SELECT major, COUNT(rid) AS count
 
 @page('/queries')
 def querylist(req):
+	"""Generates the list of queries run on the database."""
 	import os, re
 	req.header('Content-Type', 'text/plain')
 	def tryeval(expr):
