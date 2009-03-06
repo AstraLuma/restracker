@@ -1,5 +1,3 @@
-BEGIN
-COMMIT
 DELETE FROM memberOf WHERE semail=%(email)s AND cemail=%(cemail)s
 DELETE FROM runby WHERE eid=%(e)i AND cemail=%(c)s
 DELETE FROM uses WHERE eid=%(e)i AND equipname=%(eq)s
