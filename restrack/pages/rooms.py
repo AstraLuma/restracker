@@ -18,6 +18,7 @@ class Room(struct):
 
 @page('/room')
 def index(req):
+	"""Create the front page for room browsing."""
 	cur = req.db.cursor()
 	cur.execute("""SELECT * FROM room ORDER BY building, roomnum;""")
 	data = result2obj(cur, Room)
@@ -26,6 +27,7 @@ def index(req):
 
 @page('/room/([^/]+)')
 def building_index(req, building):
+	"""Create the index page of for buildings."""
 	cur = req.db.cursor()
 	cur.execute("""
 SELECT * FROM room 
@@ -38,6 +40,7 @@ SELECT * FROM room
 
 @page('/room/([^/]+)/([^/]+)')
 def details(req, building, room):
+	"""Create the page for a specific room."""
 	cur = req.db.cursor()
 	cur.execute("""
 SELECT * FROM room 
@@ -55,15 +58,18 @@ SELECT equipname FROM isIn
 
 @page('/room/([^/]+)/([^/]+)/edit', mustauth=True, methods=['GET','POST'])
 def edit(req, building, room):
+	"""Edit a room page."""
 	# Handle occupancy, equipment
 	raise NotImplementedError
 
 @page('/room/search')
 def search(req):
+	"""Search for a room based on criteria."""
 	raise NotImplementedError
 
 @page('/room/create', mustauth=True, methods=['GET','POST'])
 def create(req):
+	"""Page for creating a new room and adding it to the database."""
 	if not req.isadmin():
 		raise ActionNotAllowed
 	
