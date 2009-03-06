@@ -92,7 +92,7 @@ WHERE email = %(email)s;
 	if post is not None:
 		# Save
 		if 'club-remove' in post and userdata.semail: #TODO: Add permissions checking
-			raise NotImplemented
+			cur = req.execute("DELETE FROM memberOf WHERE semail=%(email)s AND cemail=%(cemail)s",email=user,cemail=post['cemail'])
 		elif 'mkadmin' in post and req.issuper() and not userdata.aemail and not userdata.cemail:
 			cur = req.execute("INSERT INTO admin (aemail) VALUES (%(email)s)", email=user)
 			assert cur.rowcount

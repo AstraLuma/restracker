@@ -1,9 +1,9 @@
 code:
 -reservation edit
--room edit
+	-room edit
 -room search (on equipment, on times)
 -add user to club
--club remove part of user edit
+-make user student,admin,club
 -logging to comments when changes are made
 
 write up:
