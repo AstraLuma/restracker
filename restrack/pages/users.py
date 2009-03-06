@@ -185,6 +185,10 @@ WHERE email = %(email)s;
 					cur.execute("COMMIT")
 				else:
 					cur.execute("ROLLBACK")
+		req.status(303)
+		req.header('Location', req.fullurl('/user/%s/edit' % user))
+		return
+
 	cur.execute("""
 SELECT * FROM users 
 	LEFT OUTER JOIN admin ON email = aEmail 
